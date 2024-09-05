@@ -20,7 +20,7 @@ protected:
 
 public:
 	virtual void Initialize();
-	virtual void Update() = 0;
+	virtual void Update(char keys[], char preKeys[]) = 0;
 	virtual void Draw();
 
 	Vector2 GetPosition() { return obj_.position; }

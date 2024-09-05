@@ -12,11 +12,26 @@ private:
 	float width_;
 	//弾の高さ
 	float height_;
+
+	Vector2 leftTop;
+	Vector2 rightTop;
+	Vector2 leftBottom;
+	Vector2 rightBottom;
+
+
+	Vector2 leftTop_Screen;
+	Vector2 rightTop_Screen;
+	Vector2 leftBottom_Screen;
+	Vector2 rightBottom_Screen;
+
+	float rotate = 0.0f;
+
 	//フラグ
 	bool isShot_;
 	//画像
 	int textureBullet_;
 
+	Vector2 targetPos_;
 
 	MathFunc* math_ = nullptr;
 
@@ -47,6 +62,9 @@ public:
 	bool SetIsShot(bool isShot) {
 		this->isShot_ = isShot;
 		return isShot_;
+	}
+	void SetTargetPos(const Vector2& targetPos) {
+		targetPos_ = targetPos;
 	}
 };
 

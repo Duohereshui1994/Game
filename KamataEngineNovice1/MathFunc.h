@@ -24,7 +24,7 @@ public:
 	Vector2 Transform(Vector2 vector, Matrix3x3 matrix);
 	Matrix3x3 Multiply(Matrix3x3 Matrix1, Matrix3x3 Matrix2);
 
-	Vector2 WorldToScreen(Vector2 worldTranslate, Vector2 cameraScale, float cameraRotate, Vector2 cameraTranslate, Vector2 worldPos);
+	Vector2 WorldToScreen(float rotate, Vector2 worldTranslate, Vector2 cameraScale, float cameraRotate, Vector2 cameraTranslate, Vector2 worldPos);
 
 	float Length(const Vector2& v) {
 		return sqrtf(v.x * v.x + v.y * v.y);
@@ -60,6 +60,10 @@ public:
 		result.x = Scaler * v.x;
 		result.y = Scaler * v.y;
 		return result;
+	}
+
+	Vector2 Lerp(const Vector2& v1, const Vector2& v2, float t) {
+		return Add(Multiply((1.0f - t), v1), Multiply(t, v2));
 	}
 
 };

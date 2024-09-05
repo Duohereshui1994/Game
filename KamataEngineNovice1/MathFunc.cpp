@@ -95,9 +95,9 @@ Matrix3x3 MathFunc::Multiply(Matrix3x3 Matrix1, Matrix3x3 Matrix2)
 
 }
 
-Vector2 MathFunc::WorldToScreen(Vector2 worldTranslate,Vector2 cameraScale, float cameraRotate, Vector2 cameraTranslate, Vector2 worldPos)
+Vector2 MathFunc::WorldToScreen(float rotate,Vector2 worldTranslate,Vector2 cameraScale, float cameraRotate, Vector2 cameraTranslate, Vector2 worldPos)
 {
-	Matrix3x3 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f }, 0.0f, worldTranslate);
+	Matrix3x3 worldMatrix = MakeAffineMatrix({ 1.0f,1.0f }, rotate, worldTranslate);
 	Matrix3x3 cameraWorldMatrix = MakeAffineMatrix(cameraScale, cameraRotate, cameraTranslate);
 
 	Matrix3x3 viewMatrix = Inverse(cameraWorldMatrix);

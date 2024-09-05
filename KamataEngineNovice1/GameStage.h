@@ -9,7 +9,7 @@ public:
 
 	void Initialize();
 
-	void Updadte();
+	void Updadte(char keys[], char preKeys[]);
 
 	void Draw();
 private:

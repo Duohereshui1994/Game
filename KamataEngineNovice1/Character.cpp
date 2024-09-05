@@ -3,6 +3,7 @@
 
 void Character::Initialize()
 {
+	textureHandle_ = 0;
 	frameNum_ = 0;
 	deltaTime_ = 1.0f / 60.0f;
 
@@ -18,6 +19,8 @@ void Character::Initialize()
 	obj_.rotate = 0.0f;
 
 }
+
+
 
 void Character::Draw()
 {

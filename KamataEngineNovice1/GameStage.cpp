@@ -15,9 +15,9 @@ void GameStage::Initialize()
 	player_->Initialize();
 }
 
-void GameStage::Updadte()
+void GameStage::Updadte(char keys[], char preKeys[])
 {
-	player_->Update();
+	player_->Update(keys,preKeys);
 }
 
 void GameStage::Draw()
