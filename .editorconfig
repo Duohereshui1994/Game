@@ -1,0 +1,38 @@
+# 顶级配置应用于整个项目
+root = true
+
+# 匹配所有文件
+[*]
+ 
+# 设置字符编码
+charset = utf-8
+ 
+# 设置换行符风格，通常是 LF
+end_of_line = lf
+ 
+# 在文件结束处插入新行
+insert_final_newline = true
+ 
+# 删除文件结束处的空行
+trim_trailing_whitespace = true
+
+# 使用制表符缩进
+indent_style = tab
+
+# 设置制表符宽度为4个空格
+tab_width = 4
+ 
+# 匹配 C/C++ 文件
+[*.{c,h,cpp,hpp}]
+
+# 使用制表符缩进
+indent_style = tab
+ 
+# 设置制表符宽度为4个空格
+tab_width = 4
+
+# 在文件结束处插入新行
+insert_final_newline = true
+ 
+# 删除文件结束处的空行
+trim_trailing_whitespace = true
