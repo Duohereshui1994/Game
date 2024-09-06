@@ -33,3 +33,8 @@ void Character::Draw()
 	Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)frameNum_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandle_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
 
 }
+
+void Character::SetPositon(Vector2 pos)
+{
+	obj_.position = pos;
+}
