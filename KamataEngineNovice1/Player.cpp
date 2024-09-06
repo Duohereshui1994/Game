@@ -96,25 +96,16 @@ void Player::Draw()
 				Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)frameNum_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
 			}
 			break;
+
 		case PlayerState::UnderGround:
 			Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)frameNum_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleUnder_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
 			break;
+
 		case PlayerState::Up:
-			//if (upFrame_ >= MAX_UPFRAME) {
-			//	upFrame_ = 0;
-			//}
-			//else {
-			//	upFrame_ += deltaTime_ * 2;
-			//}
 			Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)upFrame_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleUp_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
 			break;
+
 		case PlayerState::Down:
-			//if (downFrame_ >= MAX_DOWNFRAME) {
-			//	downFrame_ = 0;
-			//}
-			//else {
-			//	downFrame_ += deltaTime_ * 2;
-			//}
 			Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)downFrame_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleDown_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
 			break;
 	}
@@ -174,6 +165,7 @@ void Player::SwithGround(char keys[], char preKeys[])
 				state_ = PlayerState::Down;
 			}
 			break;
+
 		case PlayerState::UnderGround:
 
 			if (frameNum_ > MAX_IDLEFRAME) {
@@ -188,6 +180,7 @@ void Player::SwithGround(char keys[], char preKeys[])
 				state_ = PlayerState::Up;
 			}
 			break;
+
 		case PlayerState::Up:
 			if (upFrame_ >= MAX_UPFRAME) {
 				upFrame_ = MAX_UPFRAME;
@@ -202,6 +195,7 @@ void Player::SwithGround(char keys[], char preKeys[])
 				frameNum_ = 0;
 			}
 			break;
+
 		case PlayerState::Down:
 			if (downFrame_ >= MAX_DOWNFRAME) {
 				downFrame_ = MAX_DOWNFRAME;
