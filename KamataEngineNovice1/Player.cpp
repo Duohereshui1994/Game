@@ -88,26 +88,26 @@ void Player::Draw()
 	}
 
 	switch (state_) {
-		case PlayerState::OnGround:
-			if (mousePosX < obj_.position.x) {
-				Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)frameNum_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
-			}
-			else if (mousePosX > obj_.position.x) {
-				Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)frameNum_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
-			}
-			break;
+	case PlayerState::OnGround:
+		if (mousePosX < obj_.position.x) {
+			Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)frameNum_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
+		}
+		else if (mousePosX > obj_.position.x) {
+			Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)frameNum_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
+		}
+		break;
 
-		case PlayerState::UnderGround:
-			Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)frameNum_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleUnder_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
-			break;
+	case PlayerState::UnderGround:
+		Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)frameNum_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleUnder_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
+		break;
 
-		case PlayerState::Up:
-			Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)upFrame_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleUp_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
-			break;
+	case PlayerState::Up:
+		Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)upFrame_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleUp_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
+		break;
 
-		case PlayerState::Down:
-			Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)downFrame_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleDown_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
-			break;
+	case PlayerState::Down:
+		Novice::DrawSpriteRect((int)obj_.position.x, (int)obj_.position.y, (int)downFrame_ * 64, 0, (int)obj_.width, (int)obj_.height, textureHandleDown_, 1.0f / 4.0f, 1.0f, 0.0f, WHITE);
+		break;
 	}
 
 }
@@ -151,65 +151,65 @@ void Player::SwithGround(char keys[], char preKeys[])
 {
 
 	switch (state_) {
-		case PlayerState::OnGround:
+	case PlayerState::OnGround:
 
-			if (frameNum_ > MAX_IDLEFRAME) {
-				frameNum_ = 0;
-			}
-			else {
-				frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
-			}
+		if (frameNum_ > MAX_IDLEFRAME) {
+			frameNum_ = 0;
+		}
+		else {
+			frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
+		}
 
-			if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
-				downFrame_ = 0;
-				state_ = PlayerState::Down;
-			}
-			break;
+		if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
+			downFrame_ = 0;
+			state_ = PlayerState::Down;
+		}
+		break;
 
-		case PlayerState::UnderGround:
+	case PlayerState::UnderGround:
 
-			if (frameNum_ > MAX_IDLEFRAME) {
-				frameNum_ = 0;
-			}
-			else {
-				frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
-			}
+		if (frameNum_ > MAX_IDLEFRAME) {
+			frameNum_ = 0;
+		}
+		else {
+			frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
+		}
 
-			if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
-				upFrame_ = 0;
-				state_ = PlayerState::Up;
-			}
-			break;
+		if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
+			upFrame_ = 0;
+			state_ = PlayerState::Up;
+		}
+		break;
 
-		case PlayerState::Up:
-			if (upFrame_ >= MAX_UPFRAME) {
-				upFrame_ = MAX_UPFRAME;
-			}
-			else {
-				upFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
-			}
-			obj_.position = math_->Lerp(UnderPos, UpPos, upFrame_ / (float)MAX_UPFRAME);
-			if (upFrame_ >= MAX_UPFRAME) {
-				upFrame_ = 0;
-				state_ = PlayerState::OnGround;
-				frameNum_ = 0;
-			}
-			break;
+	case PlayerState::Up:
+		if (upFrame_ >= MAX_UPFRAME) {
+			upFrame_ = MAX_UPFRAME;
+		}
+		else {
+			upFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
+		}
+		obj_.position = math_->Lerp(UnderPos, UpPos, upFrame_ / (float)MAX_UPFRAME);
+		if (upFrame_ >= MAX_UPFRAME) {
+			upFrame_ = 0;
+			state_ = PlayerState::OnGround;
+			frameNum_ = 0;
+		}
+		break;
 
-		case PlayerState::Down:
-			if (downFrame_ >= MAX_DOWNFRAME) {
-				downFrame_ = MAX_DOWNFRAME;
-			}
-			else {
-				downFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
-			}
-			obj_.position = math_->Lerp(UpPos, UnderPos, downFrame_ / (float)MAX_DOWNFRAME);
-			if (downFrame_ >= MAX_DOWNFRAME) {
-				downFrame_ = 0;
-				state_ = PlayerState::UnderGround;
-				frameNum_ = 0;
-			}
-			break;
+	case PlayerState::Down:
+		if (downFrame_ >= MAX_DOWNFRAME) {
+			downFrame_ = MAX_DOWNFRAME;
+		}
+		else {
+			downFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
+		}
+		obj_.position = math_->Lerp(UpPos, UnderPos, downFrame_ / (float)MAX_DOWNFRAME);
+		if (downFrame_ >= MAX_DOWNFRAME) {
+			downFrame_ = 0;
+			state_ = PlayerState::UnderGround;
+			frameNum_ = 0;
+		}
+		break;
 	}
 }
 
