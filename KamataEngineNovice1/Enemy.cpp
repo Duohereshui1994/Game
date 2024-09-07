@@ -188,3 +188,4 @@ void EnemyManager::LoadRes()
 {
 	_spSnake = Novice::LoadTexture("./RS/Enemy/snake_walk.png");
 }
+
