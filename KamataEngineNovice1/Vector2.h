@@ -50,5 +50,5 @@ public:
 	// 内積
 	float Dot(const Vector2& v) const { return x * v.x + y * v.y; }
 	// クロス積(外積)、ベクトル２の外積の戻り値はfloat
-	float Cross(const Vector3& v) const { return x * v.y - y * v.x; }
+	float Cross(const Vector2& v) const { return x * v.y - y * v.x; }
 };
