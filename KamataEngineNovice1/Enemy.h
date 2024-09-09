@@ -58,22 +58,31 @@ public:
 	//功能方法
 
 	//Get&Set
-	const int& GetHp() const { return hp_; };
+	const int& Get_hp() const { return hp_; };
 	const Vector2& Get_targetPos() const { return _targetPos; };
+	void Set_sprite(const int& sprite) { _sprite = sprite; };
 };
 
 class EnemyManager {
 private:
 	//敌人生成路线
-	inline static const int _linesSum = 6;						//一共多少条路线
-	inline static Vector2 _bornPosOffset[_linesSum] = {
-		{ -800, 0 },{ -700, -300 } ,{ -400, -600 } ,{ 400, -600 } ,{ 700, -300 } ,{ 800, 0 }
-	};															//和目标点之前的偏移
-	inline static std::stack<Enemy*> _enemyLines[_linesSum];	//包含每条路线中生成的敌人
+	inline static int _linesSum = 2;								//当前有多少条线路
+	inline static const int _linesSumMax = 6;						//至多多少条路线
+	inline static Vector2 _bornPosOffset[_linesSumMax] = {
+		{ -800, 0 },{ 800, 0 },{ -700, -300 } ,{ 700, -300 },{ -400, -600 } ,{ 400, -600 }
+	};																//和目标点之前的偏移
+	inline static std::stack<Enemy*> _enemyLines[_linesSumMax];		//包含每条路线中生成的敌人
 	//敌人生成随机数
-	inline static int _lineTime = 30;				//进行随机选择路线的时间
-	inline static int _bornEnemyTime = 30;			//路线中生成敌人的时间
-	inline static int _eachBornMax = 5;				//每回至多生成敌人数量
+	inline static int _lineTime = 0;				//进行随机选择路线的时间(具体调整写到了BornEnemy中)
+	inline static int _bornEnemyTime = 0;			//路线中生成敌人的时间
+	inline static int _eachBornMax = 0;				//每回至多生成敌人数量
+	//生成敌人种类(最初能生成的种类，随着难度，会调整这个数组中的敌人类型)
+	inline static Enemy::Type _enemyType_walk[2] = { Enemy::tSnake,Enemy::tSnake };
+	inline static Enemy::Type _enemyType_fly[2] = { Enemy::tEagles,Enemy::tEagles };
+	//生成小伙伴
+	inline static int _bornFriendTime = 60;			//生成小伙伴的判断时间
+	inline static int _bornFriendSpace = 4;			//小伙伴的前后要空多少个位置
+	inline static int _bornFriendRandom = 1;		//生成的几率
 
 	//工具
 	inline static int _currentTimes[10] = { 0 };					// 这个用于计时器的使用
@@ -83,7 +92,10 @@ public:
 	//本地贴图
 	inline static int _spSnake = 0;
 	inline static int _spEagles = 0;
-	inline static int _spPlayer = 0;
+	inline static int _spSpider = 0;
+	inline static int _spBee = 0;
+	inline static int _spPlayer_walk = 0;
+	inline static int _spPlayer_fly = 0;
 	static void LoadRes();//预先载入本地地图，在游戏最开始载入
 
 	//Manager主函数

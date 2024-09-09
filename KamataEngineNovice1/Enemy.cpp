@@ -63,18 +63,18 @@ void Enemy::Initialize(Vector2 pos, float rotate, Type type)
 		_frameSum = 6;
 		break;
 	case Enemy::tSpider:
-		_sprite = EnemyManager::_spPlayer;
-		_spriteSize = { 96,96 };
-		_frameSum = 4;
+		_sprite = EnemyManager::_spSpider;
+		_spriteSize = { 1152 / 6.f,128 };
+		_frameSum = 6;
 		break;
 	case Enemy::tBee:
-		_sprite = EnemyManager::_spPlayer;
-		_spriteSize = { 96,96 };
-		_frameSum = 4;
+		_sprite = EnemyManager::_spBee;
+		_spriteSize = { 1152 / 6.f,128 };
+		_frameSum = 6;
 		hpMax_ = 2;
 		break;
 	case Enemy::tPlayer:
-		_sprite = EnemyManager::_spPlayer;
+		_sprite = EnemyManager::_spPlayer_walk;
 		_spriteSize = { 96,96 };
 		_frameSum = 4;
 		break;
@@ -238,32 +238,47 @@ bool EnemyManager::FrameTimeWatch(int frame, int index, bool first)
 
 void EnemyManager::BornEnemy(int score, int friendSum)
 {
-	score, friendSum;
 	std::random_device rd;
 	std::mt19937 gen(rd());
+
+	//按照分数调整难度
+	if (score < 100) {
+		_linesSum = 2;				//当前多少条线路
+		_lineTime = 60;				//进行随机选择路线的时间
+		_bornEnemyTime = 30;		//路线中生成敌人的时间
+		_eachBornMax = 2;			//每回至多生成敌人数量
+	}
+	else if (score < 500) {
+		_linesSum = 4;
+		_lineTime = 60;
+		_bornEnemyTime = 30;
+		_eachBornMax = 4;
+		_enemyType_walk[1] = { Enemy::tSpider };
+		_enemyType_fly[1] = { Enemy::tBee };
+	}
+	//按照小伙伴人数调整生成新的小伙伴的几率
+	if (friendSum < 5)
+		_bornFriendRandom = 1;
+	else if (friendSum < 10)
+		_bornFriendRandom = 2;
 
 	//随机选择路线并填入敌人
 	if (FrameTimeWatch(_lineTime, 0, true)) {
 		assert(!_idlePool.empty());//请不要让敌人的闲置对象池为空
 		//往哪个路线填入敌人
-		int lineNum = 0;
 		std::uniform_int_distribution<int> dis_line(0, _linesSum - 1);
-		lineNum = dis_line(gen);
-		//根据路线，随机出本次要出现的敌人
+		int lineNum = dis_line(gen);
+		//根据路线(天空和地面)，随机出本次要出现的敌人
 		Enemy::Type enemyType = Enemy::tSnake;
-		if (lineNum == 0 || lineNum == _linesSum - 1) {
+		if (lineNum == 0 || lineNum == 1) {
+			//地面路线
 			std::uniform_int_distribution<int> dis_enemyIndex(0, 1);
-			switch (dis_enemyIndex(gen)) {
-			case 0:enemyType = Enemy::tSnake; break;
-			case 1:enemyType = Enemy::tSpider; break;
-			}
+			enemyType = _enemyType_walk[dis_enemyIndex(gen)];
 		}
 		else {
+			//天空路线
 			std::uniform_int_distribution<int> dis_enemyIndex(0, 1);
-			switch (dis_enemyIndex(gen)) {
-			case 0:enemyType = Enemy::tEagles; break;
-			case 1:enemyType = Enemy::tBee; break;
-			}
+			enemyType = _enemyType_fly[dis_enemyIndex(gen)];
 		}
 		//往路线中填入多少个敌人
 		std::uniform_int_distribution<int> dis_enemySum(0, _eachBornMax);
@@ -276,12 +291,42 @@ void EnemyManager::BornEnemy(int score, int friendSum)
 		}
 	}
 
-	//将路线中储存的敌人释放出来
+	//随机选择路线并填入小伙伴
+	if (FrameTimeWatch(_bornFriendTime, 2, false)) {
+		//是否生成小伙伴
+		std::uniform_int_distribution<int> dis_playerRandom(0, friendSum);
+		int playerRandom = dis_playerRandom(gen);
+		if (playerRandom <= _bornFriendRandom) {
+			//往哪个路线填入
+			std::uniform_int_distribution<int> dis_line(0, _linesSum - 1);
+			int lineNum = dis_line(gen);
+			//根据路线判断是天空还是地面
+			int sprite = 0;
+			if (lineNum == 0 || lineNum == 1)
+				sprite = _spPlayer_walk;
+			else
+				sprite = _spPlayer_fly;
+			//生成小伙伴
+			Vector2 targetPos = _idlePool.front()->Get_targetPos();
+			Vector2 bornPos = targetPos + _bornPosOffset[lineNum];
+			for (int i = 0; i < _bornFriendSpace; i++)//前占位，避免敌人挤压小伙伴
+				_enemyLines[lineNum].push(nullptr);
+			Enemy* it = AcquireEnemy(bornPos, 0, Enemy::tPlayer);
+			it->Set_sprite(sprite);
+			_enemyLines[lineNum].push(it);
+			for (int i = 0; i < _bornFriendSpace; i++)//后占位
+				_enemyLines[lineNum].push(nullptr);
+		}
+	}
+
+
+	//将路线中储存的敌人和小伙伴释放出来
 	if (FrameTimeWatch(_bornEnemyTime, 1, true)) {
 		for (int i = 0; i < _linesSum; i++) {
 			if (!_enemyLines[i].empty()) {
 				Enemy* it = _enemyLines[i].top();
-				it->PushUpdate();
+				if (it != nullptr)
+					it->PushUpdate();
 				_enemyLines[i].pop();
 			}
 		}
@@ -314,6 +359,9 @@ void EnemyManager::LoadRes()
 {
 	_spSnake = Novice::LoadTexture("./RS/Enemy/snake_walk.png");
 	_spEagles = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
-	_spPlayer = Novice::LoadTexture("./RS/Enemy/player_Up_Idle_Left.png");
+	_spSpider = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
+	_spBee = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
+	_spPlayer_walk = Novice::LoadTexture("./RS/Enemy/player_Up_Idle_Left.png");
+	_spPlayer_fly = Novice::LoadTexture("./RS/Enemy/player_Up_Idle_Left.png");
 }
 
