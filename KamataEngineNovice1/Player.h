@@ -2,6 +2,7 @@
 #include <vector>
 #include "Character.h"
 #include "Bullet.h"
+#include "Camera.h"
 
 //玩家状态
 enum class PlayerState {
@@ -22,12 +23,31 @@ private:
 	int mousePosX;				//鼠标x坐标保存位置
 	int mousePosY;				//鼠标y坐标保存位置
 	Vector2 mousePos;			//用向量保存上面两个鼠标位置
+	Vector2 mousePosWorld;
 
 	float downFrame_;			//钻进土里动画的帧数序号
 	float upFrame_;				//钻出土动画的帧数序号
 
-	Vector2 UnderPos;			//地下待机位置
-	Vector2 UpPos;				//钻出土位置 也是地面上的待机位置
+	//==================camera=================================
+
+	//プレイヤーのローカル座標
+	Vertex local_;
+
+	//プレイヤー 拡縮・回転・移動
+	Affine affine_;
+
+	//スクリーン座標系に変化に使う
+	Vertex screen_;
+
+	//ワールドマトリックス
+	Matrix3x3 worldMatrix_;
+	//wvpVp
+	Matrix3x3 wvpVpMatrix_;
+	//=========================================================
+
+
+	Vector2 UnderPos;			//地下待机位置（中心）
+	Vector2 UpPos;				//钻出土位置 也是地面上的待机位置 (中心)
 
 	float attackCD_;			//攻击冷却时间计时器单位（秒） 改变攻速不在这里改 在player.cpp
 
@@ -43,10 +63,12 @@ public:
 	void Initialize() override;
 	//更新
 	void Update(char keys[], char preKeys[]);
+	void Update(char keys[], char preKeys[], Camera* camera) ;
 	//描画 重写
 	void Draw() override;
+	void DrawTexture(int leftTopX,int leftTopY,int width,int height,int textureHandle);
 	//攻击
-	void Attack();
+	void Attack(Camera* camera);
 	//地面地下状态切换
 	void SwithGround(char keys[], char preKeys[]);
 };

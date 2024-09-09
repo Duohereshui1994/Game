@@ -1,5 +1,6 @@
 #include "MathFunc.h"
 
+
 Matrix3x3 MathFunc::MakeAffineMatrix(Vector2 scale, float rotate, Vector2 translate)
 {
 	Matrix3x3 result;
@@ -13,6 +14,33 @@ Matrix3x3 MathFunc::MakeAffineMatrix(Vector2 scale, float rotate, Vector2 transl
 	result.m[2][1] = translate.y;
 	result.m[2][2] = 1;
 	return result;
+}
+
+Matrix3x3 MathFunc::MakeAffineMatrix(Affine affine)
+{
+	Matrix3x3 result;
+	result.m[0][0] = affine.scale.x * cosf(affine.theta);
+	result.m[0][1] = affine.scale.x * sinf(affine.theta);
+	result.m[0][2] = 0;
+	result.m[1][0] = -affine.scale.y * sinf(affine.theta);
+	result.m[1][1] = affine.scale.y * cosf(affine.theta);
+	result.m[1][2] = 0;
+	result.m[2][0] = affine.translate.x;
+	result.m[2][1] = affine.translate.y;
+	result.m[2][2] = 1;
+	return result;
+}
+
+Matrix3x3 MathFunc::MakeAffine(Affine affine)
+{
+	Matrix3x3 result = MakeAffineMatrix(affine);
+	return result;
+}
+
+Matrix3x3 MathFunc::ViewMatrix(Matrix3x3 cameraMatrix)
+{
+	Matrix3x3 viewMatrix = Inverse(cameraMatrix);
+	return viewMatrix;
 }
 
 Matrix3x3 MathFunc::Inverse(Matrix3x3 matrix)
@@ -53,6 +81,27 @@ Matrix3x3 MathFunc::MakeOrthographicMatrix(float left, float top, float right, f
 	return result;
 }
 
+Matrix3x3 MathFunc::MakeOrthographicMatrix(Point vertex)
+{
+	Matrix3x3 result = {};
+	result.m[0][0] = 2.0f / (vertex.right - vertex.left);
+	result.m[0][1] = 0;
+	result.m[0][2] = 0;
+	result.m[1][0] = 0;
+	result.m[1][1] = 2.0f / (vertex.top - vertex.bottom);
+	result.m[1][2] = 0;
+	result.m[2][0] = (vertex.left + vertex.right) / (vertex.left - vertex.right);
+	result.m[2][1] = (vertex.top + vertex.bottom) / (vertex.bottom - vertex.top);
+	result.m[2][2] = 1;
+	return result;
+}
+
+Matrix3x3 MathFunc::OrthoMatrix(Point vertex)
+{
+	Matrix3x3 orthoMatrix = MakeOrthographicMatrix(vertex);
+	return orthoMatrix;
+}
+
 Matrix3x3 MathFunc::MakeViewportMatrix(float left, float top, float width, float height)
 {
 	Matrix3x3 result = {};
@@ -65,6 +114,48 @@ Matrix3x3 MathFunc::MakeViewportMatrix(float left, float top, float width, float
 	result.m[2][0] = left + width / 2.0f;
 	result.m[2][1] = top + height / 2.0f;
 	result.m[2][2] = 1;
+	return result;
+}
+
+Matrix3x3 MathFunc::ViewportMatrix(LeftAndSize viewport)
+{
+	Matrix3x3 viewportMatrix_ = MakeViewportMatrix(viewport.left, viewport.top, viewport.width, viewport.height);
+	return viewportMatrix_;
+}
+
+Matrix3x3 MathFunc::MakeVpVpMatrix(Matrix3x3 viewMatrix, Matrix3x3 orthoMatrix, Matrix3x3 viewportMatrix)
+{
+	/*ワールド座標系*/
+	Matrix3x3 vpVpMatrix = Multiply(viewMatrix, orthoMatrix);
+	/*ビュー座標系*/
+	vpVpMatrix = Multiply(vpVpMatrix, viewportMatrix);
+
+	return vpVpMatrix;
+}
+
+Matrix3x3 MathFunc::WvpVpMatrix(Matrix3x3 worldMatrix, Matrix3x3 vpVpMatrix)
+{
+	return Multiply(worldMatrix, vpVpMatrix);
+}
+
+LinePosition MathFunc::TransformLine(LinePosition local, Matrix3x3 vpVpMatrix)
+{
+	LinePosition screen{};
+	screen.lateral.begin = Transform(local.lateral.begin, vpVpMatrix);
+	screen.lateral.end = Transform(local.lateral.end, vpVpMatrix);
+	screen.vert.begin = Transform(local.vert.begin, vpVpMatrix);
+	screen.vert.end = Transform(local.vert.end, vpVpMatrix);
+
+	return screen;
+}
+
+Vertex MathFunc::TransformSprite(Vertex local, Matrix3x3 wvpVpMatrix)
+{
+	Vertex result{};
+	result.leftTop = Transform(local.leftTop, wvpVpMatrix);
+	result.leftBottom = Transform(local.leftBottom, wvpVpMatrix);
+	result.rightTop = Transform(local.rightTop, wvpVpMatrix);
+	result.rightBottom = Transform(local.rightBottom, wvpVpMatrix);
 	return result;
 }
 

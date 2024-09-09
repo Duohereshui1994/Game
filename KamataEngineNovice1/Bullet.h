@@ -1,32 +1,32 @@
 #pragma once
 #include "MathFunc.h"
+#include "Camera.h"
 
 class Bullet
 {
 private:
-	//子弹中心座標
-	Vector2 pos_;
 	//速度
 	float speed_;
-	//弾の幅
-	float width_;
-	//弾の高さ
-	float height_;
+	//==================camera=================================
 
-	//子弹的四个顶点世界坐标
-	Vector2 leftTop;
-	Vector2 rightTop;
-	Vector2 leftBottom;
-	Vector2 rightBottom;
+	//プレイヤーのローカル座標
+	Vertex local_;
 
-	//子弹的四个顶点屏幕坐标
-	Vector2 leftTop_Screen;
-	Vector2 rightTop_Screen;
-	Vector2 leftBottom_Screen;
-	Vector2 rightBottom_Screen;
+	//プレイヤー 拡縮・回転・移動
+	Affine affine_;
+
+	//スクリーン座標系に変化に使う
+	Vertex screen_;
+
+	//ワールドマトリックス
+	Matrix3x3 worldMatrix_;
+	//wvpVp
+	Matrix3x3 wvpVpMatrix_;
+	//=========================================================
+
 
 	//子弹的旋转
-	float rotate = 0.0f;
+	//float rotate = 0.0f;
 
 	//フラグ
 	bool isShot_;
@@ -39,6 +39,7 @@ private:
 
 	//数学函数的指针
 	MathFunc* math_ = nullptr;
+	MathFunc::Object obj_;
 
 public:
 	Bullet();
@@ -48,28 +49,33 @@ public:
 	void Initialize();
 
 	//更新
-	void Update(const Vector2& playerPos, const Vector2& mousePos);
+	void Update(const Vector2& target, const Vector2& playerPos, Camera* camera);
 
     //射出
-	void Shoot(const Vector2& playerPos, const Vector2& mousePos);
+	void Shoot(const Vector2& target, const Vector2& playerPos);
 
 	//描画
 	void Draw();
+	void DrawTexture(int leftTopX, int leftTopY, int width, int height, int textureHandle);
 
 	//位置取得
-	Vector2 GetPos() { return pos_; }
+	Vector2 GetPos() {
+		Vector2 pos;
+		pos = affine_.translate;
+		return pos;
+	}
 
 	//位置設定
 	Vector2 SetPos(Vector2 pos) {
-		this->pos_ = pos;
-		return pos_;
+		this->affine_.translate = pos;
+		return affine_.translate;
 	}
 
 	//幅取得
-	float GetWidth() { return width_; }
+	float GetWidth() { return obj_.width; }
 
 	//高さ取得
-	float GetHeight() { return height_; }
+	float GetHeight() { return obj_.height;}
 
 	//フラグ取得
 	bool GetIsShot()const { return isShot_; }
@@ -84,5 +90,7 @@ public:
 	void SetTargetPos(const Vector2& targetPos) {
 		targetPos_ = targetPos;
 	}
+
+	Vector2 GetTargetPos() {return targetPos_; }
 };
 

@@ -40,8 +40,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓更新処理ここから
 		///
-		gamestage_->Updadte(keys, preKeys);
-		EnemyManager::Update(keys, preKeys);//敌人主循环
+
+		gamestage_->Update(keys, preKeys);
+		//EnemyManager::Update(keys, preKeys);//敌人主循环
 		///
 		/// ↑更新処理ここまで
 		///
@@ -50,7 +51,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 		gamestage_->Draw();
-		EnemyManager::Draw();//敌人主循环的绘画函数
+		//EnemyManager::Draw();//敌人主循环的绘画函数
 		///
 		/// ↑描画処理ここまで
 		///
