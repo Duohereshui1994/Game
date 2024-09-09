@@ -24,8 +24,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//Enemy
 	EnemyManager::LoadRes();//将本地贴图预先载入并保存
-	Enemy* enemyObj = EnemyManager::AcquireEnemy({ 1280 / 2.f,720 / 2.f }, 0, Enemy::tSnake);//生成一个敌人
-	enemyObj->PushUpdate();//将敌人推入主循环
+	for (int i = 0; i < 100; i++) {//预先生成一些敌人
+		Enemy* it = new Enemy();
+		EnemyManager::_idlePool.push(it);
+	}
 
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -42,6 +44,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		gamestage_->Updadte(keys, preKeys);
 		EnemyManager::Update(keys, preKeys);//敌人主循环
+		EnemyManager::BornEnemy(0, 0);
 		///
 		/// ↑更新処理ここまで
 		///
@@ -70,3 +73,4 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Novice::Finalize();
 	return 0;
 }
+
