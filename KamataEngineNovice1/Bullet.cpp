@@ -1,27 +1,49 @@
+#define BULLET_WIDTH 32.0f
+#define BULLET_HEIGHT 32.0f
 #include "Bullet.h"
 #include "Novice.h"
 
+//如果用矩阵的计算 所有的obj.center都没用了
+
 Bullet::Bullet()
 {
-	pos_.x = -100.0f;
-	pos_.y = -100.0f;
-	isShot_ = false;
-	width_ = 32.0f;
-	height_ = 32.0f;
-	speed_ = 30.0f;
+	speed_ = 15.0f;
 	textureBullet_ = Novice::LoadTexture("./RS/3.png");
 
-	leftTop = { -width_ / 2,  height_ / 2 };
-	rightTop = { width_ / 2, height_ / 2 };
-	leftBottom = { -width_ / 2, -height_ / 2 };
-	rightBottom = { width_ / 2, -height_ / 2 };
+	// 初始化 MathFunc 对象
+	math_ = new MathFunc();
 
-	leftTop_Screen = { 0.0f,0.0f };
-	rightTop_Screen = { 0.0f,0.0f };
-	leftBottom_Screen = { 0.0f,0.0f };
-	rightBottom_Screen = { 0.0f,0.0f };
 
-	targetPos_ = { 0.0f,0.0f };
+	// 初始化 Mono 结构体成员
+	obj_.position = { obj_.center.x - obj_.width,obj_.center.y + obj_.height };
+	obj_.width = BULLET_WIDTH;
+	obj_.height = BULLET_HEIGHT;
+	obj_.center = Vector2(0.0f, 0.0f);
+	obj_.scale = Vector2(1.0f, 1.0f);
+	obj_.rotate = 0.0f;
+
+	//プレイヤーのローカル座標
+	local_ = {
+		{ -obj_.width / 2.0f,+obj_.height / 2.0f},
+		{ +obj_.width / 2.0f,+obj_.height / 2.0f},
+		{ -obj_.width / 2.0f,-obj_.height / 2.0f},
+		{ +obj_.width / 2.0f,-obj_.height / 2.0f},
+	};
+
+	//プレイヤー 拡縮・回転・移動
+	affine_ = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
+
+	//スクリーン座標系に変化に使う
+	screen_ = {};
+
+	//ワールドマトリックス
+	worldMatrix_ = {};
+	//wvpVp
+	wvpVpMatrix_ = {};
+
+
+	targetPos_ = {};
+	isShot_ = false;
 }
 
 Bullet::~Bullet()
@@ -31,53 +53,46 @@ Bullet::~Bullet()
 
 void Bullet::Initialize()
 {
-	pos_.x = -100.0f;
-	pos_.y = -100.0f;
+	obj_.center = Vector2(0.0f, 0.0f);
+	affine_ = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
 	isShot_ = false;
 }
 
-void Bullet::Update(const Vector2& playerPos, const Vector2& mousePos) {
+void Bullet::Update(const Vector2& target, const Vector2& playerPos, Camera* camera) {
 
 	// 射击
-	Shoot(playerPos, mousePos);
+	if (isShot_) {
+		Shoot(target, playerPos);
+	}
+
+	if (obj_.rotate > 2.0f * (float)M_PI) {
+		obj_.rotate = 0;
+	}
+	else {
+		obj_.rotate += 1.0f / 15.0f * (float)M_PI;
+	}
+
+	affine_.theta = obj_.rotate;
+
+	worldMatrix_ = math_->MakeAffine(affine_);
+	wvpVpMatrix_ = math_->WvpVpMatrix(worldMatrix_, camera->GetVpVpMatrix());
+	screen_ = math_->TransformSprite(local_, wvpVpMatrix_);
 
 }
 
 
-void Bullet::Shoot(const Vector2& playerPos, const Vector2& mousePos)
+void Bullet::Shoot(const Vector2& target, const Vector2& playerPos)
 {
-
-	if (!isShot_) {
-		pos_ = playerPos;
-		targetPos_ = mousePos;
-	}
-
-
+	targetPos_ = target;
 	// 更新子弹的移动
-	if (isShot_) {
-		Vector2 dir = math_->Subtract(targetPos_, playerPos);
-		pos_ = math_->Add(pos_, math_->Multiply(speed_, math_->Normalize(dir)));
+	Vector2 dir = math_->Subtract(targetPos_, playerPos);
+	affine_.translate = math_->Add(affine_.translate, math_->Multiply(speed_, math_->Normalize(dir)));
 
-		// 可以加一个判断，确保子弹超出屏幕或者达到目标后停止
-		if (pos_.x > 1280 || pos_.x < 0 || pos_.y > 720 || pos_.y < 0) {
-			Initialize();
-		}
+	// 可以加一个判断，确保子弹超出屏幕或者达到目标后停止
+	if (affine_.translate.x > 1280 || affine_.translate.x < 0 || affine_.translate.y > 720 || affine_.translate.y < 0) {
+		Initialize();
 	}
 
-
-	if (rotate > 2.0f * (float)M_PI) {
-		rotate = 0;
-	}
-	else {
-		rotate += 1.0f / 15.0f * (float)M_PI;
-	}
-
-
-
-	leftTop_Screen = math_->Transform(leftTop, math_->MakeAffineMatrix({ 1.0f,1.0f }, rotate, pos_));
-	rightTop_Screen = math_->Transform(rightTop, math_->MakeAffineMatrix({ 1.0f,1.0f }, rotate, pos_));
-	leftBottom_Screen = math_->Transform(leftBottom, math_->MakeAffineMatrix({ 1.0f,1.0f }, rotate, pos_));
-	rightBottom_Screen = math_->Transform(rightBottom, math_->MakeAffineMatrix({ 1.0f,1.0f }, rotate, pos_));
 }
 
 
@@ -85,7 +100,16 @@ void Bullet::Draw()
 {
 	if (isShot_)
 	{
-		//Novice::DrawSprite((int)pos_.x, (int)pos_.y, textureBullet_, 1, 1, 0.0f, WHITE);
-		Novice::DrawQuad((int)leftTop_Screen.x, (int)leftTop_Screen.y, (int)rightTop_Screen.x, (int)rightTop_Screen.y, (int)leftBottom_Screen.x, (int)leftBottom_Screen.y, (int)rightBottom_Screen.x, (int)rightBottom_Screen.y, 0, 0, 32, 32, textureBullet_, WHITE);
+		DrawTexture(0, 0, (int)BULLET_WIDTH, (int)BULLET_HEIGHT, textureBullet_);
 	}
+}
+
+void Bullet::DrawTexture(int leftTopX, int leftTopY, int width, int height, int textureHandle)
+{
+	Novice::DrawQuad(
+		(int)screen_.leftTop.x, (int)screen_.leftTop.y,
+		(int)screen_.rightTop.x, (int)screen_.rightTop.y,
+		(int)screen_.leftBottom.x, (int)screen_.leftBottom.y,
+		(int)screen_.rightBottom.x, (int)screen_.rightBottom.y,
+		leftTopX, leftTopY, width, height, textureHandle, WHITE);
 }

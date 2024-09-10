@@ -1,5 +1,6 @@
 #pragma once
 #include "Player.h"
+#include "Camera.h"
 class GameStage
 {
 public:
@@ -9,10 +10,13 @@ public:
 
 	void Initialize();
 
-	void Updadte(char keys[], char preKeys[]);
+	void Update(char keys[], char preKeys[]);
 
 	void Draw();
 private:
 	Player* player_ = nullptr;
+	Camera* camera_ = nullptr;
+
+
 };
 

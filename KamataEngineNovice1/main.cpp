@@ -1,5 +1,4 @@
 #include <Novice.h>
-#include "Enemy.h"
 #include "GameStage.h"
 
 const char kWindowTitle[] = "6004_Game";
@@ -22,13 +21,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	gamestage_->Initialize();
 
-	//Enemy
-	EnemyManager::LoadRes();//将本地贴图预先载入并保存
-	for (int i = 0; i < 100; i++) {//预先生成一些敌人
-		Enemy* it = new Enemy();
-		EnemyManager::_idlePool.push(it);
-	}
-
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -42,9 +34,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓更新処理ここから
 		///
-		gamestage_->Updadte(keys, preKeys);
-		EnemyManager::Update(keys, preKeys);//敌人主循环
-		EnemyManager::BornEnemy(0, 0);
+
+		gamestage_->Update(keys, preKeys);
 		///
 		/// ↑更新処理ここまで
 		///
@@ -53,7 +44,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 		gamestage_->Draw();
-		EnemyManager::Draw();//敌人主循环的绘画函数
 		///
 		/// ↑描画処理ここまで
 		///

@@ -1,6 +1,5 @@
 #pragma once
-#include <Vector2.h>
-#include <Matrix3x3.h>
+#include "struct.h"
 #include <assert.h>
 #include <cmath>
 #include <corecrt_math_defines.h>
@@ -17,17 +16,36 @@ public:
 		float height;
 	}Object;
 
+
 	//制作affine变化矩阵
 	Matrix3x3 MakeAffineMatrix(Vector2 scale, float rotate, Vector2 translate);
+	Matrix3x3 MakeAffineMatrix(Affine affine);
+	Matrix3x3 MakeAffine(Affine affine);
+
+	//视野矩阵
+	Matrix3x3 ViewMatrix(Matrix3x3 cameraMatrix);
 
 	//制作逆矩阵
 	Matrix3x3 Inverse(Matrix3x3 matrix);
 
 	//制作正交矩阵
 	Matrix3x3 MakeOrthographicMatrix(float left, float top, float right, float bottom);
+	Matrix3x3 MakeOrthographicMatrix(Point vertex);
+	Matrix3x3 OrthoMatrix(Point vertex);
 
 	//制作视口矩阵
 	Matrix3x3 MakeViewportMatrix(float left, float top, float width, float height);
+	Matrix3x3 ViewportMatrix(LeftAndSize viewport);
+
+	//制作wvpvp
+	Matrix3x3 MakeVpVpMatrix(Matrix3x3 viewMatrix, Matrix3x3 orthoMatrix, Matrix3x3 viewportMatrix);
+	Matrix3x3 WvpVpMatrix(Matrix3x3 worldMatrix, Matrix3x3 vpVpMatrix);
+
+	//坐标轴的transform
+	LinePosition TransformLine(LinePosition local, Matrix3x3 vpVpMatrix);
+
+	//图像的四个点的变换
+	Vertex TransformSprite(Vertex local, Matrix3x3 wvpVpMatrix);
 
 	//坐标转换
 	Vector2 Transform(Vector2 vector, Matrix3x3 matrix);
