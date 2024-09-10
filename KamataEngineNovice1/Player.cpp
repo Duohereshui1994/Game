@@ -102,7 +102,7 @@ void Player::Update(char keys[], char preKeys[])
 
 void Player::Update(char keys[], char preKeys[], Camera* camera)
 {
-	SwithGround(keys, preKeys);
+	SwithGround(keys, preKeys, camera);
 
 	Attack(camera);
 
@@ -199,7 +199,7 @@ void Player::Attack(Camera* camera)
 	}
 }
 
-void Player::SwithGround(char keys[], char preKeys[])
+void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 {
 
 	switch (state_) {
@@ -240,7 +240,12 @@ void Player::SwithGround(char keys[], char preKeys[])
 			else {
 				upFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
 			}
+			//player本体移动
 			affine_.translate = math_->Lerp(UnderPos, UpPos, upFrame_ / (float)(MAX_UPFRAME - 1));
+			//相机倍率缩放
+			Vector2 cameraUpScale = math_->Lerp(DownCameraScale, UpCameraScale, upFrame_ / (float)(MAX_UPFRAME - 1));
+			camera->SetScale(cameraUpScale);
+
 			if (upFrame_ > MAX_UPFRAME - 1) {
 				upFrame_ = 0;
 				state_ = PlayerState::OnGround;
@@ -255,7 +260,11 @@ void Player::SwithGround(char keys[], char preKeys[])
 			else {
 				downFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
 			}
+			//player本体移动
 			affine_.translate = math_->Lerp(UpPos, UnderPos, downFrame_ / (float)(MAX_DOWNFRAME - 1));
+			//相机倍率缩放
+			Vector2 cameraDownScale = math_->Lerp(UpCameraScale, DownCameraScale, downFrame_ / (float)(MAX_DOWNFRAME - 1));
+			camera->SetScale(cameraDownScale);
 			if (downFrame_ > MAX_DOWNFRAME - 1) {
 				downFrame_ = 0;
 				state_ = PlayerState::UnderGround;

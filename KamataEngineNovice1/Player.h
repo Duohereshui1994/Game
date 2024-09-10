@@ -53,6 +53,9 @@ private:
 
 	PlayerState state_ = PlayerState::OnGround; //玩家初始状态为地面上待机
 
+	Vector2 UpCameraScale = Vector2(1.0f, 1.0f);//玩家在地面上摄像机的倍率
+	Vector2 DownCameraScale = Vector2(1.5f, 1.5f);//玩家在地下摄像机的倍率
+
 
 public:
 	//子弹数组
@@ -70,7 +73,7 @@ public:
 	//攻击
 	void Attack(Camera* camera);
 	//地面地下状态切换
-	void SwithGround(char keys[], char preKeys[]);
+	void SwithGround(char keys[], char preKeys[], Camera* camera);
 
 	Vector2 GetTranslate() { return affine_.translate; }							//获取中心点
 	void SetTranslate(const Vector2& translate) { affine_.translate = translate; }	//设置中心点
