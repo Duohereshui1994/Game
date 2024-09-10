@@ -33,6 +33,7 @@ void GameStage::Update(char keys[], char preKeys[])
 	camera_->Update(keys);
 	EnemyManager::Update(keys, preKeys);
 	player_->Update(keys, preKeys, camera_);
+	ParticleManager::Update();
 
 	IsCollision();			//碰撞检测
 	Score::Update(0);		//分数计算（要传入当前小伙伴数量）
@@ -43,6 +44,8 @@ void GameStage::Draw()
 	camera_->Draw();
 	EnemyManager::Draw();
 	player_->Draw();
+	ParticleManager::Draw();
+
 	Score::Draw();
 }
 
@@ -54,9 +57,10 @@ void GameStage::IsCollision()
 			for (auto& bullet : player_->bullets_) {
 				float length = (enemy->GetTranslate() - bullet.GetPos()).Length();
 				if (length < enemy->GetRadian() + bullet.GetWidth() / 2.f) {
+					ParticleManager::ADD_Particle(camera_, bullet.GetPos(), Emitter::playerJump);
+					Score::AddScore(enemy);
 					bullet.Initialize();
 					enemy->Set_isDead(true);
-					Score::AddScore(enemy);
 				}
 			}
 		}

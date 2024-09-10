@@ -4,6 +4,7 @@
 #include "Bullet.h"
 #include "Camera.h"
 #include "Score.h"
+#include "Particle.h"
 class GameStage
 {
 public:
