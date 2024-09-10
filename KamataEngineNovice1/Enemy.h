@@ -74,6 +74,8 @@ public:
 	void Set_isDead(const bool& flag) { _isDead = flag; };
 	const Vector2& Get_size() const { return _size; };
 	const Type& Get_type() const { return _type; };
+	void Set_spriteSize(const Vector2& size) { _spriteSize = size; };
+	const Vector2& Get_spriteSize() const { return _spriteSize; };
 
 	const Vector2& GetTranslate() const { return _affine.translate; }				//获取中心点
 	void SetTranslate(const Vector2& translate) { _affine.translate = translate; }	//设置中心点

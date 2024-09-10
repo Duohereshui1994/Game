@@ -2,12 +2,15 @@
 
 void Enemy::Move()
 {
+	//移动
 	Vector2 dir = (_targetPos - _pos).Normalize();
 	float length = (_targetPos - _pos).Length();
 	if (length > 5)
 		_pos += dir * _speed;
 	else
 		EnemyManager::ReleaseEnemy(this);
+	//旋转
+	_rotate = atan2(dir.y, dir.x) + acosf(-1);
 }
 
 void Enemy::Control(char keys[], char preKeys[])
@@ -57,7 +60,7 @@ void Enemy::ToDead()
 		alphaValue = 0;
 	_color = 0xFF000000 | alphaValue << 0;//透明度を制御する
 	//旋转
-	if (_scale.x > 0)
+	if (_scale.y > 0)
 		_rotate -= (1 - tools->EaseOutQuint(t)) * 0.3f;
 	else
 		_rotate += (1 - tools->EaseOutQuint(t)) * 0.3f;
@@ -340,10 +343,10 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 
 	//按照分数调整难度
 	if (score < 100) {
-		_linesSum = 2;					//当前多少条线路
-		_lineTime = 60;					//进行随机选择路线的时间
-		_bornEnemyTime = 30;			//路线中生成敌人的时间
-		_eachBornMax = 2;				//每回至多生成敌人数量
+		_linesSum = 6;								//当前多少条线路
+		_lineTime = 60;								//进行随机选择路线的时间
+		_bornEnemyTime = 30;						//路线中生成敌人的时间
+		_eachBornMax = 2;							//每回至多生成敌人数量
 		_enemyType_walk[0] = { Enemy::tSnake };		//修改能生成的敌人队列
 		_enemyType_walk[1] = { Enemy::tSnake };
 		_enemyType_fly[0] = { Enemy::tEagles };
@@ -398,9 +401,9 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 		for (int i = 0; i < enemySum; i++) {
 			Vector2 bornPos = _targetPos + _bornPosOffset[lineNum];
 			Enemy* it = AcquireEnemy(camera, bornPos, enemyType, _targetPos);
-			//根据路线最后调整一下贴图的左右翻转
+			//根据路线最后调整一下贴图的左右翻转(因为角度随着方向改变，所以是翻转Y轴)
 			if (lineNum == 0 || lineNum % 2 == 0)
-				it->Set_scale({ it->Get_scale().x * -1,it->Get_scale().y });
+				it->Set_scale({ it->Get_scale().x ,it->Get_scale().y * -1 });
 			_enemyLines[lineNum].push(it);
 		}
 	}
@@ -416,19 +419,27 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 			int lineNum = dis_line(gen);
 			//根据路线判断是天空还是地面
 			int sprite = 0;
+			Vector2 spriteSize{};
 			if (lineNum == 0 || lineNum == 1)
+			{
 				sprite = _spPlayer_walk;
+				spriteSize = { 384 / 4.f,96 };
+			}
 			else
+			{
 				sprite = _spPlayer_fly;
+				spriteSize = { 432 / 4.f,177 };
+			}
 			//生成小伙伴
 			Vector2 bornPos = _targetPos + _bornPosOffset[lineNum];
 			for (int i = 0; i < _bornFriendSpace; i++)//前占位，避免敌人挤压小伙伴
 				_enemyLines[lineNum].push(nullptr);
 			Enemy* it = AcquireEnemy(camera, bornPos, Enemy::tPlayer, _targetPos);
 			it->Set_sprite(sprite);
-			//根据路线最后调整一下贴图的左右翻转
+			it->Set_spriteSize(spriteSize);
+			//根据路线最后调整一下贴图的左右翻转(因为角度随着方向改变，所以是翻转Y轴)
 			if (lineNum == 0 || lineNum % 2 == 0)
-				it->Set_scale({ it->Get_scale().x * -1,it->Get_scale().y });
+				it->Set_scale({ it->Get_scale().x ,it->Get_scale().y * -1 });
 			_enemyLines[lineNum].push(it);
 			for (int i = 0; i < _bornFriendSpace; i++)//后占位
 				_enemyLines[lineNum].push(nullptr);
@@ -486,6 +497,6 @@ void EnemyManager::LoadRes()
 	_spSpider = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
 	_spBee = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
 	_spPlayer_walk = Novice::LoadTexture("./RS/Enemy/friend_walk.png");
-	_spPlayer_fly = Novice::LoadTexture("./RS/Enemy/friend_walk.png");
+	_spPlayer_fly = Novice::LoadTexture("./RS/Enemy/friend_fly.png");
 }
 
