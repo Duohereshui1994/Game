@@ -1,5 +1,6 @@
 #pragma once
 #include "Player.h"
+#include "Enemy.h"
 #include "Camera.h"
 class GameStage
 {

@@ -31,7 +31,7 @@ private:
 	//战斗属性
 	//战斗相关的属性每个敌人类型都不同，就写到了初始化方法中了，这里只补充基类缺少的变量
 	float _speed = 0;
-	Vector2 _targetPos = { 1280 / 2.f,720 / 2.f + 150 };//用于移动的目标位置
+	Vector2 _targetPos = { 1280 / 2.f,720 / 2.f - 200 };//用于移动的目标位置
 
 	//状态
 	bool _isDead = false;
@@ -69,6 +69,8 @@ public:
 	const Vector2& Get_pos() const { return _pos; };
 	const Vector2& Get_targetPos() const { return _targetPos; };
 	void Set_sprite(const int& sprite) { _sprite = sprite; };
+	const Vector2& Get_scale() const { return _scale; };
+	void Set_scale(const Vector2& scale) { _scale = scale; };
 };
 
 class EnemyManager {
@@ -77,7 +79,7 @@ private:
 	inline static int _linesSum = 2;								//当前有多少条线路
 	inline static const int _linesSumMax = 6;						//至多多少条路线
 	inline static Vector2 _bornPosOffset[_linesSumMax] = {
-		{ -800, 0 },{ 800, 0 },{ -700, -300 } ,{ 700, -300 },{ -400, -600 } ,{ 400, -600 }
+		{ -800, 0 },{ 800, 0 },{ -700, 300 } ,{ 700, 300 },{ -400, 600 } ,{ 400, 600 }
 	};																//和目标点之前的偏移
 	inline static std::stack<Enemy*> _enemyLines[_linesSumMax];		//包含每条路线中生成的敌人
 	//敌人生成随机数
@@ -111,8 +113,8 @@ public:
 	static void Draw();
 
 	//敌人生成相关函数
-	static void BornEnemy(Camera* camera, int score, int friendSum);
-	static void ClearAllEnemy();
+	static void BornEnemy(Camera* camera, int score, int friendSum);	//生成敌人(相机,分数,小伙伴数量)
+	static void ClearAllEnemy();										//清除并回收所有激活的敌人
 
 	//对象池相关
 	inline static std::vector<Enemy*> _updatePool;	//更新对象池

@@ -87,8 +87,8 @@ void Enemy::Initialize(Camera* camera, Vector2 pos, Type type)
 	{
 	case Enemy::tSnake:
 		_sprite = EnemyManager::_spSnake;
-		_spriteSize = { 128,128 };
 		_frameSum = 8;
+		_spriteSize = { 1024.f / _frameSum,128 };
 		break;
 	case Enemy::tEagles:
 		_sprite = EnemyManager::_spEagles;
@@ -102,14 +102,14 @@ void Enemy::Initialize(Camera* camera, Vector2 pos, Type type)
 		break;
 	case Enemy::tBee:
 		_sprite = EnemyManager::_spBee;
-		_spriteSize = { 1152 / 6.f,128 };
 		_frameSum = 6;
+		_spriteSize = { 1152.f / _frameSum,128 };
 		hpMax_ = 2;
 		break;
 	case Enemy::tPlayer:
 		_sprite = EnemyManager::_spPlayer_walk;
-		_spriteSize = { 96,96 };
 		_frameSum = 4;
+		_spriteSize = { 384.f / _frameSum,96 };
 		break;
 	}
 
@@ -120,9 +120,9 @@ void Enemy::Initialize(Camera* camera, Vector2 pos, Type type)
 void Enemy::Update(char keys[], char preKeys[])
 {
 	keys; preKeys;
-	Control(keys, preKeys);
+	//Control(keys, preKeys);
 
-	//Move();//移动
+	Move();//移动
 
 	//传入数据
 	_affine = { _scale,_rotate,_pos };
@@ -284,7 +284,7 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 
 	//按照分数调整难度
 	if (score < 100) {
-		_linesSum = 2;				//当前多少条线路
+		_linesSum = 6;				//当前多少条线路
 		_lineTime = 60;				//进行随机选择路线的时间
 		_bornEnemyTime = 30;		//路线中生成敌人的时间
 		_eachBornMax = 2;			//每回至多生成敌人数量
@@ -328,6 +328,9 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 			Vector2 targetPos = _idlePool.front()->Get_targetPos();
 			Vector2 bornPos = targetPos + _bornPosOffset[lineNum];
 			Enemy* it = AcquireEnemy(camera, bornPos, enemyType);
+			//根据路线最后调整一下贴图的左右翻转
+			if (lineNum == 0 || lineNum % 2 == 0)
+				it->Set_scale({ it->Get_scale().x * -1,it->Get_scale().y });
 			_enemyLines[lineNum].push(it);
 		}
 	}
@@ -354,6 +357,9 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 				_enemyLines[lineNum].push(nullptr);
 			Enemy* it = AcquireEnemy(camera, bornPos, Enemy::tPlayer);
 			it->Set_sprite(sprite);
+			//根据路线最后调整一下贴图的左右翻转
+			if (lineNum == 0 || lineNum % 2 == 0)
+				it->Set_scale({ it->Get_scale().x * -1,it->Get_scale().y });
 			_enemyLines[lineNum].push(it);
 			for (int i = 0; i < _bornFriendSpace; i++)//后占位
 				_enemyLines[lineNum].push(nullptr);
@@ -408,7 +414,7 @@ void EnemyManager::LoadRes()
 	_spEagles = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
 	_spSpider = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
 	_spBee = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
-	_spPlayer_walk = Novice::LoadTexture("./RS/Enemy/player_Up_Idle_Left.png");
-	_spPlayer_fly = Novice::LoadTexture("./RS/Enemy/player_Up_Idle_Left.png");
+	_spPlayer_walk = Novice::LoadTexture("./RS/Enemy/friend_walk.png");
+	_spPlayer_fly = Novice::LoadTexture("./RS/Enemy/friend_walk.png");
 }
 
