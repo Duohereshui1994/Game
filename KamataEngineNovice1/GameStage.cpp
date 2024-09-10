@@ -43,10 +43,7 @@ void GameStage::Draw()
 	camera_->Draw();
 	EnemyManager::Draw();
 	player_->Draw();
-
-#ifdef _DEBUG
-	Score::TestDraw();
-#endif // _Debug
+	Score::Draw();
 }
 
 void GameStage::IsCollision()

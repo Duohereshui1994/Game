@@ -13,7 +13,7 @@ private:
 public:
 	static void Initialize();				//初始化
 	static void Update(int friendSum);		//更新方法
-	static void TestDraw();					//绘画方法（只用于测试）
+	static void Draw();						//绘画方法
 
 	static void AddScore(Enemy* enemy);		//增加分数
 	static void GameOverScore();			//游戏结束，分数计算

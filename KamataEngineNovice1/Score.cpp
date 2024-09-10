@@ -21,10 +21,12 @@ void Score::Update(int friendSum)
 		_combo = 5;
 }
 
-void Score::TestDraw()
+void Score::Draw()
 {
+#ifdef _DEBUG
 	Novice::ScreenPrintf(10, 10, "Score = %d", _score);
 	Novice::ScreenPrintf(10, 30, "High Score= %d", _highScore);
+#endif // _DEBUG
 }
 
 void Score::AddScore(Enemy* enemy)
