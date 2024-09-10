@@ -14,29 +14,24 @@ Enemy::Enemy()
 {
 	frameNum_ = 0;
 	deltaTime_ = 1.0f / 60.0f;
-	// 初始化 MathFunc 对象
-	math_ = new MathFunc();
-	// 初始化 Mono 结构体成员
-	obj_.position = _pos;
-	obj_.width = _size.x;
-	obj_.height = _size.y;
-	obj_.center = Vector2(obj_.position.x + obj_.width / 2.0f, obj_.position.y + obj_.height / 2.0f);
-	obj_.scale = _scale;
-	obj_.rotate = _rotate;
-
-	tools = new EnemyTools();
+	_affine = { _scale,_rotate,_pos };
+	_screen = {};
+	math_ = new MathFunc();			// 初始化 MathFunc 对象
+	tools = new EnemyTools();		//初始化工具合集
 }
 
 Enemy::~Enemy()
 {
 	delete math_;
 	delete tools;
+	delete _camera;
 }
 
-void Enemy::Initialize(Vector2 pos, float rotate, Type type)
+void Enemy::Initialize(Camera* camera, Vector2 pos, Type type)
 {
+	_camera = camera;
 	_pos = pos;
-	_rotate = rotate;
+	_rotate = 0;
 	_type = type;
 	_size = { 96,96 };
 	_spriteSize = { 128,128 };
@@ -81,6 +76,7 @@ void Enemy::Initialize(Vector2 pos, float rotate, Type type)
 	}
 
 	hp_ = hpMax_;
+	_affine = { _scale,_rotate,_pos };
 }
 
 void Enemy::Update(char keys[], char preKeys[])
@@ -108,12 +104,15 @@ void Enemy::Update(char keys[], char preKeys[])
 	Move();//移动
 
 	//传入数据
-	obj_.position = _pos;
-	obj_.width = _size.x;
-	obj_.height = _size.y;
-	obj_.center = Vector2(obj_.position.x + obj_.width / 2.0f, obj_.position.y + obj_.height / 2.0f);
-	obj_.scale = _scale;
-	obj_.rotate = _rotate;
+	Matrix3x3 worldMatrix_ = math_->MakeAffine(_affine);
+	Matrix3x3 wvpVpMatrix_ = math_->WvpVpMatrix(worldMatrix_, _camera->GetVpVpMatrix());
+	Vertex local = {
+		{ -_spriteSize.x / 2.0f, +_spriteSize.y / 2.0f},
+		{ +_spriteSize.x / 2.0f, +_spriteSize.y / 2.0f},
+		{ -_spriteSize.x / 2.0f, -_spriteSize.y / 2.0f},
+		{ +_spriteSize.x / 2.0f, -_spriteSize.y / 2.0f},
+	};
+	_screen = math_->TransformSprite(local, wvpVpMatrix_);
 }
 
 void Enemy::Draw()
@@ -195,17 +194,17 @@ void EnemyManager::Update(char keys[], char preKeys[])
 	}
 }
 
-Enemy* EnemyManager::AcquireEnemy(Vector2 pos, float rotate, Enemy::Type type)
+Enemy* EnemyManager::AcquireEnemy(Camera* camera, Vector2 pos, Enemy::Type type)
 {
 	if (_idlePool.empty()) {
 		Enemy* enemy = new Enemy();
-		enemy->Initialize(pos, rotate, type);
+		enemy->Initialize(camera, pos, type);
 		return enemy;
 	}
 	else {
 		Enemy* enemy = _idlePool.front();
 		_idlePool.pop();
-		enemy->Initialize(pos, rotate, type);
+		enemy->Initialize(camera, pos, type);
 		return enemy;
 	}
 }
@@ -236,7 +235,7 @@ bool EnemyManager::FrameTimeWatch(int frame, int index, bool first)
 	return false;
 }
 
-void EnemyManager::BornEnemy(int score, int friendSum)
+void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 {
 	std::random_device rd;
 	std::mt19937 gen(rd());
@@ -286,7 +285,7 @@ void EnemyManager::BornEnemy(int score, int friendSum)
 		for (int i = 0; i < enemySum; i++) {
 			Vector2 targetPos = _idlePool.front()->Get_targetPos();
 			Vector2 bornPos = targetPos + _bornPosOffset[lineNum];
-			Enemy* it = AcquireEnemy(bornPos, 0, enemyType);
+			Enemy* it = AcquireEnemy(camera, bornPos, enemyType);
 			_enemyLines[lineNum].push(it);
 		}
 	}
@@ -311,7 +310,7 @@ void EnemyManager::BornEnemy(int score, int friendSum)
 			Vector2 bornPos = targetPos + _bornPosOffset[lineNum];
 			for (int i = 0; i < _bornFriendSpace; i++)//前占位，避免敌人挤压小伙伴
 				_enemyLines[lineNum].push(nullptr);
-			Enemy* it = AcquireEnemy(bornPos, 0, Enemy::tPlayer);
+			Enemy* it = AcquireEnemy(camera, bornPos, Enemy::tPlayer);
 			it->Set_sprite(sprite);
 			_enemyLines[lineNum].push(it);
 			for (int i = 0; i < _bornFriendSpace; i++)//后占位

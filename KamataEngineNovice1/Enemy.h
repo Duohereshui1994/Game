@@ -7,11 +7,17 @@
 #include <random>
 #include <cassert>
 #include "Character.h"
+#include "Camera.h"
 class EnemyTools;
 
 class Enemy : public Character
 {
 private:
+	//相机映射计算
+	Camera* _camera = nullptr;			//相机
+	Affine _affine = {};				//Affine合集(尺寸，旋转，位移)
+	Vertex _screen = {};				//屏幕坐标合集
+
 	//基础属性
 	Vector2 _pos = { -100,-100 };		//中心坐标
 	float _rotate = 0;					//旋转(弧度)
@@ -50,7 +56,7 @@ public:
 	//基础方法
 	Enemy();
 	~Enemy();
-	void Initialize(Vector2 pos, float rotate, Type type);//初始化(坐标，弧度，类型)
+	void Initialize(Camera* camera, Vector2 pos, Type type);//初始化(坐标，弧度，类型)
 	void Update(char keys[], char preKeys[]);//更新
 	void Draw() override;//描画 重写
 	void PushUpdate();//放入开始的循环中(生成敌人后，要调用这个方法敌人才会进入主循环)
@@ -103,13 +109,13 @@ public:
 	static void Draw();
 
 	//敌人生成相关函数
-	static void BornEnemy(int score, int friendSum);
+	static void BornEnemy(Camera* camera, int score, int friendSum);
 	static void ClearEnemyLines();
 
 	//对象池相关
 	inline static std::vector<Enemy*> _updatePool;	//更新对象池
 	inline static std::queue<Enemy*> _idlePool;		//闲置对象池
-	static Enemy* AcquireEnemy(Vector2 pos, float rotate, Enemy::Type type);// 获取一个对象，并且初始化
+	static Enemy* AcquireEnemy(Camera* camera, Vector2 pos, Enemy::Type type);// 获取一个对象，并且初始化
 	static void ReleaseEnemy(Enemy* enemy);// 回收一个对象
 };
 
