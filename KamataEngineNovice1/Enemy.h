@@ -41,6 +41,7 @@ private:
 	EnemyTools* tools;
 
 	void Move();
+	void Control(char keys[], char preKeys[]);//这个函数会操控敌人，只用作测试使用
 
 public:
 	//类型
@@ -65,6 +66,7 @@ public:
 
 	//Get&Set
 	const int& Get_hp() const { return hp_; };
+	const Vector2& Get_pos() const { return _pos; };
 	const Vector2& Get_targetPos() const { return _targetPos; };
 	void Set_sprite(const int& sprite) { _sprite = sprite; };
 };
@@ -110,7 +112,7 @@ public:
 
 	//敌人生成相关函数
 	static void BornEnemy(Camera* camera, int score, int friendSum);
-	static void ClearEnemyLines();
+	static void ClearAllEnemy();
 
 	//对象池相关
 	inline static std::vector<Enemy*> _updatePool;	//更新对象池
@@ -126,6 +128,7 @@ private:
 	bool FrameTimeWatch_ani(int frame, int index, bool first);		// 计时器：帧时间、编号、首次是否输出true
 public:
 	//帧动画
+	void FrameAnimation(int index, int frameTime, int frameSum, Vector2 frameSize, int sprite, Vertex screen, int color = WHITE);
 	void FrameAnimation(int index, int frameTime, int frameSum, Vector2 frameSize, int sprite, Vector2 pos, float rotate = 0, Vector2 scale = { 1,1 }, int color = WHITE);
 	//数学
 	Vector2	AditionRule(Vector2 pos, float rad);//加法定理

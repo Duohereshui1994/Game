@@ -10,6 +10,44 @@ void Enemy::Move()
 		EnemyManager::ReleaseEnemy(this);
 }
 
+void Enemy::Control(char keys[], char preKeys[])
+{
+	keys, preKeys;
+	//旋转
+	if (keys[DIK_U]) {
+		_rotate -= 0.1f;
+	}
+	else if (keys[DIK_O]) {
+		_rotate += 0.1f;
+	}
+	//尺寸
+	if (keys[DIK_J]) {
+		_scale.x += 0.1f;
+	}
+	else if (keys[DIK_L]) {
+		_scale.x -= 0.1f;
+	}
+	if (keys[DIK_I]) {
+		_scale.y += 0.1f;
+	}
+	else if (keys[DIK_K]) {
+		_scale.y -= 0.1f;
+	}
+	//移动
+	if (keys[DIK_W]) {
+		_pos.y += _speed;
+	}
+	else if (keys[DIK_S]) {
+		_pos.y -= _speed;
+	}
+	if (keys[DIK_A]) {
+		_pos.x -= _speed;
+	}
+	else if (keys[DIK_D]) {
+		_pos.x += _speed;
+	}
+}
+
 Enemy::Enemy()
 {
 	frameNum_ = 0;
@@ -82,28 +120,12 @@ void Enemy::Initialize(Camera* camera, Vector2 pos, Type type)
 void Enemy::Update(char keys[], char preKeys[])
 {
 	keys; preKeys;
-	if (keys[DIK_Q]) {
-		_rotate -= 0.1f;
-	}
-	if (keys[DIK_E]) {
-		_rotate += 0.1f;
-	}
-	if (keys[DIK_W]) {
-		_pos.y -= _speed;
-	}
-	if (keys[DIK_S]) {
-		_pos.y += _speed;
-	}
-	if (keys[DIK_A]) {
-		_pos.x -= _speed;
-	}
-	if (keys[DIK_D]) {
-		_pos.x += _speed;
-	}
+	Control(keys, preKeys);
 
-	Move();//移动
+	//Move();//移动
 
 	//传入数据
+	_affine = { _scale,_rotate,_pos };
 	Matrix3x3 worldMatrix_ = math_->MakeAffine(_affine);
 	Matrix3x3 wvpVpMatrix_ = math_->WvpVpMatrix(worldMatrix_, _camera->GetVpVpMatrix());
 	Vertex local = {
@@ -117,7 +139,8 @@ void Enemy::Update(char keys[], char preKeys[])
 
 void Enemy::Draw()
 {
-	tools->FrameAnimation(0, 10, _frameSum, _spriteSize, _sprite, _pos, _rotate, _scale, _color);
+	//tools->FrameAnimation(0, 10, _frameSum, _spriteSize, _sprite, _pos, _rotate, _scale, _color);
+	tools->FrameAnimation(0, 10, _frameSum, _spriteSize, _sprite, _screen, _color);
 }
 
 void Enemy::PushUpdate()
@@ -125,12 +148,31 @@ void Enemy::PushUpdate()
 	EnemyManager::_updatePool.push_back(this);
 }
 
-void EnemyTools::FrameAnimation(int index, int frameTime, int frameSum, Vector2 frameSize, int sprite, Vector2 pos, float rotate, Vector2 scale, int color)
+void EnemyTools::FrameAnimation(int index, int frameTime, int frameSum, Vector2 frameSize, int sprite, Vertex screen, int color)
 {
+	//帧动画的帧计算
 	if (FrameTimeWatch_ani(frameTime, index, true))
 		_currentFrameIndex[index]++;
 	if (_currentFrameIndex[index] > frameSum - 1 || _currentFrameIndex[index] < 0)
 		_currentFrameIndex[index] = 0;
+	//绘图(通过Camera计算的坐标绘图
+	Novice::DrawQuad(
+		(int)screen.leftTop.x, (int)screen.leftTop.y,
+		(int)screen.rightTop.x, (int)screen.rightTop.y,
+		(int)screen.leftBottom.x, (int)screen.leftBottom.y,
+		(int)screen.rightBottom.x, (int)screen.rightBottom.y,
+		(int)(_currentFrameIndex[index] * frameSize.x), 0,
+		(int)frameSize.x, (int)frameSize.y, sprite, color);
+}
+
+void EnemyTools::FrameAnimation(int index, int frameTime, int frameSum, Vector2 frameSize, int sprite, Vector2 pos, float rotate, Vector2 scale, int color)
+{
+	//帧动画的帧计算
+	if (FrameTimeWatch_ani(frameTime, index, true))
+		_currentFrameIndex[index]++;
+	if (_currentFrameIndex[index] > frameSum - 1 || _currentFrameIndex[index] < 0)
+		_currentFrameIndex[index] = 0;
+	//绘图(直接在屏幕上)
 	int listX = int(_currentFrameIndex[index] * frameSize.x);
 	int listY = 0;
 	int listW = int(frameSum * frameSize.x);
@@ -332,8 +374,9 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 	}
 }
 
-void EnemyManager::ClearEnemyLines()
+void EnemyManager::ClearAllEnemy()
 {
+	//将待生成队列中的敌人全部回收并清除
 	for (int i = 0; i < _linesSum; i++) {
 		while (!_enemyLines[i].empty())
 		{
@@ -342,6 +385,11 @@ void EnemyManager::ClearEnemyLines()
 			_enemyLines[i].pop();
 		}
 	}
+	//将已激活的敌人全部回收并清除
+	for (Enemy* it : _updatePool) {
+		ReleaseEnemy(it);
+	}
+	_updatePool.clear();
 }
 
 void EnemyManager::ReleaseEnemy(Enemy* enemy)
