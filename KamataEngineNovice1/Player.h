@@ -53,23 +53,30 @@ private:
 
 	PlayerState state_ = PlayerState::OnGround; //玩家初始状态为地面上待机
 
+
+public:
 	//子弹数组
 	std::vector<Bullet> bullets_;
-public:
-
 	Player();
 	~Player();
 	//初始化 重写
 	void Initialize() override;
 	//更新
 	void Update(char keys[], char preKeys[]);
-	void Update(char keys[], char preKeys[], Camera* camera) ;
+	void Update(char keys[], char preKeys[], Camera* camera);
 	//描画 重写
 	void Draw() override;
-	void DrawTexture(int leftTopX,int leftTopY,int width,int height,int textureHandle);
+	void DrawTexture(int leftTopX, int leftTopY, int width, int height, int textureHandle);
 	//攻击
 	void Attack(Camera* camera);
 	//地面地下状态切换
 	void SwithGround(char keys[], char preKeys[]);
+
+	Vector2 GetTranslate() { return affine_.translate; }							//获取中心点
+	void SetTranslate(const Vector2& translate) { affine_.translate = translate; }	//设置中心点
+	float GetRadian() { return obj_.width / 2.0f; }									//获取图片宽度的一半当半径
+
+	void OnEnenyCollide();															//玩家与敌人碰撞运行
+	void OnFriendCollide();															//玩家与友方碰撞运行
 };
 

@@ -1,5 +1,7 @@
-#define BULLET_WIDTH 32.0f
-#define BULLET_HEIGHT 32.0f
+#define BULLET_WIDTH 45.0f
+#define BULLET_HEIGHT 45.0f
+#define BULLET_SPEED 5.0f			//子弹的速度
+#define BULLET_ROTATE_TIMESCALE 1.0f//子弹旋转时的时间倍率 每帧加 1.0f / 60.0f * BULLET_ROTATE_TIMESCALE * (float)M_PI;
 #include "Bullet.h"
 #include "Novice.h"
 
@@ -7,8 +9,9 @@
 
 Bullet::Bullet()
 {
-	speed_ = 15.0f;
-	textureBullet_ = Novice::LoadTexture("./RS/3.png");
+	speed_ = BULLET_SPEED;
+	textureBullet1_ = Novice::LoadTexture("./RS/Bullet/bullet_mushroom.png");
+	textureBullet2_ = Novice::LoadTexture("./RS/Bullet/bullet_stone.png");
 
 	// 初始化 MathFunc 对象
 	math_ = new MathFunc();
@@ -69,7 +72,7 @@ void Bullet::Update(const Vector2& target, const Vector2& playerPos, Camera* cam
 		obj_.rotate = 0;
 	}
 	else {
-		obj_.rotate += 1.0f / 15.0f * (float)M_PI;
+		obj_.rotate += 1.0f / 60.0f * BULLET_ROTATE_TIMESCALE * (float)M_PI;
 	}
 
 	affine_.theta = obj_.rotate;
@@ -100,7 +103,12 @@ void Bullet::Draw()
 {
 	if (isShot_)
 	{
-		DrawTexture(0, 0, (int)BULLET_WIDTH, (int)BULLET_HEIGHT, textureBullet_);
+		if (bulletSwitch_) {
+			DrawTexture(0, 0, (int)BULLET_WIDTH, (int)BULLET_HEIGHT, textureBullet1_);
+		}
+		else {
+			DrawTexture(0, 0, (int)BULLET_WIDTH, (int)BULLET_HEIGHT, textureBullet2_);
+		}
 	}
 }
 

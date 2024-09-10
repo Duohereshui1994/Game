@@ -32,7 +32,8 @@ private:
 	bool isShot_;
 
 	//画像
-	int textureBullet_;
+	int textureBullet1_;
+	int textureBullet2_;
 
 	//目标位置的保存
 	Vector2 targetPos_;
@@ -92,5 +93,7 @@ public:
 	}
 
 	Vector2 GetTargetPos() {return targetPos_; }
+
+	bool bulletSwitch_;		//测试子弹图片用的，player.cpp里点一下切换一下状态。
 };
 

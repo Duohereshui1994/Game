@@ -185,6 +185,7 @@ void Player::Attack(Camera* camera)
 					bullet.SetPos(affine_.translate);
 					bullet.SetTargetPos(mousePosWorld);
 					bullet.Shoot(bullet.GetTargetPos(), affine_.translate);  // 发射子弹
+					bullet.bulletSwitch_ = !bullet.bulletSwitch_;
 					bullet.SetIsShot(true);
 					attackCD_ = ATTACK_COOLDOWN;
 					break;  // 只发射一颗子弹
@@ -262,6 +263,14 @@ void Player::SwithGround(char keys[], char preKeys[])
 			}
 			break;
 	}
+}
+
+void Player::OnEnenyCollide()
+{
+}
+
+void Player::OnFriendCollide()
+{
 }
 
 
