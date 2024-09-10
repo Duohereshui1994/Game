@@ -25,7 +25,8 @@ private:
 	Vector2 _spriteSize{};				//贴图的大小
 	int _frameSum = 1;					//动画帧数总数
 	Vector2 _scale = { 1,1 };			//尺寸
-	int _color = WHITE;					//颜色
+	unsigned int _color = WHITE;		//颜色
+	int alphaValue = 255;				//颜色的alpha值
 
 	//战斗属性
 	//战斗相关的属性每个敌人类型都不同，就写到了初始化方法中了，这里只补充基类缺少的变量
@@ -34,7 +35,7 @@ private:
 
 	//状态
 	bool _isDead = false;
-	bool _isCollison = false;
+	bool _isGetPlayer = false;
 
 	//工具
 	EnemyTools* tools;
@@ -60,8 +61,7 @@ public:
 	void Update(char keys[], char preKeys[]);//更新
 	void Draw() override;//描画 重写
 	void PushUpdate();//放入开始的循环中(生成敌人后，要调用这个方法敌人才会进入主循环)
-
-	//功能方法
+	void ToDead();
 
 	//Get&Set
 	const int& Get_hp() const { return hp_; };
@@ -70,6 +70,14 @@ public:
 	void Set_sprite(const int& sprite) { _sprite = sprite; };
 	const Vector2& Get_scale() const { return _scale; };
 	void Set_scale(const Vector2& scale) { _scale = scale; };
+	const bool& Get_isDead() const { return _isDead; };
+	void Set_isDead(const bool& flag) { _isDead = flag; };
+	const Vector2& Get_size() const { return _size; };
+	const Type& Get_type() const { return _type; };
+
+	const Vector2& GetTranslate() const { return _affine.translate; }				//获取中心点
+	void SetTranslate(const Vector2& translate) { _affine.translate = translate; }	//设置中心点
+	const float GetRadian() const { return _size.x / 2.f; };						//获取半径
 };
 
 class EnemyManager {
@@ -79,7 +87,7 @@ private:
 	inline static const int _linesSumMax = 6;							//至多多少条路线
 	inline static Vector2 _targetPos = { 1280 / 2.f,720 / 2.f - 200 };	//移动的目标位置
 	inline static Vector2 _bornPosOffset[_linesSumMax] = {
-		{ -1000, 0 },{ 1000, 0 },{ -800, 300 } ,{ 800, 300 },{ -500, 700 } ,{ 500, 700 }
+		{ -1000, 0 },{ 1000, 0 },{ -1000, 300 } ,{ 1000, 300 },{ -500, 800 } ,{ 500, 800 }
 	};																	//和目标点之前的偏移
 	inline static std::stack<Enemy*> _enemyLines[_linesSumMax];			//包含每条路线中生成的敌人
 	//敌人生成随机数
@@ -101,7 +109,9 @@ private:
 public:
 	//本地贴图
 	inline static int _spSnake = 0;
+	inline static int _spSnake_hurt = 0;
 	inline static int _spEagles = 0;
+	inline static int _spEagles_hurt = 0;
 	inline static int _spSpider = 0;
 	inline static int _spBee = 0;
 	inline static int _spPlayer_walk = 0;
@@ -134,6 +144,9 @@ public:
 	void FrameAnimation(int index, int frameTime, int frameSum, Vector2 frameSize, int sprite, Vector2 pos, float rotate = 0, Vector2 scale = { 1,1 }, int color = WHITE);
 	//数学
 	Vector2	AditionRule(Vector2 pos, float rad);//加法定理
+	//Ease
+	float EaseOutQuint(float t) { return 1.f - powf(1.f - t, 5.f); };
+	float EaseInCirc(float t) { return 1 - sqrtf(1 - powf(t, 2)); };
 	//工具
 	int _currentTimes[10] = { 0 };								// 这个用于计时器的使用
 	bool FrameTimeWatch(int frame, int index, bool first);		// 计时器：帧时间、编号、首次是否输出true

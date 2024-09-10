@@ -32,6 +32,8 @@ void GameStage::Update(char keys[], char preKeys[])
 	camera_->Update(keys);
 	EnemyManager::Update(keys, preKeys);
 	player_->Update(keys, preKeys, camera_);
+
+	IsCollision();
 }
 
 void GameStage::Draw()
@@ -39,4 +41,36 @@ void GameStage::Draw()
 	camera_->Draw();
 	EnemyManager::Draw();
 	player_->Draw();
+}
+
+void GameStage::IsCollision()
+{
+	//敌人和子弹
+	for (Enemy* enemy : EnemyManager::_updatePool) {
+		if (!enemy->Get_isDead()) {
+			for (auto& bullet : player_->bullets_) {
+				float length = (enemy->GetTranslate() - bullet.GetPos()).Length();
+				if (length < enemy->GetRadian() + bullet.GetWidth() / 2.f) {
+					bullet.Initialize();
+					enemy->Set_isDead(true);
+				}
+			}
+		}
+	}
+	//敌人和玩家
+	for (Enemy* it : EnemyManager::_updatePool) {
+		float length = (it->GetTranslate() - player_->GetTranslate()).Length();
+		if (length < it->GetRadian() + player_->GetRadian()) {
+			if (it->Get_type() == Enemy::tPlayer) {
+				//和小伙伴触碰
+				//可以使用下面提供的这个坐标去生成一个小伙伴，这样就可以无缝衔接上了
+				Vector2 friendPos = it->GetTranslate();
+				EnemyManager::ReleaseEnemy(it);
+			}
+			else {
+				//和敌人触碰
+				//需要提供一个小伙伴的坐标，这样我才知道要去哪里抓小伙伴
+			}
+		}
+	}
 }

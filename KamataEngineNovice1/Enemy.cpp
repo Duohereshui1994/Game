@@ -48,6 +48,57 @@ void Enemy::Control(char keys[], char preKeys[])
 	}
 }
 
+void Enemy::ToDead()
+{
+	float t = tools->_currentTimes[0] / 60.f;
+	//颜色
+	alphaValue = int((tools->EaseOutQuint(t)) * 255);
+	if (alphaValue < 0)
+		alphaValue = 0;
+	_color = 0xFF000000 | alphaValue << 0;//透明度を制御する
+	//旋转
+	if (_scale.x > 0)
+		_rotate -= (1 - tools->EaseOutQuint(t)) * 0.3f;
+	else
+		_rotate += (1 - tools->EaseOutQuint(t)) * 0.3f;
+	//尺寸
+	_scale.x = std::lerp(_scale.x, 0.f, tools->EaseInCirc(t));
+	_scale.y = std::lerp(_scale.y, 0.f, tools->EaseInCirc(t));
+	//位移
+	Vector2 dir = (_targetPos - _pos).Normalize();
+	_pos += dir * -1 * 2 * (1 - tools->EaseOutQuint(t));
+	if (tools->FrameTimeWatch(60, 0, false))
+		EnemyManager::ReleaseEnemy(this);
+	//图片
+	switch (_type)
+	{
+	case Enemy::tSnake:
+		_sprite = EnemyManager::_spSnake_hurt;
+		break;
+	case Enemy::tEagles:
+		_sprite = EnemyManager::_spEagles_hurt;
+		break;
+	case Enemy::tSpider:
+		break;
+	case Enemy::tBee:
+		break;
+	case Enemy::tPlayer:
+		break;
+	}
+
+	//传入数据
+	_affine = { _scale,_rotate,_pos };
+	Matrix3x3 worldMatrix_ = math_->MakeAffine(_affine);
+	Matrix3x3 wvpVpMatrix_ = math_->WvpVpMatrix(worldMatrix_, _camera->GetVpVpMatrix());
+	Vertex local = {
+		{ -_spriteSize.x / 2.0f, +_spriteSize.y / 2.0f},
+		{ +_spriteSize.x / 2.0f, +_spriteSize.y / 2.0f},
+		{ -_spriteSize.x / 2.0f, -_spriteSize.y / 2.0f},
+		{ +_spriteSize.x / 2.0f, -_spriteSize.y / 2.0f},
+	};
+	_screen = math_->TransformSprite(local, wvpVpMatrix_);
+}
+
 Enemy::Enemy()
 {
 	frameNum_ = 0;
@@ -76,13 +127,14 @@ void Enemy::Initialize(Camera* camera, Vector2 pos, Type type, Vector2 targetPos
 	_frameSum = 1;
 	_scale = { 1,1 };
 	_color = WHITE;
+	alphaValue = 255;
 	hpMax_ = 1;
 	attack_ = 1;
-	_speed = 3.f;
+	_speed = 3;
 	_targetPos = targetPos;
 
 	_isDead = false;
-	_isCollison = false;
+	_isGetPlayer = false;
 
 	switch (_type)
 	{
@@ -233,7 +285,10 @@ bool EnemyTools::FrameTimeWatch(int frame, int index, bool first)
 void EnemyManager::Update(char keys[], char preKeys[])
 {
 	for (Enemy* it : _updatePool) {
-		it->Update(keys, preKeys);
+		if (!it->Get_isDead())
+			it->Update(keys, preKeys);
+		else
+			it->ToDead();
 	}
 }
 
@@ -290,9 +345,9 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 		//_bornEnemyTime = 30;			//路线中生成敌人的时间
 		//_eachBornMax = 2;				//每回至多生成敌人数量
 		_linesSum = 6;
-		_lineTime = 10;
+		_lineTime = 60;
 		_bornEnemyTime = 30;
-		_eachBornMax = 10;
+		_eachBornMax = 3;
 	}
 	else if (score < 500) {
 		_linesSum = 4;
@@ -413,7 +468,9 @@ void EnemyManager::ReleaseEnemy(Enemy* enemy)
 void EnemyManager::LoadRes()
 {
 	_spSnake = Novice::LoadTexture("./RS/Enemy/snake_walk.png");
+	_spSnake_hurt = Novice::LoadTexture("./RS/Enemy/snake_hurt.png");
 	_spEagles = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
+	_spEagles_hurt = Novice::LoadTexture("./RS/Enemy/hawk_hurt.png");
 	_spSpider = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
 	_spBee = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
 	_spPlayer_walk = Novice::LoadTexture("./RS/Enemy/friend_walk.png");
