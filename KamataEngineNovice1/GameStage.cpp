@@ -18,16 +18,21 @@ void GameStage::Initialize()
 	Affine cameraCenter{ {1.0f,1.0f},0,{640,360} };//原点
 	Speed cameraSpeed{ 1.0f / 60.0f,1.0f / 60.0f,5 };//拡縮や回転や移動のスピード
 	camera_ = new Camera(cameraCenter, cameraSpeed);//インスタンス
+
+	bg_ = new Background();
+	bg_->Initialize();
 }
 
 void GameStage::Update(char keys[], char preKeys[])
 {
 	camera_->Update(keys);
 	player_->Update(keys, preKeys, camera_);
+	bg_->Update(camera_);
 }
 
 void GameStage::Draw()
 {
+	bg_->Draw();
 	camera_->Draw();
 	player_->Draw();
 }

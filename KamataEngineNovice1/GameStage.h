@@ -1,6 +1,7 @@
 #pragma once
 #include "Player.h"
 #include "Camera.h"
+#include "Background.h"
 class GameStage
 {
 public:
@@ -16,6 +17,7 @@ public:
 private:
 	Player* player_ = nullptr;
 	Camera* camera_ = nullptr;
+	Background* bg_ = nullptr;
 
 
 };
