@@ -22,18 +22,20 @@ void GameStage::Initialize()
 	Speed cameraSpeed{ 1.0f / 60.0f,1.0f / 60.0f,5 };//拡縮や回転や移動のスピード
 	camera_ = new Camera(cameraCenter, cameraSpeed);//インスタンス
 
-	EnemyManager::ClearAllEnemy();//清除所有敌人
+	EnemyManager::ClearAllEnemy();	//清除所有敌人
+	Score::Initialize();			//重置分数
 }
 
 void GameStage::Update(char keys[], char preKeys[])
 {
-	EnemyManager::BornEnemy(camera_, 0, 0);//生成敌人(相机，分数，小伙伴人数)
+	EnemyManager::BornEnemy(camera_, Score::GetScore(), 0);//生成敌人(相机，分数，小伙伴人数)
 
 	camera_->Update(keys);
 	EnemyManager::Update(keys, preKeys);
 	player_->Update(keys, preKeys, camera_);
 
-	IsCollision();
+	IsCollision();			//碰撞检测
+	Score::Update(0);		//分数计算（要传入当前小伙伴数量）
 }
 
 void GameStage::Draw()
@@ -41,6 +43,10 @@ void GameStage::Draw()
 	camera_->Draw();
 	EnemyManager::Draw();
 	player_->Draw();
+
+#ifdef _DEBUG
+	Score::TestDraw();
+#endif // _Debug
 }
 
 void GameStage::IsCollision()
@@ -53,6 +59,7 @@ void GameStage::IsCollision()
 				if (length < enemy->GetRadian() + bullet.GetWidth() / 2.f) {
 					bullet.Initialize();
 					enemy->Set_isDead(true);
+					Score::AddScore(enemy);
 				}
 			}
 		}

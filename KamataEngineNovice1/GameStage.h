@@ -3,6 +3,7 @@
 #include "Enemy.h"
 #include "Bullet.h"
 #include "Camera.h"
+#include "Score.h"
 class GameStage
 {
 public:
