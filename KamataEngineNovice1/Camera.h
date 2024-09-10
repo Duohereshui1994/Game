@@ -79,5 +79,14 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	Matrix3x3 GetVpVpMatrix() { return vpVpMatrix_; };
+
+	Vector2 GetScale() { return affine_.scale; };
+	void SetScale(Vector2 scale) { affine_.scale = scale; };
+
+	float GetRotate() { return affine_.theta; };
+	void SetRotate(float theta) { affine_.theta = theta; };
+
+	Vector2 GetTranslate() { return affine_.translate; };
+	void SetTranslate(Vector2 translate) { affine_.translate = translate; };
 };
 

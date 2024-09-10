@@ -65,7 +65,7 @@ Enemy::~Enemy()
 	delete _camera;
 }
 
-void Enemy::Initialize(Camera* camera, Vector2 pos, Type type)
+void Enemy::Initialize(Camera* camera, Vector2 pos, Type type, Vector2 targetPos)
 {
 	_camera = camera;
 	_pos = pos;
@@ -79,6 +79,7 @@ void Enemy::Initialize(Camera* camera, Vector2 pos, Type type)
 	hpMax_ = 1;
 	attack_ = 1;
 	_speed = 3.f;
+	_targetPos = targetPos;
 
 	_isDead = false;
 	_isCollison = false;
@@ -236,17 +237,17 @@ void EnemyManager::Update(char keys[], char preKeys[])
 	}
 }
 
-Enemy* EnemyManager::AcquireEnemy(Camera* camera, Vector2 pos, Enemy::Type type)
+Enemy* EnemyManager::AcquireEnemy(Camera* camera, Vector2 pos, Enemy::Type type, Vector2 targetPos)
 {
 	if (_idlePool.empty()) {
 		Enemy* enemy = new Enemy();
-		enemy->Initialize(camera, pos, type);
+		enemy->Initialize(camera, pos, type, targetPos);
 		return enemy;
 	}
 	else {
 		Enemy* enemy = _idlePool.front();
 		_idlePool.pop();
-		enemy->Initialize(camera, pos, type);
+		enemy->Initialize(camera, pos, type, targetPos);
 		return enemy;
 	}
 }
@@ -284,10 +285,14 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 
 	//按照分数调整难度
 	if (score < 100) {
-		_linesSum = 6;				//当前多少条线路
-		_lineTime = 60;				//进行随机选择路线的时间
-		_bornEnemyTime = 30;		//路线中生成敌人的时间
-		_eachBornMax = 2;			//每回至多生成敌人数量
+		//_linesSum = 2;				//当前多少条线路
+		//_lineTime = 60;				//进行随机选择路线的时间
+		//_bornEnemyTime = 30;			//路线中生成敌人的时间
+		//_eachBornMax = 2;				//每回至多生成敌人数量
+		_linesSum = 6;
+		_lineTime = 10;
+		_bornEnemyTime = 30;
+		_eachBornMax = 10;
 	}
 	else if (score < 500) {
 		_linesSum = 4;
@@ -305,7 +310,6 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 
 	//随机选择路线并填入敌人
 	if (FrameTimeWatch(_lineTime, 0, true)) {
-		assert(!_idlePool.empty());//请不要让敌人的闲置对象池为空
 		//往哪个路线填入敌人
 		std::uniform_int_distribution<int> dis_line(0, _linesSum - 1);
 		int lineNum = dis_line(gen);
@@ -325,9 +329,8 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 		std::uniform_int_distribution<int> dis_enemySum(0, _eachBornMax);
 		int enemySum = dis_enemySum(gen);
 		for (int i = 0; i < enemySum; i++) {
-			Vector2 targetPos = _idlePool.front()->Get_targetPos();
-			Vector2 bornPos = targetPos + _bornPosOffset[lineNum];
-			Enemy* it = AcquireEnemy(camera, bornPos, enemyType);
+			Vector2 bornPos = _targetPos + _bornPosOffset[lineNum];
+			Enemy* it = AcquireEnemy(camera, bornPos, enemyType, _targetPos);
 			//根据路线最后调整一下贴图的左右翻转
 			if (lineNum == 0 || lineNum % 2 == 0)
 				it->Set_scale({ it->Get_scale().x * -1,it->Get_scale().y });
@@ -351,11 +354,10 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 			else
 				sprite = _spPlayer_fly;
 			//生成小伙伴
-			Vector2 targetPos = _idlePool.front()->Get_targetPos();
-			Vector2 bornPos = targetPos + _bornPosOffset[lineNum];
+			Vector2 bornPos = _targetPos + _bornPosOffset[lineNum];
 			for (int i = 0; i < _bornFriendSpace; i++)//前占位，避免敌人挤压小伙伴
 				_enemyLines[lineNum].push(nullptr);
-			Enemy* it = AcquireEnemy(camera, bornPos, Enemy::tPlayer);
+			Enemy* it = AcquireEnemy(camera, bornPos, Enemy::tPlayer, _targetPos);
 			it->Set_sprite(sprite);
 			//根据路线最后调整一下贴图的左右翻转
 			if (lineNum == 0 || lineNum % 2 == 0)

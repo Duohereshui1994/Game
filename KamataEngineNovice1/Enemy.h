@@ -5,7 +5,6 @@
 #include <queue>
 #include <stack>
 #include <random>
-#include <cassert>
 #include "Character.h"
 #include "Camera.h"
 class EnemyTools;
@@ -31,7 +30,7 @@ private:
 	//战斗属性
 	//战斗相关的属性每个敌人类型都不同，就写到了初始化方法中了，这里只补充基类缺少的变量
 	float _speed = 0;
-	Vector2 _targetPos = { 1280 / 2.f,720 / 2.f - 200 };//用于移动的目标位置
+	Vector2 _targetPos{};//用于移动的目标位置
 
 	//状态
 	bool _isDead = false;
@@ -57,7 +56,7 @@ public:
 	//基础方法
 	Enemy();
 	~Enemy();
-	void Initialize(Camera* camera, Vector2 pos, Type type);//初始化(坐标，弧度，类型)
+	void Initialize(Camera* camera, Vector2 pos, Type type, Vector2 targetPos);//初始化(坐标，弧度，类型,目标位置)
 	void Update(char keys[], char preKeys[]);//更新
 	void Draw() override;//描画 重写
 	void PushUpdate();//放入开始的循环中(生成敌人后，要调用这个方法敌人才会进入主循环)
@@ -76,12 +75,13 @@ public:
 class EnemyManager {
 private:
 	//敌人生成路线
-	inline static int _linesSum = 2;								//当前有多少条线路
-	inline static const int _linesSumMax = 6;						//至多多少条路线
+	inline static int _linesSum = 2;									//当前有多少条线路
+	inline static const int _linesSumMax = 6;							//至多多少条路线
+	inline static Vector2 _targetPos = { 1280 / 2.f,720 / 2.f - 200 };	//移动的目标位置
 	inline static Vector2 _bornPosOffset[_linesSumMax] = {
-		{ -800, 0 },{ 800, 0 },{ -700, 300 } ,{ 700, 300 },{ -400, 600 } ,{ 400, 600 }
-	};																//和目标点之前的偏移
-	inline static std::stack<Enemy*> _enemyLines[_linesSumMax];		//包含每条路线中生成的敌人
+		{ -1000, 0 },{ 1000, 0 },{ -800, 300 } ,{ 800, 300 },{ -500, 700 } ,{ 500, 700 }
+	};																	//和目标点之前的偏移
+	inline static std::stack<Enemy*> _enemyLines[_linesSumMax];			//包含每条路线中生成的敌人
 	//敌人生成随机数
 	inline static int _lineTime = 0;				//进行随机选择路线的时间(具体调整写到了BornEnemy中)
 	inline static int _bornEnemyTime = 0;			//路线中生成敌人的时间
@@ -119,7 +119,7 @@ public:
 	//对象池相关
 	inline static std::vector<Enemy*> _updatePool;	//更新对象池
 	inline static std::queue<Enemy*> _idlePool;		//闲置对象池
-	static Enemy* AcquireEnemy(Camera* camera, Vector2 pos, Enemy::Type type);// 获取一个对象，并且初始化
+	static Enemy* AcquireEnemy(Camera* camera, Vector2 pos, Enemy::Type type, Vector2 targetPos);// 获取一个对象，并且初始化
 	static void ReleaseEnemy(Enemy* enemy);// 回收一个对象
 };
 
