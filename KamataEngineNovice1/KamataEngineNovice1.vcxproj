@@ -127,6 +127,8 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MathFunc.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="TitleBackground.cpp" />
+    <ClCompile Include="TitleStage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Background.h" />
@@ -169,6 +171,8 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="Matrix3x3.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="struct.h" />
+    <ClInclude Include="TitleBackground.h" />
+    <ClInclude Include="TitleStage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

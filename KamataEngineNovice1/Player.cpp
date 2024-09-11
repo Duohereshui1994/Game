@@ -275,15 +275,32 @@ void Player::Draw()
 			break;
 
 		case PlayerState::UnderGround:
+			//BULLET
+			for (auto& bullet : bullets_)
+			{
+				bullet.Draw();
+			}
+
 			DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleUnder_);
 			break;
 
 		case PlayerState::Up:
+			//BULLET
+			for (auto& bullet : bullets_)
+			{
+				bullet.Draw();
+			}
 
 			DrawTexture((int)upFrame_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleUp_);
 			break;
 
 		case PlayerState::Down:
+			//BULLET
+			for (auto& bullet : bullets_)
+			{
+				bullet.Draw();
+			}
+
 			DrawTexture((int)downFrame_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleDown_);
 			break;
 	}
