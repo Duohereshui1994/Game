@@ -35,7 +35,8 @@ private:
 	float downFrame_;			//钻进土里动画的帧数序号
 	float upFrame_;				//钻出土动画的帧数序号
 
-	int emotion_;				//情绪值
+	int emotionValue_;				//情绪值
+	int emotionRecover_;				//情绪回复倍率
 
 	int currentFriendIndex = 13;  // 全局变量或者类的成员变量
 
@@ -116,8 +117,9 @@ public:
 	void OnEnenyCollide();															//玩家与敌人碰撞运行
 	void OnFriendCollide();															//玩家与友方碰撞运行
 
-	PlayerState GetState() { return state_; }
-	EmotionState GetEmotion() { return emotionState_; }
+	PlayerState GetState() { return state_; }	//获取玩家状态
+	EmotionState GetEmotion() { return emotionState_; }//获取玩家情绪状态
+	int GetEmotionValue() { return emotionValue_; }//获取玩家情绪值
 
 	void EmotionUpdate();
 };

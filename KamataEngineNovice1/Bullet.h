@@ -2,6 +2,11 @@
 #include "MathFunc.h"
 #include "Camera.h"
 
+enum class BulletType {
+	Mushroom,
+	Stone,
+};
+
 class Bullet
 {
 private:
@@ -24,6 +29,8 @@ private:
 	Matrix3x3 wvpVpMatrix_;
 	//=========================================================
 
+	//子弹状态
+	BulletType bulletState_ = BulletType::Mushroom;
 
 	//子弹的旋转
 	//float rotate = 0.0f;
@@ -92,7 +99,11 @@ public:
 		targetPos_ = targetPos;
 	}
 
+	//获取目标位置
 	Vector2 GetTargetPos() {return targetPos_; }
+
+	//获取子弹状态
+	BulletType GetBulletState() { return bulletState_; }
 
 	bool bulletSwitch_;		//测试子弹图片用的，player.cpp里点一下切换一下状态。
 };

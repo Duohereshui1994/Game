@@ -9,6 +9,7 @@ GameStage::~GameStage()
 	delete player_;
 	delete bg_;
 	delete filter_;
+	delete emotion_;
 }
 
 void GameStage::Initialize()
@@ -26,6 +27,9 @@ void GameStage::Initialize()
 
 	filter_ = new Filter();
 	filter_->Initialize();
+
+	emotion_ = new Emotion();
+	emotion_->Initialize();
 }
 
 void GameStage::Update(char keys[], char preKeys[])
@@ -35,6 +39,7 @@ void GameStage::Update(char keys[], char preKeys[])
 	player_->Update(keys, preKeys, camera_);
 	bg_->Update(camera_);
 	filter_->Update(camera_);
+	emotion_->Update(player_, camera_);
 }
 
 void GameStage::Draw()
@@ -42,5 +47,6 @@ void GameStage::Draw()
 	bg_->Draw();
 	camera_->Draw();
 	player_->Draw();
+	emotion_->Draw();
 	filter_->Draw();
 }

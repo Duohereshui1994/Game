@@ -2,8 +2,9 @@
 #define MAX_UPFRAME 4.0f			//从土里钻出来的动画的最大帧数
 #define MAX_DOWNFRAME 7.0f			//钻进土里去的动画的最大帧数
 #define MAX_IDLEFRAME 4.0f			//在地面或者在地下待机的动画最大帧数（共用一个）
-#define UP_DOWN_TIME_SCALE 4.0f		//钻进钻出的动画速度
+#define UP_DOWN_TIME_SCALE 15.0f		//钻进钻出的动画速度
 #define IDLE_TIME_SCALE 2.0f		//待机的动画速度
+#define RECOVER_SPEED 120			//恢复速度
 #define PLAYER_WIDTH 96.0f
 #define PLAYER_HEIGHT 96.0f
 #include "Player.h"
@@ -30,7 +31,8 @@ Player::Player()
 
 	attackCD_ = 0.0f;
 
-	emotion_ = 50;
+	emotionValue_ = 50;
+	emotionRecover_ = RECOVER_SPEED;
 
 
 	// 初始化 MathFunc 对象
@@ -134,8 +136,11 @@ void Player::Initialize()
 
 	attackCD_ = 0.0f;
 
+	emotionValue_ = 50;
+
 	affine_ = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
 	affine_.translate = UpPos;
+
 
 	for (int i = 0; i < 14; i++) {
 		affineFriends_[i].translate = friends_[i].pos_;
@@ -175,6 +180,12 @@ void Player::Update(char keys[], char preKeys[])
 		if (currentFriendIndex > 13) {
 			currentFriendIndex = 13;
 		}
+	}
+	if (keys[DIK_U] && !preKeys[DIK_U]) {
+		emotionValue_ += 10;
+	}
+	if (keys[DIK_I] && !preKeys[DIK_I]) {
+		emotionValue_ -= 10;
 	}
 }
 
@@ -340,6 +351,7 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 				downFrame_ = 0;
 				state_ = PlayerState::Down;
 			}
+
 			break;
 
 		case PlayerState::UnderGround:
@@ -355,6 +367,10 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 				upFrame_ = 0;
 				state_ = PlayerState::Up;
 			}
+
+
+			//回复心情
+			emotionValue_ += (int)(deltaTime_ * RECOVER_SPEED);
 			break;
 
 		case PlayerState::Up:
@@ -408,17 +424,17 @@ void Player::OnFriendCollide()
 
 void Player::EmotionUpdate()
 {
-	if (emotion_ > 100) {
-		emotion_ = 100;
+	if (emotionValue_ > 100) {
+		emotionValue_ = 100;
 	}
-	if (emotion_ < 0) {
-		emotion_ = 0;
+	if (emotionValue_ < 0) {
+		emotionValue_ = 0;
 	}
 
-	if (emotion_ > 60) {
+	if (emotionValue_ > 60) {
 		emotionState_ = EmotionState::Happy;
 	}
-	else if (emotion_ > 30 && emotion_ <= 60) {
+	else if (emotionValue_ > 30 && emotionValue_ <= 60) {
 		emotionState_ = EmotionState::General;
 	}
 	else {

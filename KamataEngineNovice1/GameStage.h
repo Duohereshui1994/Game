@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Background.h"
 #include "Filter.h"
+#include "Emotion.h"
 
 class GameStage
 {
@@ -21,7 +22,7 @@ private:
 	Camera* camera_ = nullptr;
 	Background* bg_ = nullptr;
 	Filter* filter_ = nullptr;
-
+	Emotion* emotion_ = nullptr;
 
 };
 

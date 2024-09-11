@@ -2,6 +2,8 @@
 #include "MathFunc.h"
 #include "Camera.h"
 
+class Player;
+
 class Emotion
 {
 private:
@@ -23,6 +25,8 @@ private:
 	//=========================================================
 
 	int textureEmotion_;
+
+	int stateTextureRange_;
 
 	MathFunc* math_ = nullptr;	//数学函数类的指针
 
