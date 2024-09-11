@@ -1,17 +1,23 @@
 #define FILTER_WIDTH 1940
 #define FILTER_HEIGHT 1100
+#define MAX_UPFRAME 4.0f			//从土里钻出来的动画的最大帧数
+#define MAX_DOWNFRAME 7.0f			//钻进土里去的动画的最大帧数
 #include "Novice.h"
 #include "Filter.h"
+#include "Player.h"
 
 Filter::Filter()
 {
 	//加载图片
 	textureFilter_ = Novice::LoadTexture("./RS/UI/UI_filter.png");
 
+	upViewScale = { 1.0f,1.0f };
+	downViewScale = { 2.0f,2.0f };
+
 	// 初始化 Mono 结构体成员
 	obj_.width = FILTER_WIDTH;
 	obj_.height = FILTER_HEIGHT;
-	obj_.scale = Vector2(1.0f, 1.0f);
+	obj_.scale = upViewScale;
 	obj_.rotate = 0.0f;
 
 	//==================camera=================================
@@ -48,8 +54,26 @@ void Filter::Initialize()
 	affine_.translate = { 640.0f, 360.0f };
 }
 
-void Filter::Update(Camera* camera)
+void Filter::Update(Player* player, Camera* camera)
 {
+	switch (player->GetState())
+	{
+		case PlayerState::OnGround:
+			obj_.scale = upViewScale;
+			break;
+		case PlayerState::UnderGround:
+			obj_.scale = downViewScale;
+			break;
+		case PlayerState::Up:
+			obj_.scale = math_->Lerp(downViewScale, upViewScale, player->GetUpFrame() / (float)(MAX_UPFRAME - 1));
+			break;
+		case PlayerState::Down:
+			obj_.scale = math_->Lerp(upViewScale, downViewScale, player->GetDownFrame() / (float)(MAX_DOWNFRAME - 1));
+			break;
+		default:
+			break;
+	}
+	affine_.scale = obj_.scale;
 	//更新变换矩阵
 	worldMatrix_ = math_->MakeAffine(affine_);
 

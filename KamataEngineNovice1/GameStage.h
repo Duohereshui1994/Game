@@ -5,6 +5,8 @@
 #include "Camera.h"
 #include "Background.h"
 #include "Filter.h"
+#include "Emotion.h"
+#include "Grid.h"
 #include "Score.h"
 #include "Particle.h"
 
@@ -27,7 +29,8 @@ private:
 	Camera* camera_ = nullptr;
 	Background* bg_ = nullptr;
 	Filter* filter_ = nullptr;
-
+	Emotion* emotion_ = nullptr;
+	Grid* grid_ = nullptr;
 
 };
 

@@ -68,6 +68,15 @@
     <ClCompile Include="Emotion.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
+    <ClCompile Include="Grid.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleStage.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleBackground.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -151,5 +160,8 @@
     <ClInclude Include="Background.h" />
     <ClInclude Include="Filter.h" />
     <ClInclude Include="Emotion.h" />
+    <ClInclude Include="Grid.h" />
+    <ClInclude Include="TitleStage.h" />
+    <ClInclude Include="TitleBackground.h" />
   </ItemGroup>
 </Project>

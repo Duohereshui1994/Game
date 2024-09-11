@@ -15,6 +15,8 @@ Emotion::Emotion()
 	obj_.scale = Vector2(1.0f, 1.0f);
 	obj_.rotate = 0.0f;
 
+	stateTextureRange_ = 0;
+
 	//==================camera=================================
 	//プレイヤーのローカル座標
 	local_ = {
@@ -44,12 +46,28 @@ void Emotion::Initialize()
 {
 	//以画面中心为原点画图的操作方法
 	affine_ = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
-	affine_.translate = { 640.0f, 360.0f };
+	affine_.translate = { 768.0f, 360.0f };
 }
 
 void Emotion::Update(Player* player, Camera* camera)
 {
 	player->GetEmotion();
+
+	switch (player->GetEmotion())
+	{
+		case EmotionState::Happy:
+			stateTextureRange_ = 0;
+			break;
+
+		case EmotionState::General:
+			stateTextureRange_ = 1;
+			break;
+
+		case EmotionState::Sad:
+			stateTextureRange_ = 2;
+			break;
+	}
+
 
 	//更新变换矩阵
 	worldMatrix_ = math_->MakeAffine(affine_);
@@ -61,7 +79,7 @@ void Emotion::Update(Player* player, Camera* camera)
 
 void Emotion::Draw()
 {
-	DrawTexture(0, 0, (int)obj_.width, (int)obj_.height, textureEmotion_);
+	DrawTexture((int)stateTextureRange_ * Emotion_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureEmotion_);
 }
 
 void Emotion::DrawTexture(int leftTopX, int leftTopY, int width, int height, int textureHandle)

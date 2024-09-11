@@ -12,6 +12,7 @@ GameStage::~GameStage()
 	delete player_;
 	delete bg_;
 	delete filter_;
+	delete emotion_;
 }
 
 void GameStage::Initialize()
@@ -32,6 +33,12 @@ void GameStage::Initialize()
 
 	filter_ = new Filter();
 	filter_->Initialize();
+
+	emotion_ = new Emotion();
+	emotion_->Initialize();
+
+	grid_ = new Grid();
+	grid_->Initialize();
 }
 
 void GameStage::Update(char keys[], char preKeys[])
@@ -43,6 +50,8 @@ void GameStage::Update(char keys[], char preKeys[])
 	EnemyManager::Update(keys, preKeys);
 	player_->Update(keys, preKeys, camera_);
 	bg_->Update(camera_);
+	filter_->Update(player_, camera_);
+	emotion_->Update(player_, camera_);
 	filter_->Update(camera_);
 	ParticleManager::Update();
 
@@ -52,14 +61,16 @@ void GameStage::Update(char keys[], char preKeys[])
 
 void GameStage::Draw()
 {
-	Novice::DrawBox(-50, -50, 1280 + 50, 720 + 50, 0, BLACK, kFillModeSolid);//最下面的黑色背景，防止穿帮
+	Novice::DrawBox(-50, -50, 1280 + 100, 720 + 100, 0, BLACK, kFillModeSolid);//最下面的黑色背景，防止穿帮
 
 	bg_->Draw();
 	camera_->Draw();
 	EnemyManager::Draw();
 	player_->Draw();
+	emotion_->Draw();
 	ParticleManager::Draw();
 	filter_->Draw();
+	grid_->Draw();
 
 	ParticleManager::PreDraw();
 	Score::Draw();
