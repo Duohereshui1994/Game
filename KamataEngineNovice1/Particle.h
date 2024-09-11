@@ -11,7 +11,7 @@
 //这个系统写的太复杂了，所以就只要关注ParticleManager这个类即可
 //重要的就是Update()和Draw()和PreDraw()，这3个方法要放到主循环中
 //需要使用特效的时候就调用ADD_Particle()方法，要传入相机、出现的坐标、Emitter::的一个enum类型
-//例：ADD_Particle(camera_,pos_,Emitter::emotion_happy);
+//例：ParticleManager::ADD_Particle(camera_,pos_,Emitter::emotion_happy);
 
 
 class Particle
@@ -26,6 +26,8 @@ public:
 		emotion_happy,
 		emotion_normal,
 		emotion_sad,
+		friendDead,
+		friendAdd,
 	}_particleType;
 
 	Vector2 _pos;
@@ -78,6 +80,8 @@ public:
 		emotion_happy,
 		emotion_normal,
 		emotion_sad,
+		friendDead,
+		friendAdd,
 	}_particleType;
 
 	Vector2 _pos;

@@ -89,7 +89,7 @@ void GameStage::IsCollision()
 					Vector2 enemyPos = enemy->GetTranslate();
 					//地面的情况要将特效收缩到屏幕内
 					if (player_->GetState() == PlayerState::OnGround) {
-						enemyPos.x = std::clamp(enemyPos.x, 30.f, 1280.f - 30.f);
+						enemyPos.x = std::clamp(enemyPos.x, 50.f, 1280.f - 50.f);
 						enemyPos.y = std::clamp(enemyPos.y, 15.f, 720.f - 15.f);
 					}
 					if (enemy->Get_type() == Enemy::tPlayer)
@@ -100,6 +100,7 @@ void GameStage::IsCollision()
 					Score::AddScore(enemy);
 					bullet.Initialize();
 					enemy->Set_isDead(true);
+					//ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::friendAdd);
 				}
 			}
 		}

@@ -32,7 +32,7 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 	case bulletHurt: {
 		_spriteSize = { 20,20 };
 		_sprite = Novice::LoadTexture("./RS/Particle/stone.png");
-		_speed = 0.1f;
+		_speed = 0.2f;
 		std::uniform_real_distribution dis_dirX(-0.7f, 0.7f);
 		std::uniform_real_distribution dis_dirY(0.f, 2.f);
 		_dir = { dis_dirX(gen), dis_dirY(gen) };
@@ -41,7 +41,7 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 		std::uniform_real_distribution dis_scale(0.5f, 0.7f);
 		float randScale = dis_scale(gen);
 		_scale = { randScale,randScale };
-		std::uniform_int_distribution dis_life(40, 60);
+		std::uniform_int_distribution dis_life(60, 80);
 		_lifeTime = dis_life(gen);
 		break;
 	}
@@ -78,6 +78,34 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 		_scale = { 0,0 };
 		Vector2 posOffset = { 40,60 };//偏移
 		_pos += posOffset;
+		break;
+	}
+	case friendDead: {
+		_spriteSize = { 29,4 };
+		_sprite = Novice::LoadTexture("./RS/Particle/friendDead.png");
+		_scale = { 2.f,2.f };
+		_speed = 0.5f;
+		std::uniform_real_distribution dis_dirX(-1.f, 1.f);
+		_dir.x = dis_dirX(gen);
+		std::uniform_real_distribution dis_dirY(2.f, 2.5f);
+		_dir.y = dis_dirY(gen) * -1;
+		std::uniform_real_distribution dis_angle(-10.f, 10.f);
+		_angle = dis_angle(gen);
+		_lifeTime = 240;
+		break;
+	}
+	case friendAdd: {
+		_spriteSize = { 44,44 };
+		_sprite = Novice::LoadTexture("./RS/Particle/friendAdd.png");
+		_scale = { 0.5f,0.5f };
+		_speed = 0.5f;
+		std::uniform_real_distribution dis_dirX(-0.5f, 0.5f);
+		_dir.x = dis_dirX(gen);
+		std::uniform_real_distribution dis_dirY(2.f, 2.5f);
+		_dir.y = dis_dirY(gen) * -1;
+		std::uniform_real_distribution dis_angle(-10.f, 10.f);
+		_angle = dis_angle(gen);
+		_lifeTime = 240;
 		break;
 	}
 	}
@@ -156,6 +184,35 @@ void Particle::Move()
 		}
 		break;
 	}
+	case friendDead:
+	case friendAdd: {
+		if (_alphaValue > 5 && _currentTime > _lifeTime - 30) {
+			_color = 0xFFFFFF00 | _alphaValue << 0;
+			_alphaValue -= 5;
+		}
+		float bounce = 0.6f;
+		float gravity = -0.5f;
+		Vector2 backupPos = { _pos.x,_pos.y };
+		_angle += 0.1f;
+		_acc.y = _dir.y * _speed;
+		if (_currentTime < 10) {
+			_vel.y += _acc.y;
+		}
+		_vel.y -= gravity;
+		_pos.y -= _vel.y;
+		_acc.x = _dir.x * _speed;
+		if (_currentTime < 10) {
+			_vel.x += _acc.x;
+		}
+		_pos.x += _vel.x;
+		if (_pos.y < 200) {
+			_pos.y = backupPos.y;
+			_vel.x *= bounce;
+			_vel.y *= -bounce;
+			_angle *= -bounce;
+		}
+		break;
+	}
 	}
 
 	_currentTime++;
@@ -181,6 +238,8 @@ void Particle::Draw()
 		Novice::DrawBox(int(screenPos.x), int(screenPos.y), int(_radius * _scale.x), int(_radius * _scale.y), _angle, _color, kFillModeSolid);
 		break;
 	case bulletHurt:
+	case friendDead:
+	case friendAdd:
 		Novice::DrawQuad(
 			(int)_screen.leftTop.x, (int)_screen.leftTop.y,
 			(int)_screen.rightTop.x, (int)_screen.rightTop.y,
@@ -282,6 +341,12 @@ void Emitter::Initialize(Camera* camera, Vector2 pos, TYPE type)
 	case bulletHurt:
 		_width = 2;
 		_height = 10;
+		_particleSum = 5;
+		break;
+	case friendDead:
+	case friendAdd:
+		_width = 5;
+		_height = 5;
 		_particleSum = 5;
 		break;
 	}
