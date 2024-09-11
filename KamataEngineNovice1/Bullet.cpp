@@ -92,7 +92,7 @@ void Bullet::Shoot(const Vector2& target, const Vector2& playerPos)
 	affine_.translate = math_->Add(affine_.translate, math_->Multiply(speed_, math_->Normalize(dir)));
 
 	// 可以加一个判断，确保子弹超出屏幕或者达到目标后停止
-	if (affine_.translate.x > 1280 || affine_.translate.x < 0 || affine_.translate.y > 720 || affine_.translate.y < 0) {
+	if (affine_.translate.x > 1600 || affine_.translate.x < -320 || affine_.translate.y > 900 || affine_.translate.y < -180) {
 		Initialize();
 	}
 

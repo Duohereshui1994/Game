@@ -30,6 +30,8 @@ Player::Player()
 
 	attackCD_ = 0.0f;
 
+	emotion_ = 50;
+
 
 	// 初始化 MathFunc 对象
 	math_ = new MathFunc();
@@ -55,8 +57,20 @@ Player::Player()
 	//プレイヤー 拡縮・回転・移動
 	affine_ = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
 
+	for (int i = 0; i < 14; i++) {
+		affineFriends_[i] = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
+	}
+
+
 	//スクリーン座標系に変化に使う
 	screen_ = {};
+
+	for (int i = 0; i < 14; i++) {
+
+		screenFriends_[i] = {};
+		worldMatrixFriends_[i] = {};
+		wvpVpMatrixFriends_[i] = {};
+	}
 
 	//ワールドマトリックス
 	worldMatrix_ = {};
@@ -64,6 +78,43 @@ Player::Player()
 	wvpVpMatrix_ = {};
 
 	//=========================================================
+
+	//伙伴保存数列 位置及状态
+	//最下层 4
+	friends_[10] = { {UpPos.x + PLAYER_WIDTH / 2.0f * 1.5f * 2.0f,UpPos.y},0xFFFFFFFF,false };
+	friends_[11] = { {UpPos.x - PLAYER_WIDTH / 2.0f * 1.5f * 2.0f,UpPos.y},0xFFFFFFFF,false };
+	friends_[12] = { {UpPos.x + PLAYER_WIDTH / 2.0f * 1.5f * 1.0f,UpPos.y},0xFFFFFFFF,false };
+	friends_[13] = { {UpPos.x - PLAYER_WIDTH / 2.0f * 1.5f * 1.0f,UpPos.y},0xFFFFFFFF,false };
+
+	//第二层 4
+	friends_[6] = { {UpPos.x + PLAYER_WIDTH / 3.0f + PLAYER_WIDTH / 2.0f * 1.5f,UpPos.y + 48.0f},0xFFFFFFFF,false };
+	friends_[7] = { {UpPos.x - PLAYER_WIDTH / 3.0f - PLAYER_WIDTH / 2.0f * 1.5f,UpPos.y + PLAYER_HEIGHT / 2.0f},0xFFFFFFFF,false };
+	friends_[8] = { {UpPos.x + PLAYER_WIDTH / 3.0f,UpPos.y + PLAYER_HEIGHT / 2.0f},0xFFFFFFFF,false };
+	friends_[9] = { {UpPos.x - PLAYER_WIDTH / 3.0f,UpPos.y + PLAYER_HEIGHT / 2.0f},0xFFFFFFFF,false };
+
+	//第三层 3
+	friends_[3] = { {UpPos.x ,UpPos.y + PLAYER_HEIGHT},0xFFFFFFFF,false };
+	friends_[4] = { {UpPos.x - PLAYER_WIDTH / 2.0f * 1.5f,UpPos.y + PLAYER_HEIGHT},0xFFFFFFFF,false };
+	friends_[5] = { {UpPos.x + PLAYER_WIDTH / 2.0f * 1.5f,UpPos.y + PLAYER_HEIGHT},0xFFFFFFFF,false };
+
+	//第四层 2
+	friends_[1] = { {UpPos.x - PLAYER_WIDTH / 3.0f,UpPos.y + PLAYER_HEIGHT * 1.5f},0xFFFFFFFF,false };
+	friends_[2] = { {UpPos.x + PLAYER_WIDTH / 3.0f,UpPos.y + PLAYER_HEIGHT * 1.5f},0xFFFFFFFF,false };
+
+	//第五层 1
+	friends_[0] = { {UpPos.x,UpPos.y + PLAYER_HEIGHT * 2.0f},0xFFFFFFFF,false };
+
+	for (int i = 0; i < 14; i++) {
+		localFriends_[i] = {
+			{ -obj_.width / 2.0f, +obj_.height / 2.0f},
+			{ +obj_.width / 2.0f, +obj_.height / 2.0f},
+			{ -obj_.width / 2.0f, -obj_.height / 2.0f},
+			{ +obj_.width / 2.0f, -obj_.height / 2.0f},
+		};
+
+		affineFriends_[i] = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
+	}
+
 
 }
 
@@ -86,6 +137,10 @@ void Player::Initialize()
 	affine_ = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
 	affine_.translate = UpPos;
 
+	for (int i = 0; i < 14; i++) {
+		affineFriends_[i].translate = friends_[i].pos_;
+	}
+
 	for (auto& bullet : bullets_)
 	{
 		bullet.Initialize();
@@ -95,13 +150,38 @@ void Player::Initialize()
 
 void Player::Update(char keys[], char preKeys[])
 {
-	if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
+	if (keys[DIK_J] && !preKeys[DIK_J]) {
+		// 如果当前索引对应的 friend 不活跃
+		if (!friends_[currentFriendIndex].isAlive_) {
+			friends_[currentFriendIndex].isAlive_ = true;
+		}
+		// 增加索引以便下次操作下一个 friend
+		currentFriendIndex--;
 
+		// 如果索引超过范围，重置为 0
+		if (currentFriendIndex < 0) {
+			currentFriendIndex = 0;
+		}
+	}
+	if (keys[DIK_K] && !preKeys[DIK_K]) {
+		// 如果当前索引对应的 friend 不活跃
+		if (friends_[currentFriendIndex+1].isAlive_) {
+			friends_[currentFriendIndex+1].isAlive_ = false;
+		}
+		// 增加索引以便下次操作下一个 friend
+		currentFriendIndex++;
+
+		// 如果索引超过范围，重置为 0
+		if (currentFriendIndex > 13) {
+			currentFriendIndex = 13;
+		}
 	}
 }
 
 void Player::Update(char keys[], char preKeys[], Camera* camera)
 {
+	EmotionUpdate();
+
 	SwithGround(keys, preKeys, camera);
 
 	Attack(camera);
@@ -110,11 +190,22 @@ void Player::Update(char keys[], char preKeys[], Camera* camera)
 	mousePos = Vector2((float)mousePosX, (float)mousePosY);
 	mousePosWorld = { mousePos.x,720 - mousePos.y };
 
+	//==================friends================
+	for (int i = 0; i < 14; i++) {
+		affineFriends_[i].translate = friends_[i].pos_;
+	}
+
 	worldMatrix_ = math_->MakeAffine(affine_);
 
 	wvpVpMatrix_ = math_->WvpVpMatrix(worldMatrix_, camera->GetVpVpMatrix());
 
 	screen_ = math_->TransformSprite(local_, wvpVpMatrix_);
+
+	for (int i = 0; i < 14; i++) {
+		worldMatrixFriends_[i] = math_->MakeAffine(affineFriends_[i]);
+		wvpVpMatrixFriends_[i] = math_->WvpVpMatrix(worldMatrixFriends_[i], camera->GetVpVpMatrix());
+		screenFriends_[i] = math_->TransformSprite(localFriends_[i], wvpVpMatrixFriends_[i]);
+	}
 
 }
 
@@ -122,20 +213,53 @@ void Player::Update(char keys[], char preKeys[], Camera* camera)
 
 void Player::Draw()
 {
-
-	for (auto& bullet : bullets_)
-	{
-		bullet.Draw();
-	}
-
 	switch (state_) {
 		case PlayerState::OnGround:
 
 			if (mousePosX < affine_.translate.x) {
+				//friends
+				for (int i = 0; i < 14; i++) {
+					if (friends_[i].isAlive_) {
+						Novice::DrawQuad(
+							(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
+							(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
+							(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
+							(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
+							(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_, WHITE);
+					}
+				}
+
+				//BULLET
+				for (auto& bullet : bullets_)
+				{
+					bullet.Draw();
+				}
+
+				//本体
 				DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_);
 			}
 			else if (mousePosX > affine_.translate.x) {
+				//friends
+				for (int i = 0; i < 14; i++) {
+					if (friends_[i].isAlive_) {
+						Novice::DrawQuad(
+							(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
+							(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
+							(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
+							(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
+							(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_, WHITE);
+					}
+				}
+
+				//BULLET
+				for (auto& bullet : bullets_)
+				{
+					bullet.Draw();
+				}
+
+				//本体
 				DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_);
+
 			}
 			break;
 
@@ -280,6 +404,27 @@ void Player::OnEnenyCollide()
 
 void Player::OnFriendCollide()
 {
+}
+
+void Player::EmotionUpdate()
+{
+	if (emotion_ > 100) {
+		emotion_ = 100;
+	}
+	if (emotion_ < 0) {
+		emotion_ = 0;
+	}
+
+	if (emotion_ > 60) {
+		emotionState_ = EmotionState::Happy;
+	}
+	else if (emotion_ > 30 && emotion_ <= 60) {
+		emotionState_ = EmotionState::General;
+	}
+	else {
+		emotionState_ = EmotionState::Sad;
+	}
+
 }
 
 

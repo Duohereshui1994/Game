@@ -7,6 +7,8 @@ GameStage::GameStage()
 GameStage::~GameStage()
 {
 	delete player_;
+	delete bg_;
+	delete filter_;
 }
 
 void GameStage::Initialize()
@@ -21,13 +23,18 @@ void GameStage::Initialize()
 
 	bg_ = new Background();
 	bg_->Initialize();
+
+	filter_ = new Filter();
+	filter_->Initialize();
 }
 
 void GameStage::Update(char keys[], char preKeys[])
 {
 	camera_->Update(keys);
+	player_->Update(keys, preKeys);
 	player_->Update(keys, preKeys, camera_);
 	bg_->Update(camera_);
+	filter_->Update(camera_);
 }
 
 void GameStage::Draw()
@@ -35,4 +42,5 @@ void GameStage::Draw()
 	bg_->Draw();
 	camera_->Draw();
 	player_->Draw();
+	filter_->Draw();
 }
