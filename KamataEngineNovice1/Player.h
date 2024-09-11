@@ -12,6 +12,13 @@ enum class PlayerState {
 	Down			//钻进土里
 
 };
+
+enum class EmotionState {
+	Happy,
+	General,
+	Sad,
+};
+
 class Player : public Character
 {
 private:
@@ -28,21 +35,36 @@ private:
 	float downFrame_;			//钻进土里动画的帧数序号
 	float upFrame_;				//钻出土动画的帧数序号
 
+	int emotion_;				//情绪值
+
+	int currentFriendIndex = 13;  // 全局变量或者类的成员变量
+
 	//==================camera=================================
 
 	//プレイヤーのローカル座標
 	Vertex local_;
 
+	Vertex localFriends_[14];
+
 	//プレイヤー 拡縮・回転・移動
 	Affine affine_;
+
+	Affine affineFriends_[14];
 
 	//スクリーン座標系に変化に使う
 	Vertex screen_;
 
+	Vertex screenFriends_[14];
+
 	//ワールドマトリックス
 	Matrix3x3 worldMatrix_;
+
+	Matrix3x3 worldMatrixFriends_[14];
+
 	//wvpVp
 	Matrix3x3 wvpVpMatrix_;
+
+	Matrix3x3 wvpVpMatrixFriends_[14];
 	//=========================================================
 
 
@@ -52,14 +74,26 @@ private:
 	float attackCD_;			//攻击冷却时间计时器单位（秒） 改变攻速不在这里改 在player.cpp
 
 	PlayerState state_ = PlayerState::OnGround; //玩家初始状态为地面上待机
+	EmotionState emotionState_ = EmotionState::Happy; //玩家初始情绪为开心
 
 	Vector2 UpCameraScale = Vector2(1.0f, 1.0f);//玩家在地面上摄像机的倍率
 	Vector2 DownCameraScale = Vector2(1.5f, 1.5f);//玩家在地下摄像机的倍率
+
+	typedef struct {
+		Vector2 pos_;
+		unsigned int color;
+		bool isAlive_;
+	}Friends;
+
+
 
 
 public:
 	//子弹数组
 	std::vector<Bullet> bullets_;
+	//友方数组 最多14个友方
+	Friends friends_[14];
+
 	Player();
 	~Player();
 	//初始化 重写
@@ -81,5 +115,10 @@ public:
 
 	void OnEnenyCollide();															//玩家与敌人碰撞运行
 	void OnFriendCollide();															//玩家与友方碰撞运行
+
+	PlayerState GetState() { return state_; }
+	EmotionState GetEmotion() { return emotionState_; }
+
+	void EmotionUpdate();
 };
 

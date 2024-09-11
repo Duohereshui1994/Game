@@ -344,10 +344,10 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 
 	//按照分数调整难度
 	if (score < 100) {
-		_linesSum = 6;								//当前多少条线路
+		_linesSum = 2;								//当前多少条线路
 		_lineTime = 60;								//进行随机选择路线的时间
 		_bornEnemyTime = 30;						//路线中生成敌人的时间
-		_eachBornMax = 2;							//每回至多生成敌人数量
+		_eachBornMax = 4;							//每回至多生成敌人数量
 		_enemyType_walk[0] = { Enemy::tSnake };		//修改能生成的敌人队列
 		_enemyType_walk[1] = { Enemy::tSnake };
 		_enemyType_fly[0] = { Enemy::tEagles };

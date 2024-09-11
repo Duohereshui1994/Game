@@ -1,26 +1,19 @@
-#define BG_WIDTH 1940
-#define BG_HEIGHT 1100
-#define MAX_BG_FRAME 4
-#define BG_TIME_SCALE 1.0f
-#include "Background.h"
+#define Emotion_WIDTH 128
+#define Emotion_HEIGHT 128
+#include "Emotion.h"
 #include "Novice.h"
+#include "Player.h"
 
-Background::Background()
+Emotion::Emotion()
 {
 	//加载图片
-	textureBackground_ = Novice::LoadTexture("./RS/Background/BG.png");
-	textureGround_ = Novice::LoadTexture("./RS/Background/doro.png");
-	textureKusaDoro_ = Novice::LoadTexture("./RS/Background/kusadoro.png");
-	//textureFilter_ = Novice::LoadTexture("./RS/UI/UI_filter.png");
+	textureEmotion_ = Novice::LoadTexture("./RS/Emotion/emotion.png");
 
 	// 初始化 Mono 结构体成员
-	obj_.width = BG_WIDTH;
-	obj_.height = BG_HEIGHT;
+	obj_.width = Emotion_WIDTH;
+	obj_.height = Emotion_HEIGHT;
 	obj_.scale = Vector2(1.0f, 1.0f);
 	obj_.rotate = 0.0f;
-
-	frameNum_ = 0;
-	deltaTime_ = 1.0f / 60.0f;
 
 	//==================camera=================================
 	//プレイヤーのローカル座標
@@ -40,31 +33,23 @@ Background::Background()
 	worldMatrix_ = {};
 	//wvpVp
 	wvpVpMatrix_ = {};
-
-	//=========================================================
 }
 
-Background::~Background()
+Emotion::~Emotion()
 {
 	delete math_;
 }
 
-void Background::Initialize()
+void Emotion::Initialize()
 {
 	//以画面中心为原点画图的操作方法
 	affine_ = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
 	affine_.translate = { 640.0f, 360.0f };
 }
 
-void Background::Update(Camera* camera)
+void Emotion::Update(Player* player, Camera* camera)
 {
-	//背景帧数变化
-	if (frameNum_ > MAX_BG_FRAME - 1) {
-		frameNum_ = 0;
-	}
-	else {
-		frameNum_ += deltaTime_ * BG_TIME_SCALE;
-	}
+	player->GetEmotion();
 
 	//更新变换矩阵
 	worldMatrix_ = math_->MakeAffine(affine_);
@@ -74,15 +59,12 @@ void Background::Update(Camera* camera)
 	screen_ = math_->TransformSprite(local_, wvpVpMatrix_);
 }
 
-void Background::Draw()
+void Emotion::Draw()
 {
-	DrawTexture((int)frameNum_ * (int)BG_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureBackground_);
-	DrawTexture(0, 0, (int)obj_.width, (int)obj_.height, textureGround_);
-	DrawTexture(0, 0, (int)obj_.width, (int)obj_.height, textureKusaDoro_);
-	//DrawTexture(0, 0, (int)obj_.width, (int)obj_.height, textureFilter_);
+	DrawTexture(0, 0, (int)obj_.width, (int)obj_.height, textureEmotion_);
 }
 
-void Background::DrawTexture(int leftTopX, int leftTopY, int width, int height, int textureHandle)
+void Emotion::DrawTexture(int leftTopX, int leftTopY, int width, int height, int textureHandle)
 {
 	Novice::DrawQuad(
 		(int)screen_.leftTop.x, (int)screen_.leftTop.y,

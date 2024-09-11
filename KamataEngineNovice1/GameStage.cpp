@@ -10,6 +10,8 @@ GameStage::GameStage()
 GameStage::~GameStage()
 {
 	delete player_;
+	delete bg_;
+	delete filter_;
 }
 
 void GameStage::Initialize()
@@ -27,6 +29,9 @@ void GameStage::Initialize()
 
 	bg_ = new Background();
 	bg_->Initialize();
+
+	filter_ = new Filter();
+	filter_->Initialize();
 }
 
 void GameStage::Update(char keys[], char preKeys[])
@@ -34,9 +39,11 @@ void GameStage::Update(char keys[], char preKeys[])
 	EnemyManager::BornEnemy(camera_, Score::GetScore(), 0);//生成敌人(相机，分数，小伙伴人数)
 
 	camera_->Update(keys);
+	player_->Update(keys, preKeys);
 	EnemyManager::Update(keys, preKeys);
 	player_->Update(keys, preKeys, camera_);
 	bg_->Update(camera_);
+	filter_->Update(camera_);
 	ParticleManager::Update();
 
 	IsCollision();			//碰撞检测
@@ -49,6 +56,7 @@ void GameStage::Draw()
 	camera_->Draw();
 	EnemyManager::Draw();
 	player_->Draw();
+	filter_->Draw();
 	ParticleManager::Draw();
 
 	ParticleManager::PreDraw();
@@ -66,9 +74,11 @@ void GameStage::IsCollision()
 					//特效
 					ParticleManager::ADD_Particle(camera_, bullet.GetPos(), Emitter::bulletHurt);
 					Vector2 enemyPos = enemy->GetTranslate();
-					//地面的情况
-					enemyPos.x = std::clamp(enemyPos.x, 0.f, 1280.f);
-					enemyPos.y = std::clamp(enemyPos.y, 0.f, 720.f);
+					//地面的情况要将特效收缩到屏幕内
+					if (player_->GetState() == PlayerState::OnGround) {
+						enemyPos.x = std::clamp(enemyPos.x, 30.f, 1280.f - 30.f);
+						enemyPos.y = std::clamp(enemyPos.y, 15.f, 720.f - 15.f);
+					}
 					if (enemy->Get_type() == Enemy::tPlayer)
 						ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::minusScore);
 					else

@@ -50,7 +50,7 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 		_sprite = Novice::LoadTexture("./RS/Particle/minus.png");
 		_speed = 0.2f;
 		_dir = { 0, 1 };
-		_scale = { 0.7f,0.7f };
+		_scale = { 0.6f,0.6f };
 		_lifeTime = 30;
 		break;
 	}

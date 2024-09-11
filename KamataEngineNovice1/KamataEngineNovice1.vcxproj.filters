@@ -62,6 +62,12 @@
     <ClCompile Include="Background.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
+    <ClCompile Include="Filter.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Emotion.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -143,5 +149,7 @@
     <ClInclude Include="struct.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Background.h" />
+    <ClInclude Include="Filter.h" />
+    <ClInclude Include="Emotion.h" />
   </ItemGroup>
 </Project>
