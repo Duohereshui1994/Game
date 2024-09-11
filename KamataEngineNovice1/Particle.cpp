@@ -31,7 +31,7 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 	}
 	case bulletHurt: {
 		_spriteSize = { 20,20 };
-		_sprite = Novice::LoadTexture("./RS/Particle/stone.png");
+		_sprite = ParticleManager::_spBulletHurt;
 		_speed = 0.2f;
 		std::uniform_real_distribution dis_dirX(-0.7f, 0.7f);
 		std::uniform_real_distribution dis_dirY(0.f, 2.f);
@@ -47,7 +47,7 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 	}
 	case minusScore: {
 		_spriteSize = { 99,44 };
-		_sprite = Novice::LoadTexture("./RS/Particle/minus.png");
+		_sprite = ParticleManager::_spMinusScore;
 		_speed = 0.2f;
 		_dir = { 0, 1 };
 		_scale = { 0.6f,0.6f };
@@ -56,7 +56,7 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 	}
 	case plusScore: {
 		_spriteSize = { 46,25 };
-		_sprite = Novice::LoadTexture("./RS/Particle/bonus.png");
+		_sprite = ParticleManager::_spPlusScore;
 		_speed = 0.2f;
 		_dir = { 0, 1 };
 		_scale = { 1.0f,1.0f };
@@ -67,9 +67,9 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 	case emotion_normal:
 	case emotion_sad: {
 		switch (_type) {
-		case Particle::emotion_happy:_sprite = Novice::LoadTexture("./RS/Particle/emotion_1.png"); break;
-		case Particle::emotion_normal:_sprite = Novice::LoadTexture("./RS/Particle/emotion_2.png"); break;
-		case Particle::emotion_sad:_sprite = Novice::LoadTexture("./RS/Particle/emotion_3.png"); break;
+		case Particle::emotion_happy:_sprite = ParticleManager::_spEmotion_happy; break;
+		case Particle::emotion_normal:_sprite = ParticleManager::_spEmotion_normal; break;
+		case Particle::emotion_sad:_sprite = ParticleManager::_spEmotion_sad; break;
 		}
 		_spriteSize = { 128,128 };
 		_speed = 1.f;
@@ -82,7 +82,7 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 	}
 	case friendDead: {
 		_spriteSize = { 29,4 };
-		_sprite = Novice::LoadTexture("./RS/Particle/friendDead.png");
+		_sprite = ParticleManager::_spFriendDead;
 		_scale = { 2.f,2.f };
 		_speed = 0.5f;
 		std::uniform_real_distribution dis_dirX(-1.f, 1.f);
@@ -96,7 +96,7 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 	}
 	case friendAdd: {
 		_spriteSize = { 44,44 };
-		_sprite = Novice::LoadTexture("./RS/Particle/friendAdd.png");
+		_sprite = ParticleManager::_spFriendAdd;
 		_scale = { 0.5f,0.5f };
 		_speed = 0.5f;
 		std::uniform_real_distribution dis_dirX(-0.5f, 0.5f);
@@ -330,7 +330,7 @@ void Emitter::Initialize(Camera* camera, Vector2 pos, TYPE type)
 	_pos = pos; _scale = { 1,1 }; _angle = 0; _color = WHITE;
 	_currentTime = 0; _lifeTime = 0; _particleCurrentTime = 0;
 	_width = 2; _height = 2; _particleSum = 1;
-	_isDead = false; _isLoop = false;
+	_isDead = false; _isLoop = false; _isFirst = true;
 
 	switch (_type) {
 	case fireWorks:
@@ -343,11 +343,19 @@ void Emitter::Initialize(Camera* camera, Vector2 pos, TYPE type)
 		_height = 10;
 		_particleSum = 5;
 		break;
-	case friendDead:
 	case friendAdd:
 		_width = 5;
 		_height = 5;
 		_particleSum = 5;
+		break;
+	case friendDead:
+		_width = 5;
+		_height = 5;
+		_particleSum = 5;
+		_lifeTime = 20;
+		_particleGetTime = 10;
+		_isFirst = false;
+		_scale = { 20,20 };
 		break;
 	}
 }
@@ -361,7 +369,7 @@ void Emitter::ParticleStart()
 	Vector2 randomPos{};
 	Particle* element{};
 
-	if (_particleCurrentTime == 0) {
+	if (_particleCurrentTime == 0 && _isFirst) {
 		for (int i = 0; i < _particleSum; i++) {
 			randomPos = { disX(gen),disY(gen) };
 			randomPos = { randomPos.x + _pos.x,randomPos.y + _pos.y };
@@ -391,6 +399,7 @@ void Emitter::ParticleStart()
 	if (_particleCurrentTime > _particleGetTime) {
 		_particleCurrentTime = 0;
 	}
+	_isFirst = true;
 }
 
 void Emitter::Draw()
@@ -407,6 +416,12 @@ void Emitter::Draw()
 	};
 	Vertex _screen = math_->TransformSprite(local, wvpVpMatrix_);
 	Vector2 screenPos = { _screen.leftTop.x - _width / 2.0f ,_screen.leftTop.y + +_height / 2.0f };
+	switch (_type)
+	{
+	case Emitter::friendDead:
+		FrameAnimation(0, _lifeTime / 4, 4, { 64,64 }, ParticleManager::_spListBite, _screen, _color);
+		break;
+	}
 }
 
 void Emitter::PreDraw()
@@ -435,6 +450,55 @@ void Emitter::ToDead()
 void Emitter::PushUpdate()
 {
 	ParticleManager::_emitterUpadtePool.push_back(this);
+}
+
+bool Emitter::FrameTimeWatch_ani(int frame, int index, bool first)
+{
+	if (!first) {
+		if (_currentFrame_ani[index] > frame) {
+			_currentFrame_ani[index] = 0;
+			return true;
+		}
+		_currentFrame_ani[index]++;
+	}
+	else {
+		if (_currentFrame_ani[index] <= 0) {
+			_currentFrame_ani[index] = frame;
+			return true;
+		}
+		_currentFrame_ani[index]--;
+	}
+	return false;
+}
+
+void Emitter::FrameAnimation(int index, int frameTime, int frameSum, Vector2 frameSize, int sprite, Vertex screen, int color)
+{
+	//帧动画的帧计算
+	if (FrameTimeWatch_ani(frameTime, index, false))
+		_currentFrameIndex[index]++;
+	if (_currentFrameIndex[index] > frameSum - 1 || _currentFrameIndex[index] < 0)
+		_currentFrameIndex[index] = 0;
+	//绘图(通过Camera计算的坐标绘图
+	Novice::DrawQuad(
+		(int)screen.leftTop.x, (int)screen.leftTop.y,
+		(int)screen.rightTop.x, (int)screen.rightTop.y,
+		(int)screen.leftBottom.x, (int)screen.leftBottom.y,
+		(int)screen.rightBottom.x, (int)screen.rightBottom.y,
+		(int)(_currentFrameIndex[index] * frameSize.x), 0,
+		(int)frameSize.x, (int)frameSize.y, sprite, color);
+}
+
+void ParticleManager::LoadRes()
+{
+	_spPlusScore = Novice::LoadTexture("./RS/Particle/bonus.png");
+	_spMinusScore = Novice::LoadTexture("./RS/Particle/minus.png");
+	_spBulletHurt = Novice::LoadTexture("./RS/Particle/stone.png");
+	_spEmotion_happy = Novice::LoadTexture("./RS/Particle/emotion_1.png");
+	_spEmotion_normal = Novice::LoadTexture("./RS/Particle/emotion_2.png");
+	_spEmotion_sad = Novice::LoadTexture("./RS/Particle/emotion_3.png");
+	_spFriendAdd = Novice::LoadTexture("./RS/Particle/friendAdd.png");
+	_spFriendDead = Novice::LoadTexture("./RS/Particle/friendDead.png");
+	_spListBite = Novice::LoadTexture("./RS/Particle/bite.png");
 }
 
 void ParticleManager::ParticleUpdate()

@@ -3,6 +3,7 @@
 GameStage::GameStage()
 {
 	EnemyManager::LoadRes();//预先载入敌人需要的贴图
+	ParticleManager::LoadRes();
 	for (int i = 0; i < 100; i++)//预先生成一些敌人类，防止大量生成时候的卡顿
 		EnemyManager::_idlePool.push(new Enemy());
 }
@@ -100,7 +101,7 @@ void GameStage::IsCollision()
 					Score::AddScore(enemy);
 					bullet.Initialize();
 					enemy->Set_isDead(true);
-					//ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::friendAdd);
+					ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::fireWorks);
 				}
 			}
 		}

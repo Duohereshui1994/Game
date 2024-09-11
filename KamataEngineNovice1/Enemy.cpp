@@ -208,7 +208,7 @@ void Enemy::PushUpdate()
 void EnemyTools::FrameAnimation(int index, int frameTime, int frameSum, Vector2 frameSize, int sprite, Vertex screen, int color)
 {
 	//帧动画的帧计算
-	if (FrameTimeWatch_ani(frameTime, index, true))
+	if (FrameTimeWatch_ani(frameTime, index, false))
 		_currentFrameIndex[index]++;
 	if (_currentFrameIndex[index] > frameSum - 1 || _currentFrameIndex[index] < 0)
 		_currentFrameIndex[index] = 0;
