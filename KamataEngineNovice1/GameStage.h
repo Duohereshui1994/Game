@@ -3,6 +3,7 @@
 #include "Enemy.h"
 #include "Bullet.h"
 #include "Camera.h"
+#include "Background.h"
 #include "Score.h"
 #include "Particle.h"
 class GameStage
@@ -22,6 +23,7 @@ public:
 private:
 	Player* player_ = nullptr;
 	Camera* camera_ = nullptr;
+	Background* bg_ = nullptr;
 
 
 };

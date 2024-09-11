@@ -24,9 +24,9 @@ Player::Player()
 	upFrame_ = 0;
 	deltaTime_ = 1.0f / 60.0f;
 
-	UpPos = Vector2(640.0f, 180.0f);
+	UpPos = Vector2(640.0f, 220.0f);
 
-	UnderPos = Vector2(640.0f, 80.0f);
+	UnderPos = Vector2(640.0f, 120.0f);
 
 	attackCD_ = 0.0f;
 

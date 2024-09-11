@@ -24,6 +24,9 @@ void GameStage::Initialize()
 
 	EnemyManager::ClearAllEnemy();	//清除所有敌人
 	Score::Initialize();			//重置分数
+
+	bg_ = new Background();
+	bg_->Initialize();
 }
 
 void GameStage::Update(char keys[], char preKeys[])
@@ -33,6 +36,7 @@ void GameStage::Update(char keys[], char preKeys[])
 	camera_->Update(keys);
 	EnemyManager::Update(keys, preKeys);
 	player_->Update(keys, preKeys, camera_);
+	bg_->Update(camera_);
 	ParticleManager::Update();
 
 	IsCollision();			//碰撞检测
@@ -41,6 +45,7 @@ void GameStage::Update(char keys[], char preKeys[])
 
 void GameStage::Draw()
 {
+	bg_->Draw();
 	camera_->Draw();
 	EnemyManager::Draw();
 	player_->Draw();
