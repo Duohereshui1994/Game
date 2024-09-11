@@ -14,6 +14,7 @@ enum class PlayerState {
 };
 
 enum class EmotionState {
+	Null,
 	Happy,
 	General,
 	Sad,
@@ -38,7 +39,7 @@ private:
 	int emotionValue_;				//情绪值
 	int emotionRecover_;				//情绪回复倍率
 
-	int currentFriendIndex = 13;  // 全局变量或者类的成员变量
+	int currentFriendIndex = 13;  // 当前小伙伴数组下标
 
 	//==================camera=================================
 

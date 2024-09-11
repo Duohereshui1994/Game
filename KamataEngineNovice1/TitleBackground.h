@@ -1,4 +1,5 @@
 #pragma once
+//title界面的背景类
 #include "MathFunc.h"
 
 class TitleBackground

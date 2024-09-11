@@ -3,6 +3,7 @@
 #include "Emotion.h"
 #include "Novice.h"
 #include "Player.h"
+#include "Particle.h"
 
 Emotion::Emotion()
 {
@@ -15,8 +16,8 @@ Emotion::Emotion()
 	obj_.scale = Vector2(1.0f, 1.0f);
 	obj_.rotate = 0.0f;
 
-	stateTextureRange_ = 0;
-
+	currentState_ = EmotionState::General;
+	previousState_ = EmotionState::Null;
 	//==================camera=================================
 	//プレイヤーのローカル座標
 	local_ = {
@@ -51,43 +52,35 @@ void Emotion::Initialize()
 
 void Emotion::Update(Player* player, Camera* camera)
 {
-	player->GetEmotion();
+	currentState_ = player->GetEmotion();
 
-	switch (player->GetEmotion())
-	{
-		case EmotionState::Happy:
-			stateTextureRange_ = 0;
-			break;
+	if (currentState_ != previousState_) {
+		switch (currentState_)
+		{
+			case EmotionState::Happy:
+				ParticleManager::ADD_Particle(camera, affine_.translate, Emitter::emotion_happy);
+				previousState_ = EmotionState::Happy;
+				break;
 
-		case EmotionState::General:
-			stateTextureRange_ = 1;
-			break;
+			case EmotionState::General:
+				ParticleManager::ADD_Particle(camera, affine_.translate, Emitter::emotion_normal);
+				previousState_ = EmotionState::General;
+				break;
 
-		case EmotionState::Sad:
-			stateTextureRange_ = 2;
-			break;
+			case EmotionState::Sad:
+				ParticleManager::ADD_Particle(camera, affine_.translate, Emitter::emotion_sad);
+				previousState_ = EmotionState::Sad;
+				break;
+		}
 	}
-
-
+	
 	//更新变换矩阵
 	worldMatrix_ = math_->MakeAffine(affine_);
 
 	wvpVpMatrix_ = math_->WvpVpMatrix(worldMatrix_, camera->GetVpVpMatrix());
 
 	screen_ = math_->TransformSprite(local_, wvpVpMatrix_);
+
+
 }
 
-void Emotion::Draw()
-{
-	DrawTexture((int)stateTextureRange_ * Emotion_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureEmotion_);
-}
-
-void Emotion::DrawTexture(int leftTopX, int leftTopY, int width, int height, int textureHandle)
-{
-	Novice::DrawQuad(
-		(int)screen_.leftTop.x, (int)screen_.leftTop.y,
-		(int)screen_.rightTop.x, (int)screen_.rightTop.y,
-		(int)screen_.leftBottom.x, (int)screen_.leftBottom.y,
-		(int)screen_.rightBottom.x, (int)screen_.rightBottom.y,
-		leftTopX, leftTopY, width, height, textureHandle, WHITE);
-}

@@ -151,34 +151,40 @@ void Player::Initialize()
 		bullet.Initialize();
 	}
 
+	currentFriendIndex = 13;  // 当前小伙伴数组下标
+
 }
 
 void Player::Update(char keys[], char preKeys[])
 {
 	if (keys[DIK_J] && !preKeys[DIK_J]) {
+
 		// 如果当前索引对应的 friend 不活跃
 		if (!friends_[currentFriendIndex].isAlive_) {
 			friends_[currentFriendIndex].isAlive_ = true;
 		}
+
 		// 增加索引以便下次操作下一个 friend
 		currentFriendIndex--;
 
 		// 如果索引超过范围，重置为 0
-		if (currentFriendIndex < 0) {
-			currentFriendIndex = 0;
+		if (currentFriendIndex < -1) {
+			currentFriendIndex = -1;
 		}
 	}
 	if (keys[DIK_K] && !preKeys[DIK_K]) {
-		// 如果当前索引对应的 friend 不活跃
+
+		// 如果当前索引对应的 friend 活跃
 		if (friends_[currentFriendIndex + 1].isAlive_) {
 			friends_[currentFriendIndex + 1].isAlive_ = false;
 		}
+
 		// 增加索引以便下次操作下一个 friend
 		currentFriendIndex++;
 
 		// 如果索引超过范围，重置为 
 		if (currentFriendIndex > 13) {
-			currentFriendIndex = 14;
+			currentFriendIndex = 13;
 		}
 	}
 	if (keys[DIK_U] && !preKeys[DIK_U]) {
@@ -225,54 +231,54 @@ void Player::Update(char keys[], char preKeys[], Camera* camera)
 void Player::Draw()
 {
 	switch (state_) {
-	case PlayerState::OnGround:
+		case PlayerState::OnGround:
 
-		if (mousePosX < affine_.translate.x) {
-			//friends
-			for (int i = 0; i < 14; i++) {
-				if (friends_[i].isAlive_) {
-					Novice::DrawQuad(
-						(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
-						(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
-						(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
-						(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
-						(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_, WHITE);
+			if (mousePosX < affine_.translate.x) {
+				//friends
+				for (int i = 0; i < 14; i++) {
+					if (friends_[i].isAlive_) {
+						Novice::DrawQuad(
+							(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
+							(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
+							(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
+							(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
+							(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_, WHITE);
+					}
 				}
-			}
 
-			//BULLET
-			for (auto& bullet : bullets_)
-			{
-				bullet.Draw();
-			}
-
-			//本体
-			DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_);
-		}
-		else if (mousePosX > affine_.translate.x) {
-			//friends
-			for (int i = 0; i < 14; i++) {
-				if (friends_[i].isAlive_) {
-					Novice::DrawQuad(
-						(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
-						(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
-						(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
-						(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
-						(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_, WHITE);
+				//BULLET
+				for (auto& bullet : bullets_)
+				{
+					bullet.Draw();
 				}
+
+				//本体
+				DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_);
 			}
+			else if (mousePosX > affine_.translate.x) {
+				//friends
+				for (int i = 0; i < 14; i++) {
+					if (friends_[i].isAlive_) {
+						Novice::DrawQuad(
+							(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
+							(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
+							(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
+							(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
+							(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_, WHITE);
+					}
+				}
 
-			//BULLET
-			for (auto& bullet : bullets_)
-			{
-				bullet.Draw();
+				//BULLET
+				for (auto& bullet : bullets_)
+				{
+					bullet.Draw();
+				}
+
+				//本体
+				DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_);
+
 			}
-
-			//本体
-			DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_);
-
-		}
-		break;
+			break;
 
 		case PlayerState::UnderGround:
 			//BULLET
@@ -291,8 +297,8 @@ void Player::Draw()
 				bullet.Draw();
 			}
 
-		DrawTexture((int)upFrame_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleUp_);
-		break;
+			DrawTexture((int)upFrame_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleUp_);
+			break;
 
 		case PlayerState::Down:
 			//BULLET
@@ -355,14 +361,14 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 {
 
 	switch (state_) {
-	case PlayerState::OnGround:
+		case PlayerState::OnGround:
 
-		if (frameNum_ > MAX_IDLEFRAME - 1) {
-			frameNum_ = 0;
-		}
-		else {
-			frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
-		}
+			if (frameNum_ > MAX_IDLEFRAME - 1) {
+				frameNum_ = 0;
+			}
+			else {
+				frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
+			}
 
 			if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
 				downFrame_ = 0;
@@ -371,14 +377,14 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 
 			break;
 
-	case PlayerState::UnderGround:
+		case PlayerState::UnderGround:
 
-		if (frameNum_ > MAX_IDLEFRAME - 1) {
-			frameNum_ = 0;
-		}
-		else {
-			frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
-		}
+			if (frameNum_ > MAX_IDLEFRAME - 1) {
+				frameNum_ = 0;
+			}
+			else {
+				frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
+			}
 
 			if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
 				upFrame_ = 0;
@@ -390,44 +396,44 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 			emotionValue_ += (int)(deltaTime_ * RECOVER_SPEED);
 			break;
 
-	case PlayerState::Up:
-		if (upFrame_ > MAX_UPFRAME) {
-			upFrame_ = MAX_UPFRAME;
-		}
-		else {
-			upFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
-		}
-		//player本体移动
-		affine_.translate = math_->Lerp(UnderPos, UpPos, upFrame_ / (float)(MAX_UPFRAME - 1));
-		//相机倍率缩放
-		Vector2 cameraUpScale = math_->Lerp(DownCameraScale, UpCameraScale, upFrame_ / (float)(MAX_UPFRAME - 1));
-		camera->SetScale(cameraUpScale);
+		case PlayerState::Up:
+			if (upFrame_ > MAX_UPFRAME) {
+				upFrame_ = MAX_UPFRAME;
+			}
+			else {
+				upFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
+			}
+			//player本体移动
+			affine_.translate = math_->Lerp(UnderPos, UpPos, upFrame_ / (float)(MAX_UPFRAME - 1));
+			//相机倍率缩放
+			Vector2 cameraUpScale = math_->Lerp(DownCameraScale, UpCameraScale, upFrame_ / (float)(MAX_UPFRAME - 1));
+			camera->SetScale(cameraUpScale);
 
-		if (upFrame_ > MAX_UPFRAME - 1) {
-			upFrame_ = 0;
-			state_ = PlayerState::OnGround;
-			frameNum_ = 0;
-		}
-		break;
+			if (upFrame_ > MAX_UPFRAME - 1) {
+				upFrame_ = 0;
+				state_ = PlayerState::OnGround;
+				frameNum_ = 0;
+			}
+			break;
 
-	case PlayerState::Down:
-		if (downFrame_ > MAX_DOWNFRAME) {
-			downFrame_ = MAX_DOWNFRAME;
-		}
-		else {
-			downFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
-		}
-		//player本体移动
-		affine_.translate = math_->Lerp(UpPos, UnderPos, downFrame_ / (float)(MAX_DOWNFRAME - 1));
-		//相机倍率缩放
-		Vector2 cameraDownScale = math_->Lerp(UpCameraScale, DownCameraScale, downFrame_ / (float)(MAX_DOWNFRAME - 1));
-		camera->SetScale(cameraDownScale);
-		if (downFrame_ > MAX_DOWNFRAME - 1) {
-			downFrame_ = 0;
-			state_ = PlayerState::UnderGround;
-			frameNum_ = 0;
-		}
-		break;
+		case PlayerState::Down:
+			if (downFrame_ > MAX_DOWNFRAME) {
+				downFrame_ = MAX_DOWNFRAME;
+			}
+			else {
+				downFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
+			}
+			//player本体移动
+			affine_.translate = math_->Lerp(UpPos, UnderPos, downFrame_ / (float)(MAX_DOWNFRAME - 1));
+			//相机倍率缩放
+			Vector2 cameraDownScale = math_->Lerp(UpCameraScale, DownCameraScale, downFrame_ / (float)(MAX_DOWNFRAME - 1));
+			camera->SetScale(cameraDownScale);
+			if (downFrame_ > MAX_DOWNFRAME - 1) {
+				downFrame_ = 0;
+				state_ = PlayerState::UnderGround;
+				frameNum_ = 0;
+			}
+			break;
 	}
 }
 

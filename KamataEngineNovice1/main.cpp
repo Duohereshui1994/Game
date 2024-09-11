@@ -4,9 +4,38 @@
 
 const char kWindowTitle[] = "6004_Game";
 
+enum class Scene {
+	kUnkonwn = 0,
+	kTitle,
+	kGame,
+};
+Scene scene = Scene::kUnkonwn;
 
 GameStage* gamestage_ = nullptr;
 TitleStage* titleStage_ = nullptr;
+
+void ChangeScene() {
+	switch (scene) {
+		case Scene::kTitle:
+			if (titleStage_->IsFinished()) {
+				scene = Scene::kGame;
+				delete titleStage_;
+				titleStage_ = nullptr;
+				gamestage_ = new GameStage();
+				gamestage_->Initialize();
+			}
+			break;
+		case Scene::kGame:
+			if (gamestage_->IsFinished()) {
+				scene = Scene::kTitle;
+				delete gamestage_;
+				gamestage_ = nullptr;
+				titleStage_ = new TitleStage();
+				titleStage_->Initialize();
+			}
+			break;
+	}
+}
 
 
 // Windowsアプリでのエントリーポイント(main関数)
@@ -21,11 +50,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	gamestage_ = new GameStage();
 
-	gamestage_->Initialize();
+	//gamestage_->Initialize();
 
 	titleStage_ = new TitleStage();
 
-	titleStage_->Initialize();
+	//titleStage_->Initialize();
+
+	// 最初のシーンの初期化
+	scene = Scene::kTitle;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -39,10 +71,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓更新処理ここから
 		///
-		/// 
+		///
+		
 		//titleStage_->Update();
 
-		gamestage_->Update(keys, preKeys);
+		//gamestage_->Update(keys, preKeys);
+
+		ChangeScene();
+
+		//Update Scene
+		switch (scene) {
+			case Scene::kTitle:
+				titleStage_->Update(keys, preKeys);
+				break;
+			case Scene::kGame:
+				gamestage_->Update(keys, preKeys);
+				break;
+		}
 
 		///
 		/// ↑更新処理ここまで
@@ -51,9 +96,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
+
 		//titleStage_->Draw();
 
-		gamestage_->Draw();
+		//gamestage_->Draw();
+
+		switch (scene) {
+			case Scene::kTitle:
+				titleStage_->Draw();
+				break;
+			case Scene::kGame:
+				gamestage_->Draw();
+				break;
+		}
 
 		///
 		/// ↑描画処理ここまで
@@ -68,6 +123,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 	}
 
+	delete titleStage_;
 	delete gamestage_;
 
 	// ライブラリの終了
