@@ -2,6 +2,8 @@
 #include "MathFunc.h"
 #include "Camera.h"
 
+class Player;
+
 class Filter
 {
 private:
@@ -24,6 +26,9 @@ private:
 
 	int textureFilter_;
 
+	Vector2 upViewScale;
+	Vector2 downViewScale;
+
 	MathFunc* math_ = nullptr;	//数学函数类的指针
 
 	MathFunc::Object obj_;		//数学函数类里 对象结构体的实例
@@ -34,7 +39,7 @@ public:
 	//初始化
 	void Initialize();
 	//更新
-	void Update(Camera* camera);
+	void Update(Player* player,Camera* camera);
 	//描画
 	void Draw();
 	void DrawTexture(int leftTopX, int leftTopY, int width, int height, int textureHandle);

@@ -4,6 +4,7 @@
 #include "Background.h"
 #include "Filter.h"
 #include "Emotion.h"
+#include "Grid.h"
 
 class GameStage
 {
@@ -23,6 +24,7 @@ private:
 	Background* bg_ = nullptr;
 	Filter* filter_ = nullptr;
 	Emotion* emotion_ = nullptr;
+	Grid* grid_ = nullptr;
 
 };
 

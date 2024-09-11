@@ -176,9 +176,9 @@ void Player::Update(char keys[], char preKeys[])
 		// 增加索引以便下次操作下一个 friend
 		currentFriendIndex++;
 
-		// 如果索引超过范围，重置为 0
+		// 如果索引超过范围，重置为 
 		if (currentFriendIndex > 13) {
-			currentFriendIndex = 13;
+			currentFriendIndex = 14;
 		}
 	}
 	if (keys[DIK_U] && !preKeys[DIK_U]) {

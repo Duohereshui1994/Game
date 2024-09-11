@@ -122,5 +122,8 @@ public:
 	int GetEmotionValue() { return emotionValue_; }//获取玩家情绪值
 
 	void EmotionUpdate();
+
+	float GetUpFrame() { return upFrame_; }
+	float GetDownFrame() { return downFrame_; }
 };
 

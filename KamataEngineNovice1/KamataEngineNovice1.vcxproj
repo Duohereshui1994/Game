@@ -123,6 +123,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="GameStage.cpp" />
+    <ClCompile Include="Grid.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MathFunc.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -163,6 +164,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Filter.h" />
     <ClInclude Include="GameStage.h" />
+    <ClInclude Include="Grid.h" />
     <ClInclude Include="MathFunc.h" />
     <ClInclude Include="Matrix3x3.h" />
     <ClInclude Include="Player.h" />

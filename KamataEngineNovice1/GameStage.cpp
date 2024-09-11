@@ -30,6 +30,9 @@ void GameStage::Initialize()
 
 	emotion_ = new Emotion();
 	emotion_->Initialize();
+
+	grid_ = new Grid();
+	grid_->Initialize();
 }
 
 void GameStage::Update(char keys[], char preKeys[])
@@ -38,7 +41,7 @@ void GameStage::Update(char keys[], char preKeys[])
 	player_->Update(keys, preKeys);
 	player_->Update(keys, preKeys, camera_);
 	bg_->Update(camera_);
-	filter_->Update(camera_);
+	filter_->Update(player_,camera_);
 	emotion_->Update(player_, camera_);
 }
 
@@ -49,4 +52,5 @@ void GameStage::Draw()
 	player_->Draw();
 	emotion_->Draw();
 	filter_->Draw();
+	grid_->Draw();
 }
