@@ -122,7 +122,6 @@ void GameStage::IsCollision()
 			}
 			else {
 				//和敌人触碰
-				//需要提供一个小伙伴的坐标，这样我才知道要去哪里抓小伙伴
 			}
 		}
 	}

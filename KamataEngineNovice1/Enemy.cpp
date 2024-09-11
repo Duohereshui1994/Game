@@ -373,6 +373,12 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 		_bornEnemyTime = 30;
 		_eachBornMax = 6;
 	}
+	else {
+		_linesSum = 6;
+		_lineTime = 30;
+		_bornEnemyTime = 30;
+		_eachBornMax = 8;
+	}
 	//按照小伙伴人数调整生成新的小伙伴的几率
 	if (friendSum < 5)
 		_bornFriendRandom = 1;
