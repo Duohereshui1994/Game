@@ -14,6 +14,8 @@ public:
 	{
 		fireWorks,
 		bulletHurt,
+		minusScore,
+		plusScore,
 	}_particleType;
 
 	Vector2 _pos;
@@ -44,6 +46,7 @@ public:
 	void Initialize(Camera* camera, Vector2 pos, TYPE type);
 	void Move();
 	void Draw();
+	void PreDraw();
 	void ToDead();
 	void PushUpdate();
 
@@ -58,6 +61,8 @@ public:
 	{
 		fireWorks,
 		bulletHurt,
+		minusScore,
+		plusScore,
 	}_particleType;
 
 	Vector2 _pos;
@@ -84,6 +89,7 @@ public:
 	void Initialize(Camera* camera, Vector2 pos, TYPE type);
 	void ParticleStart();
 	void Draw();
+	void PreDraw();
 	void ToDead();
 	void PushUpdate();
 };
@@ -112,4 +118,5 @@ public:
 	static void Update();
 	//描画用関数
 	static void Draw();
+	static void PreDraw();//前景绘图
 };

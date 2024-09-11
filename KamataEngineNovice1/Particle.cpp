@@ -38,11 +38,29 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 		_dir = { dis_dirX(gen), dis_dirY(gen) };
 		std::uniform_real_distribution dis_angle(-10.f, 10.f);
 		_angle = dis_angle(gen);
-		std::uniform_real_distribution dis_scale(3.f, 5.f);
+		std::uniform_real_distribution dis_scale(0.5f, 0.7f);
 		float randScale = dis_scale(gen);
 		_scale = { randScale,randScale };
 		std::uniform_int_distribution dis_life(40, 60);
 		_lifeTime = dis_life(gen);
+		break;
+	}
+	case minusScore: {
+		_spriteSize = { 99,44 };
+		_sprite = Novice::LoadTexture("./RS/Particle/minus.png");
+		_speed = 0.2f;
+		_dir = { 0, 1 };
+		_scale = { 0.7f,0.7f };
+		_lifeTime = 30;
+		break;
+	}
+	case plusScore: {
+		_spriteSize = { 46,25 };
+		_sprite = Novice::LoadTexture("./RS/Particle/bonus.png");
+		_speed = 0.2f;
+		_dir = { 0, 1 };
+		_scale = { 1.0f,1.0f };
+		_lifeTime = 30;
 		break;
 	}
 	}
@@ -84,6 +102,26 @@ void Particle::Move()
 		_scale.y += 0.01f;
 		break;
 	}
+	case minusScore:
+	case plusScore: {
+		_acc.x = _dir.x * _speed;
+		_acc.y = _dir.y * _speed;
+		if (_currentTime < 10) {
+			_vel.x += _acc.x;
+			_vel.y += _acc.y;
+		}
+		else {
+			_vel.y *= 0.9f;
+		}
+		_pos = { _pos.x + _vel.x,_pos.y + _vel.y };
+		if (_alphaValue > 5) {
+			_color = 0xFFFFFF00 | _alphaValue << 0;
+			_alphaValue -= 5;
+		}
+		_scale.x += 0.01f;
+		_scale.y += 0.01f;
+		break;
+	}
 	}
 
 	_currentTime++;
@@ -96,19 +134,48 @@ void Particle::Draw()
 	Matrix3x3 worldMatrix_ = math_->MakeAffine(_affine);
 	Matrix3x3 wvpVpMatrix_ = math_->WvpVpMatrix(worldMatrix_, _camera->GetVpVpMatrix());
 	Vertex local = {
-		{ -_scale.x / 2.0f, +_scale.y / 2.0f},
-		{ +_scale.x / 2.0f, +_scale.y / 2.0f},
-		{ -_scale.x / 2.0f, -_scale.y / 2.0f},
-		{ +_scale.x / 2.0f, -_scale.y / 2.0f},
+		{ -_spriteSize.x / 2.0f, +_spriteSize.y / 2.0f},
+		{ +_spriteSize.x / 2.0f, +_spriteSize.y / 2.0f},
+		{ -_spriteSize.x / 2.0f, -_spriteSize.y / 2.0f},
+		{ +_spriteSize.x / 2.0f, -_spriteSize.y / 2.0f},
 	};
 	Vertex _screen = math_->TransformSprite(local, wvpVpMatrix_);
-	Vector2 screenPos = { _screen.leftTop.x - _scale.x / 2.0f ,_screen.leftTop.y + _scale.y / 2.0f };
+	Vector2 screenPos = { _screen.leftTop.x - _spriteSize.x / 2.0f ,_screen.leftTop.y + _spriteSize.y / 2.0f };
 
 	switch (_type) {
 	case fireWorks:
 		Novice::DrawBox(int(screenPos.x), int(screenPos.y), int(_radius * _scale.x), int(_radius * _scale.y), _angle, _color, kFillModeSolid);
 		break;
 	case bulletHurt:
+		Novice::DrawQuad(
+			(int)_screen.leftTop.x, (int)_screen.leftTop.y,
+			(int)_screen.rightTop.x, (int)_screen.rightTop.y,
+			(int)_screen.leftBottom.x, (int)_screen.leftBottom.y,
+			(int)_screen.rightBottom.x, (int)_screen.rightBottom.y,
+			0, 0, (int)_spriteSize.x, (int)_spriteSize.y,
+			_sprite, _color);
+		break;
+	}
+}
+
+void Particle::PreDraw()
+{
+	//根据摄像机计算屏幕坐标
+	Affine _affine = { _scale,_angle,_pos };
+	Matrix3x3 worldMatrix_ = math_->MakeAffine(_affine);
+	Matrix3x3 wvpVpMatrix_ = math_->WvpVpMatrix(worldMatrix_, _camera->GetVpVpMatrix());
+	Vertex local = {
+		{ -_spriteSize.x / 2.0f, +_spriteSize.y / 2.0f},
+		{ +_spriteSize.x / 2.0f, +_spriteSize.y / 2.0f},
+		{ -_spriteSize.x / 2.0f, -_spriteSize.y / 2.0f},
+		{ +_spriteSize.x / 2.0f, -_spriteSize.y / 2.0f},
+	};
+	Vertex _screen = math_->TransformSprite(local, wvpVpMatrix_);
+	Vector2 screenPos = { _screen.leftTop.x - _spriteSize.x / 2.0f ,_screen.leftTop.y + _spriteSize.y / 2.0f };
+
+	switch (_type) {
+	case minusScore:
+	case plusScore:
 		Novice::DrawQuad(
 			(int)_screen.leftTop.x, (int)_screen.leftTop.y,
 			(int)_screen.rightTop.x, (int)_screen.rightTop.y,
@@ -166,6 +233,7 @@ void Emitter::Initialize(Camera* camera, Vector2 pos, TYPE type)
 	_camera = camera; _type = type;
 	_pos = pos; _scale = { 1,1 }; _angle = 0; _color = WHITE;
 	_currentTime = 0; _lifeTime = 0; _particleCurrentTime = 0;
+	_width = 2; _height = 2; _particleSum = 1;
 	_isDead = false; _isLoop = false;
 
 	switch (_type) {
@@ -230,13 +298,29 @@ void Emitter::Draw()
 	Matrix3x3 worldMatrix_ = math_->MakeAffine(_affine);
 	Matrix3x3 wvpVpMatrix_ = math_->WvpVpMatrix(worldMatrix_, _camera->GetVpVpMatrix());
 	Vertex local = {
-		{ -_scale.x / 2.0f, +_scale.y / 2.0f},
-		{ +_scale.x / 2.0f, +_scale.y / 2.0f},
-		{ -_scale.x / 2.0f, -_scale.y / 2.0f},
-		{ +_scale.x / 2.0f, -_scale.y / 2.0f},
+		{ -_width / 2.0f, +_height / 2.0f},
+		{ +_width / 2.0f, +_height / 2.0f},
+		{ -_width / 2.0f, -_height / 2.0f},
+		{ +_width / 2.0f, -_height / 2.0f},
 	};
 	Vertex _screen = math_->TransformSprite(local, wvpVpMatrix_);
-	Vector2 screenPos = { _screen.leftTop.x - _scale.x / 2.0f ,_screen.leftTop.y + _scale.y / 2.0f };
+	Vector2 screenPos = { _screen.leftTop.x - _width / 2.0f ,_screen.leftTop.y + +_height / 2.0f };
+}
+
+void Emitter::PreDraw()
+{
+	//根据摄像机计算屏幕坐标
+	Affine _affine = { _scale,_angle,_pos };
+	Matrix3x3 worldMatrix_ = math_->MakeAffine(_affine);
+	Matrix3x3 wvpVpMatrix_ = math_->WvpVpMatrix(worldMatrix_, _camera->GetVpVpMatrix());
+	Vertex local = {
+		{ -_width / 2.0f, +_height / 2.0f},
+		{ +_width / 2.0f, +_height / 2.0f},
+		{ -_width / 2.0f, -_height / 2.0f},
+		{ +_width / 2.0f, -_height / 2.0f},
+	};
+	Vertex _screen = math_->TransformSprite(local, wvpVpMatrix_);
+	Vector2 screenPos = { _screen.leftTop.x - _width / 2.0f ,_screen.leftTop.y + +_height / 2.0f };
 }
 
 void Emitter::ToDead()
@@ -349,4 +433,14 @@ void ParticleManager::Draw()
 {
 	ParticleUpdateShow();
 	EmitterUpdateShow();
+}
+
+void ParticleManager::PreDraw()
+{
+	for (Emitter* emi : _emitterUpadtePool) {
+		emi->PreDraw();
+	}
+	for (Particle* it : _particleUpdatePool) {
+		it->PreDraw();
+	}
 }

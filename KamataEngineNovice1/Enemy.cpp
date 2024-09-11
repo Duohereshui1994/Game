@@ -53,7 +53,8 @@ void Enemy::Control(char keys[], char preKeys[])
 
 void Enemy::ToDead()
 {
-	float t = tools->_currentTimes[0] / 60.f;
+	int aniTime = 30;
+	float t = tools->_currentTimes[0] / (float)aniTime;
 	//颜色
 	alphaValue = int((tools->EaseOutQuint(t)) * 255);
 	if (alphaValue < 0)
@@ -70,7 +71,7 @@ void Enemy::ToDead()
 	//位移
 	Vector2 dir = (_targetPos - _pos).Normalize();
 	_pos += dir * -1 * 2 * (1 - tools->EaseOutQuint(t));
-	if (tools->FrameTimeWatch(60, 0, false))
+	if (tools->FrameTimeWatch(aniTime, 0, false))
 		EnemyManager::ReleaseEnemy(this);
 	//图片
 	switch (_type)

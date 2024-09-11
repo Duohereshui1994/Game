@@ -51,6 +51,7 @@ void GameStage::Draw()
 	player_->Draw();
 	ParticleManager::Draw();
 
+	ParticleManager::PreDraw();
 	Score::Draw();
 }
 
@@ -62,7 +63,17 @@ void GameStage::IsCollision()
 			for (auto& bullet : player_->bullets_) {
 				float length = (enemy->GetTranslate() - bullet.GetPos()).Length();
 				if (length < enemy->GetRadian() + bullet.GetWidth() / 2.f) {
+					//特效
 					ParticleManager::ADD_Particle(camera_, bullet.GetPos(), Emitter::bulletHurt);
+					Vector2 enemyPos = enemy->GetTranslate();
+					//地面的情况
+					enemyPos.x = std::clamp(enemyPos.x, 0.f, 1280.f);
+					enemyPos.y = std::clamp(enemyPos.y, 0.f, 720.f);
+					if (enemy->Get_type() == Enemy::tPlayer)
+						ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::minusScore);
+					else
+						ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore);
+					//分数
 					Score::AddScore(enemy);
 					bullet.Initialize();
 					enemy->Set_isDead(true);
