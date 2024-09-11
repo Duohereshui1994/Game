@@ -52,7 +52,7 @@ void GameStage::Update(char keys[], char preKeys[])
 	bg_->Update(camera_);
 	filter_->Update(player_, camera_);
 	emotion_->Update(player_, camera_);
-	filter_->Update(camera_);
+	filter_->Update(player_, camera_);
 	ParticleManager::Update();
 
 	IsCollision();			//碰撞检测
