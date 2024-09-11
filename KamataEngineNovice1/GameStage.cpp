@@ -52,12 +52,14 @@ void GameStage::Update(char keys[], char preKeys[])
 
 void GameStage::Draw()
 {
+	Novice::DrawBox(-50, -50, 1280 + 50, 720 + 50, 0, BLACK, kFillModeSolid);//最下面的黑色背景，防止穿帮
+
 	bg_->Draw();
 	camera_->Draw();
 	EnemyManager::Draw();
 	player_->Draw();
-	filter_->Draw();
 	ParticleManager::Draw();
+	filter_->Draw();
 
 	ParticleManager::PreDraw();
 	Score::Draw();

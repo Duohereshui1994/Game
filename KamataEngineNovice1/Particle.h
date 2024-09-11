@@ -7,6 +7,13 @@
 #include "Camera.h"
 #include "MathFunc.h"
 
+//粒子系统使用方法：
+//这个系统写的太复杂了，所以就只要关注ParticleManager这个类即可
+//重要的就是Update()和Draw()和PreDraw()，这3个方法要放到主循环中
+//需要使用特效的时候就调用ADD_Particle()方法，要传入相机、出现的坐标、Emitter::的一个enum类型
+//例：ADD_Particle(camera_,pos_,Emitter::emotion_happy);
+
+
 class Particle
 {
 public:
@@ -16,6 +23,9 @@ public:
 		bulletHurt,
 		minusScore,
 		plusScore,
+		emotion_happy,
+		emotion_normal,
+		emotion_sad,
 	}_particleType;
 
 	Vector2 _pos;
@@ -52,6 +62,8 @@ public:
 
 	//工具
 	unsigned int ColorInterpolation(unsigned int startColor, unsigned int targetColor, float percent);
+	float EaseOutQuint(float t) { return 1.f - powf(1.f - t, 5.f); };
+	float EaseInCirc(float t) { return 1 - sqrtf(1 - powf(t, 2)); };
 };
 
 class Emitter
@@ -63,6 +75,9 @@ public:
 		bulletHurt,
 		minusScore,
 		plusScore,
+		emotion_happy,
+		emotion_normal,
+		emotion_sad,
 	}_particleType;
 
 	Vector2 _pos;

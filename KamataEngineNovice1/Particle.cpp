@@ -63,6 +63,23 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 		_lifeTime = 30;
 		break;
 	}
+	case emotion_happy:
+	case emotion_normal:
+	case emotion_sad: {
+		switch (_type) {
+		case Particle::emotion_happy:_sprite = Novice::LoadTexture("./RS/Particle/emotion_1.png"); break;
+		case Particle::emotion_normal:_sprite = Novice::LoadTexture("./RS/Particle/emotion_2.png"); break;
+		case Particle::emotion_sad:_sprite = Novice::LoadTexture("./RS/Particle/emotion_3.png"); break;
+		}
+		_spriteSize = { 128,128 };
+		_speed = 1.f;
+		_dir = { 1.f, 1.f };
+		_lifeTime = 100;
+		_scale = { 0,0 };
+		Vector2 posOffset = { 40,60 };//偏移
+		_pos += posOffset;
+		break;
+	}
 	}
 }
 
@@ -122,6 +139,23 @@ void Particle::Move()
 		_scale.y += 0.01f;
 		break;
 	}
+	case emotion_happy:
+	case emotion_normal:
+	case emotion_sad: {
+		int aniTime_in = 30;
+		int aniTime_out = 20;
+		if (_currentTime < aniTime_in) {
+			float t = _currentTime / float(aniTime_in);
+			_pos += _dir * _speed * EaseOutQuint(1 - t);
+			_scale = { 1 * EaseOutQuint(t),1 * EaseOutQuint(t) };
+		}
+		else if (_currentTime > _lifeTime - aniTime_out) {
+			float t = (_currentTime - (_lifeTime - aniTime_out)) / (float)(_lifeTime - aniTime_out);
+			_alphaValue = int(255 * EaseInCirc(1 - t));
+			_color = 0xFFFFFF00 | _alphaValue << 0;
+		}
+		break;
+	}
 	}
 
 	_currentTime++;
@@ -176,6 +210,9 @@ void Particle::PreDraw()
 	switch (_type) {
 	case minusScore:
 	case plusScore:
+	case emotion_happy:
+	case emotion_normal:
+	case emotion_sad:
 		Novice::DrawQuad(
 			(int)_screen.leftTop.x, (int)_screen.leftTop.y,
 			(int)_screen.rightTop.x, (int)_screen.rightTop.y,
