@@ -87,7 +87,7 @@ private:
 	//敌人生成路线
 	inline static int _linesSum = 2;									//当前有多少条线路
 	inline static const int _linesSumMax = 6;							//至多多少条路线
-	inline static Vector2 _targetPos = { 1280 / 2.f,720 / 2.f - 200 };	//移动的目标位置
+	inline static Vector2 _targetPos = { 640.0f, 220.0f + 30.f };		//移动的目标位置
 	inline static Vector2 _bornPosOffset[_linesSumMax] = {
 		{ -1000, 0 },{ 1000, 0 },{ -1000, 300 } ,{ 1000, 300 },{ -500, 800 } ,{ 500, 800 }
 	};																	//和目标点之前的偏移

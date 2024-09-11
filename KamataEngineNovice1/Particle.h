@@ -13,13 +13,7 @@ public:
 	static enum TYPE
 	{
 		fireWorks,
-		gunFire,
-		playerJump,
-		enemyHurtL,
-		enemyHurtR,
-		playerRunL,
-		playerRunR,
-		playerHurt,
+		bulletHurt,
 	}_particleType;
 
 	Vector2 _pos;
@@ -32,9 +26,10 @@ public:
 	MathFunc* math_ = nullptr;	//数学函数类的指针
 
 	TYPE _type;
-	float _radius;
-	float _angle;
-	Vector2 _scale;
+	float _radius;			//物理判断半径
+	float _angle;			//旋转
+	Vector2 _spriteSize;	//贴图大小
+	Vector2 _scale;			//尺寸
 	int _sprite;
 	unsigned int _color;
 	int _alphaValue;
@@ -62,13 +57,7 @@ public:
 	static enum TYPE
 	{
 		fireWorks,
-		gunFire,
-		playerJump,
-		enemyHurtL,
-		enemyHurtR,
-		playerRunL,
-		playerRunR,
-		playerHurt,
+		bulletHurt,
 	}_particleType;
 
 	Vector2 _pos;

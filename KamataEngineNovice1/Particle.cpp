@@ -10,19 +10,10 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 {
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	_camera = camera;
-
-	_currentTime = 0;
-	_pos = pos;
-	_vel = { 0,0 };
-	_acc = { 0,0 };
-	_dir = { 0,0 };
-	_gravity = 0.7f;
-	_type = type;
-	_sprite = {};
-	_angle = 0;
-	_scale = { 1,1 };
-	_alphaValue = 255;
+	_camera = camera; _currentTime = 0;
+	_pos = pos; _vel = { 0,0 }; _acc = { 0,0 }; _dir = { 0,0 }; _gravity = 0.7f;
+	_type = type; _sprite = 0; _spriteSize = { 6,6 };
+	_angle = 0; _scale = { 1,1 }; _color = WHITE; _alphaValue = 255;
 	_isAudio = false;
 
 	switch (_type) {
@@ -34,70 +25,23 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 		_radius = 3;
 		std::uniform_real_distribution dis_angle(-10.f, 10.f);
 		_angle = dis_angle(gen);
-		_color = WHITE;
 		std::uniform_int_distribution dis_life(5, 10);
 		_lifeTime = dis_life(gen);
 		break;
 	}
-	case gunFire: {
-		_speed = 0.01f;
-		std::uniform_real_distribution dis_dirX(-1.f, 1.f);
-		std::uniform_real_distribution dis_dirY(-0.5f, 2.f);
-		_dir = { dis_dirX(gen), dis_dirY(gen) };
-		_radius = 1;
-		_color = 0xfff59dff;
-		std::uniform_int_distribution dis_life(10, 20);
-		_lifeTime = dis_life(gen);
-		break;
-	}
-	case playerJump: {
+	case bulletHurt: {
+		_spriteSize = { 20,20 };
+		_sprite = Novice::LoadTexture("./RS/Particle/stone.png");
 		_speed = 0.1f;
 		std::uniform_real_distribution dis_dirX(-0.7f, 0.7f);
 		std::uniform_real_distribution dis_dirY(0.f, 2.f);
 		_dir = { dis_dirX(gen), dis_dirY(gen) };
-		_radius = 3;
-		_color = WHITE;
-		std::uniform_real_distribution dis_scale(2.f, 4.f);
+		std::uniform_real_distribution dis_angle(-10.f, 10.f);
+		_angle = dis_angle(gen);
+		std::uniform_real_distribution dis_scale(3.f, 5.f);
 		float randScale = dis_scale(gen);
 		_scale = { randScale,randScale };
 		std::uniform_int_distribution dis_life(40, 60);
-		_lifeTime = dis_life(gen);
-		break;
-	}
-	case enemyHurtL:
-	case enemyHurtR: {
-		_speed = 0.5f;
-		_dir.x = _type == enemyHurtL ? -1.f : 1.f;
-		std::uniform_real_distribution dis_dirY(-0.5f, 2.f);
-		_dir.y = dis_dirY(gen);
-		_radius = 3;
-		_color = 0xce93d8ff;
-		std::uniform_int_distribution dis_life(100, 120);
-		_lifeTime = dis_life(gen);
-		break;
-	}
-	case playerRunL:
-	case playerRunR: {
-		_speed = 0.05f;
-		_dir.x = _type == playerRunL ? 1.f : -1.f;
-		std::uniform_real_distribution dis_dirY(0.f, 1.f);
-		_dir.y = dis_dirY(gen);
-		_radius = 2;
-		_color = 0xe0e0e0ff;
-		std::uniform_real_distribution dis_scale(1.f, 2.f);
-		_scale = { dis_scale(rd),dis_scale(rd) };
-		std::uniform_int_distribution dis_life(5, 10);
-		_lifeTime = dis_life(gen);
-		break;
-	}
-	case playerHurt: {
-		_speed = 0.5f;
-		std::uniform_real_distribution dis_dirX(-1.f, 1.f);
-		std::uniform_real_distribution dis_dirY(-0.5f, 2.f);
-		_dir = { dis_dirX(gen), dis_dirY(gen) };
-		_radius = 3;
-		_color = 0xe51c23ff;
-		std::uniform_int_distribution dis_life(100, 120);
 		_lifeTime = dis_life(gen);
 		break;
 	}
@@ -121,22 +65,7 @@ void Particle::Move()
 		_pos = { _pos.x + _vel.x,_pos.y + _vel.y };
 		break;
 	}
-	case gunFire: {
-		_acc.x = _dir.x * _speed;
-		_acc.y = _dir.y * _speed;
-		if (_currentTime < 10) {
-			_vel.x += _acc.x;
-			_vel.y += _acc.y;
-		}
-		_vel.y += 0.1f;
-		_pos = { _pos.x + _vel.x,_pos.y + _vel.y };
-		_scale.x += 0.05f;
-		_scale.y += 0.05f;
-		float steps = float(_currentTime) / float(_lifeTime);
-		_color = ColorInterpolation(0xfff59dff, RED, steps);
-		break;
-	}
-	case playerJump: {
+	case bulletHurt: {
 		_acc.x = _dir.x * _speed;
 		_acc.y = _dir.y * _speed;
 		if (_currentTime < 10) {
@@ -153,50 +82,6 @@ void Particle::Move()
 		}
 		_scale.x += 0.01f;
 		_scale.y += 0.01f;
-		break;
-	}
-	case enemyHurtL:
-	case enemyHurtR: {
-		if (_alphaValue > 5 && _currentTime > _lifeTime - 30) {
-			_color = 0xce93d800 | _alphaValue << 0;
-			_alphaValue -= 5;
-		}
-
-		_acc.x = _dir.x * _speed;
-		_acc.y = _dir.y * _speed;
-		if (_currentTime < 10) {
-			_vel.x += _acc.x;
-			_vel.y += _acc.y;
-		}
-		_vel.y -= 0.5f;
-		break;
-	}
-	case playerRunL:
-	case playerRunR: {
-		_acc.x = _dir.x * _speed;
-		_acc.y = _dir.y * _speed;
-		if (_currentTime < 10) {
-			_vel.x += _acc.x;
-			_vel.y += _acc.y;
-		}
-		_pos = { _pos.x + _vel.x,_pos.y + _vel.y };
-		_scale.x += 0.02f;
-		_scale.y += 0.02f;
-		break;
-	}
-	case playerHurt: {
-		if (_alphaValue > 5 && _currentTime > _lifeTime - 30) {
-			_color = 0xe51c2300 | _alphaValue << 0;
-			_alphaValue -= 5;
-		}
-
-		_acc.x = _dir.x * _speed;
-		_acc.y = _dir.y * _speed;
-		if (_currentTime < 10) {
-			_vel.x += _acc.x;
-			_vel.y += _acc.y;
-		}
-		_vel.y -= 0.5f;
 		break;
 	}
 	}
@@ -223,14 +108,14 @@ void Particle::Draw()
 	case fireWorks:
 		Novice::DrawBox(int(screenPos.x), int(screenPos.y), int(_radius * _scale.x), int(_radius * _scale.y), _angle, _color, kFillModeSolid);
 		break;
-	case gunFire:
-	case playerJump:
-	case enemyHurtL:
-	case enemyHurtR:
-	case playerRunL:
-	case playerRunR:
-	case playerHurt:
-		Novice::DrawEllipse(int(screenPos.x), int(screenPos.y), int(_radius * _scale.x), int(_radius * _scale.y), _angle, _color, kFillModeSolid);
+	case bulletHurt:
+		Novice::DrawQuad(
+			(int)_screen.leftTop.x, (int)_screen.leftTop.y,
+			(int)_screen.rightTop.x, (int)_screen.rightTop.y,
+			(int)_screen.leftBottom.x, (int)_screen.leftBottom.y,
+			(int)_screen.rightBottom.x, (int)_screen.rightBottom.y,
+			0, 0, (int)_spriteSize.x, (int)_spriteSize.y,
+			_sprite, _color);
 		break;
 	}
 }
@@ -278,17 +163,10 @@ Emitter::Emitter(Camera* camera, Vector2 pos, TYPE type)
 
 void Emitter::Initialize(Camera* camera, Vector2 pos, TYPE type)
 {
-	_pos = pos;
-	_scale = { 1,1 };
-	_type = type;
-	_isDead = false;
-	_color = WHITE;
-	_angle = 0;
-	_currentTime = 0;
-	_lifeTime = 0;
-	_isLoop = false;
-	_particleCurrentTime = 0;
-	_camera = camera;
+	_camera = camera; _type = type;
+	_pos = pos; _scale = { 1,1 }; _angle = 0; _color = WHITE;
+	_currentTime = 0; _lifeTime = 0; _particleCurrentTime = 0;
+	_isDead = false; _isLoop = false;
 
 	switch (_type) {
 	case fireWorks:
@@ -296,34 +174,11 @@ void Emitter::Initialize(Camera* camera, Vector2 pos, TYPE type)
 		_height = 5;
 		_particleSum = 12;
 		break;
-	case gunFire:
-		_width = 25;
-		_height = 25;
-		_particleSum = 1;
-		_lifeTime = 2;
-		_color = 0xfff59dff;
-		break;
-	case playerJump:
+	case bulletHurt:
 		_width = 2;
 		_height = 10;
 		_particleSum = 5;
 		break;
-	case enemyHurtL:
-	case enemyHurtR:
-		_width = 5;
-		_height = 5;
-		_particleSum = 2;
-		break;
-	case playerRunL:
-	case playerRunR:
-		_width = 2;
-		_height = 10;
-		_particleSum = 1;
-		break;
-	case playerHurt:
-		_width = 5;
-		_height = 5;
-		_particleSum = 5;
 	}
 }
 
@@ -340,40 +195,19 @@ void Emitter::ParticleStart()
 		for (int i = 0; i < _particleSum; i++) {
 			randomPos = { disX(gen),disY(gen) };
 			randomPos = { randomPos.x + _pos.x,randomPos.y + _pos.y };
-			switch (_type) {
-			case fireWorks:
-				element = ParticleManager::AcquireParticle(_camera, randomPos, Particle::fireWorks);
-				element->PushUpdate();
-				break;
-			case gunFire:
-				element = ParticleManager::AcquireParticle(_camera, randomPos, Particle::gunFire);
-				element->PushUpdate();
-				break;
-			case playerJump:
-				element = ParticleManager::AcquireParticle(_camera, randomPos, Particle::playerJump);
-				element->PushUpdate();
-				break;
-			case enemyHurtL:
-				element = ParticleManager::AcquireParticle(_camera, randomPos, Particle::enemyHurtL);
-				element->PushUpdate();
-				break;
-			case enemyHurtR:
-				element = ParticleManager::AcquireParticle(_camera, randomPos, Particle::enemyHurtR);
-				element->PushUpdate();
-				break;
-			case playerRunL:
-				element = ParticleManager::AcquireParticle(_camera, randomPos, Particle::playerRunL);
-				element->PushUpdate();
-				break;
-			case playerRunR:
-				element = ParticleManager::AcquireParticle(_camera, randomPos, Particle::playerRunR);
-				element->PushUpdate();
-				break;
-			case playerHurt:
-				element = ParticleManager::AcquireParticle(_camera, randomPos, Particle::playerHurt);
-				element->PushUpdate();
-				break;
-			}
+			Particle::TYPE parType = Particle::TYPE(_type);
+			element = ParticleManager::AcquireParticle(_camera, randomPos, parType);
+			element->PushUpdate();
+			//switch (_type) {
+			//case fireWorks:
+			//	element = ParticleManager::AcquireParticle(_camera, randomPos, Particle::fireWorks);
+			//	element->PushUpdate();
+			//	break;
+			//case bulletHurt:
+			//	element = ParticleManager::AcquireParticle(_camera, randomPos, Particle::bulletHurt);
+			//	element->PushUpdate();
+			//	break;
+			//}
 		}
 	}
 
@@ -403,12 +237,6 @@ void Emitter::Draw()
 	};
 	Vertex _screen = math_->TransformSprite(local, wvpVpMatrix_);
 	Vector2 screenPos = { _screen.leftTop.x - _scale.x / 2.0f ,_screen.leftTop.y + _scale.y / 2.0f };
-
-	switch (_type) {
-	case gunFire:
-		Novice::DrawEllipse(int(screenPos.x), int(screenPos.y), int(_width / 2 * _scale.x), int(_height / 2 * _scale.y), _angle, _color, kFillModeSolid);
-		break;
-	}
 }
 
 void Emitter::ToDead()

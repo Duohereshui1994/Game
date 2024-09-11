@@ -62,7 +62,7 @@ void GameStage::IsCollision()
 			for (auto& bullet : player_->bullets_) {
 				float length = (enemy->GetTranslate() - bullet.GetPos()).Length();
 				if (length < enemy->GetRadian() + bullet.GetWidth() / 2.f) {
-					ParticleManager::ADD_Particle(camera_, bullet.GetPos(), Emitter::playerJump);
+					ParticleManager::ADD_Particle(camera_, bullet.GetPos(), Emitter::bulletHurt);
 					Score::AddScore(enemy);
 					bullet.Initialize();
 					enemy->Set_isDead(true);
