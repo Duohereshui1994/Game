@@ -1,4 +1,5 @@
 #pragma once
+//情绪类
 #include "MathFunc.h"
 #include "Camera.h"
 #include "Player.h"
@@ -27,7 +28,9 @@ private:
 
 	int textureEmotion_;
 
-	int stateTextureRange_;
+	EmotionState currentState_;
+	EmotionState previousState_;
+
 
 	MathFunc* math_ = nullptr;	//数学函数类的指针
 
@@ -43,8 +46,5 @@ public:
 	//更新
 	void Update(Player* player, Camera* camera);
 
-	//描画
-	void Draw();
-	void DrawTexture(int leftTopX, int leftTopY, int width, int height, int textureHandle);
 };
 

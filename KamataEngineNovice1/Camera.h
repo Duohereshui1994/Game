@@ -1,5 +1,6 @@
 #pragma once
 #include "MathFunc.h"
+//摄像机
 class Camera
 {
 private:

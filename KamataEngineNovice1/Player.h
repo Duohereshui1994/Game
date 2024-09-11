@@ -14,6 +14,7 @@ enum class PlayerState {
 };
 
 enum class EmotionState {
+	Null,
 	Happy,
 	General,
 	Sad,

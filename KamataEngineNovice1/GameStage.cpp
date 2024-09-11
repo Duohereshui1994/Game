@@ -43,6 +43,11 @@ void GameStage::Initialize()
 
 void GameStage::Update(char keys[], char preKeys[])
 {
+	//scene 切换 test
+	if (keys[DIK_R] && !preKeys[DIK_R]) {
+		finished_ = true;
+	}
+
 	EnemyManager::BornEnemy(camera_, Score::GetScore(), 0);//生成敌人(相机，分数，小伙伴人数)
 
 	camera_->Update(keys);
@@ -67,7 +72,6 @@ void GameStage::Draw()
 	camera_->Draw();
 	EnemyManager::Draw();
 	player_->Draw();
-	emotion_->Draw();
 	ParticleManager::Draw();
 	filter_->Draw();
 	grid_->Draw();

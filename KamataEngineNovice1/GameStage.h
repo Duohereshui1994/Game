@@ -1,4 +1,5 @@
 #pragma once
+//game界面的类
 #include "Player.h"
 #include "Enemy.h"
 #include "Bullet.h"
@@ -24,6 +25,8 @@ public:
 	void Draw();
 
 	void IsCollision();//碰撞判定
+
+	bool IsFinished() const { return finished_; }
 private:
 	Player* player_ = nullptr;
 	Camera* camera_ = nullptr;
@@ -31,6 +34,9 @@ private:
 	Filter* filter_ = nullptr;
 	Emotion* emotion_ = nullptr;
 	Grid* grid_ = nullptr;
+
+	//Scene切换
+	bool finished_ = false;
 
 };
 
