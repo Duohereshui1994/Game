@@ -23,6 +23,7 @@ public:
 		bulletHurt,
 		minusScore,
 		plusScore,
+		plusScore_long,
 		emotion_happy,
 		emotion_normal,
 		emotion_sad,
@@ -79,6 +80,7 @@ public:
 		bulletHurt,
 		minusScore,
 		plusScore,
+		plusScore_long,
 		emotion_happy,
 		emotion_normal,
 		emotion_sad,
@@ -128,6 +130,7 @@ class ParticleManager
 public:
 	//本地贴图
 	inline static int _spPlusScore = 0;
+	inline static int _spPlusScore_long = 0;
 	inline static int _spMinusScore = 0;
 	inline static int _spBulletHurt = 0;
 	inline static int _spEmotion_happy = 0;

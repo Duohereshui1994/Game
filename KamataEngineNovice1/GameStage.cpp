@@ -95,7 +95,7 @@ void GameStage::IsCollision()
 {
 	//敌人和子弹
 	for (Enemy* enemy : EnemyManager::_updatePool) {
-		if (!enemy->Get_isDead()) {
+		if (!enemy->Get_isDead() && !enemy->Get_isGetPlayer()) {
 			for (auto& bullet : player_->bullets_) {
 				float length = (enemy->GetTranslate() - bullet.GetPos()).Length();
 				if (length < enemy->GetRadian() + bullet.GetWidth() / 2.f) {
@@ -105,33 +105,43 @@ void GameStage::IsCollision()
 					//地面的情况要将特效收缩到屏幕内
 					if (player_->GetState() == PlayerState::OnGround) {
 						enemyPos.x = std::clamp(enemyPos.x, 50.f, 1280.f - 50.f);
-						enemyPos.y = std::clamp(enemyPos.y, 15.f, 720.f - 15.f);
+						enemyPos.y = std::clamp(enemyPos.y, 50.f, 720.f - 50.f);
 					}
 					if (enemy->Get_type() == Enemy::tPlayer)
 						ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::minusScore);
+					else {
+						if (enemy->GetTranslate().x > 0 && enemy->GetTranslate().x < 1280
+							&& enemy->GetTranslate().y>0 && enemy->GetTranslate().y < 720)
+							ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore);
+						else
+							ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore_long);
+					}
+					//分数(判断是否远距离击杀)
+					if (enemy->GetTranslate().x > 0 && enemy->GetTranslate().x < 1280
+						&& enemy->GetTranslate().y>0 && enemy->GetTranslate().y < 720)
+						Score::AddScore(enemy, false);
 					else
-						ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore);
-					//分数
-					Score::AddScore(enemy);
+						Score::AddScore(enemy, true);
+					//回收子弹和敌人
 					bullet.Initialize();
 					enemy->Set_isDead(true);
-					ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::fireWorks);
 				}
 			}
 		}
 	}
 	//敌人和玩家
 	for (Enemy* it : EnemyManager::_updatePool) {
-		float length = (it->GetTranslate() - player_->GetTranslate()).Length();
-		if (length < it->GetRadian() + player_->GetRadian()) {
-			if (it->Get_type() == Enemy::tPlayer) {
-				//和小伙伴触碰
-				//可以使用下面提供的这个坐标去生成一个小伙伴，这样就可以无缝衔接上了
-				Vector2 friendPos = it->GetTranslate();
-				EnemyManager::ReleaseEnemy(it);
-			}
-			else {
-				//和敌人触碰
+		if (!it->Get_isDead() && !it->Get_isGetPlayer()) {
+			float length = (it->GetTranslate() - player_->GetTranslate()).Length();
+			if (length < it->GetRadian() + player_->GetRadian()) {
+				if (it->Get_type() == Enemy::tPlayer) {
+					//和小伙伴触碰
+					EnemyManager::ReleaseEnemy(it);
+				}
+				else {
+					//和敌人触碰
+					it->Set_isGetPlayer(true);
+				}
 			}
 		}
 	}

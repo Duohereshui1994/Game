@@ -63,6 +63,7 @@ public:
 	void Draw() override;//描画 重写
 	void PushUpdate();//放入开始的循环中(生成敌人后，要调用这个方法敌人才会进入主循环)
 	void ToDead();
+	void ToGetPlayer();
 
 	//Get&Set
 	const int& Get_hp() const { return hp_; };
@@ -77,6 +78,8 @@ public:
 	const Type& Get_type() const { return _type; };
 	void Set_spriteSize(const Vector2& size) { _spriteSize = size; };
 	const Vector2& Get_spriteSize() const { return _spriteSize; };
+	const bool& Get_isGetPlayer() const { return _isGetPlayer; };
+	void Set_isGetPlayer(const bool& flag) { _isGetPlayer = flag; };
 
 	const Vector2& GetTranslate() const { return _affine.translate; }				//获取中心点
 	void SetTranslate(const Vector2& translate) { _affine.translate = translate; }	//设置中心点
@@ -116,6 +119,7 @@ public:
 	inline static int _spEagles = 0;
 	inline static int _spEagles_hurt = 0;
 	inline static int _spSpider = 0;
+	inline static int _spSpider_hurt = 0;
 	inline static int _spBee = 0;
 	inline static int _spPlayer_walk = 0;
 	inline static int _spPlayer_fly = 0;

@@ -63,6 +63,15 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 		_lifeTime = 30;
 		break;
 	}
+	case plusScore_long: {
+		_spriteSize = { 57,52 };
+		_sprite = ParticleManager::_spPlusScore_long;
+		_speed = 0.2f;
+		_dir = { 0, 1 };
+		_scale = { 1.0f,1.0f };
+		_lifeTime = 30;
+		break;
+	}
 	case emotion_happy:
 	case emotion_normal:
 	case emotion_sad: {
@@ -178,7 +187,8 @@ void Particle::Move()
 		break;
 	}
 	case minusScore:
-	case plusScore: {
+	case plusScore:
+	case plusScore_long: {
 		_acc.x = _dir.x * _speed;
 		_acc.y = _dir.y * _speed;
 		if (_currentTime < 10) {
@@ -339,6 +349,7 @@ void Particle::PreDraw()
 	switch (_type) {
 	case minusScore:
 	case plusScore:
+	case plusScore_long:
 	case emotion_happy:
 	case emotion_normal:
 	case emotion_sad:
@@ -569,6 +580,7 @@ void Emitter::FrameAnimation(int index, int frameTime, int frameSum, Vector2 fra
 void ParticleManager::LoadRes()
 {
 	_spPlusScore = Novice::LoadTexture("./RS/Particle/bonus.png");
+	_spPlusScore_long = Novice::LoadTexture("./RS/Particle/bonus_long.png");
 	_spMinusScore = Novice::LoadTexture("./RS/Particle/minus.png");
 	_spBulletHurt = Novice::LoadTexture("./RS/Particle/stone.png");
 	_spEmotion_happy = Novice::LoadTexture("./RS/Particle/emotion_1.png");

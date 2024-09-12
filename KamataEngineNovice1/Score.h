@@ -19,8 +19,8 @@ public:
 	static void Update(int friendSum);		//更新方法
 	static void Draw();						//绘画方法
 
-	static void AddScore(Enemy* enemy);		//增加分数
-	static void GameOverScore();			//游戏结束，分数计算
+	static void AddScore(Enemy* enemy, bool longKill);	//增加分数
+	static void GameOverScore();						//游戏结束，分数计算
 	static void ScoreDraw(Vector2 pos);
 
 	static const int& GetScore() { return _score; }

@@ -26,33 +26,31 @@ void Score::Update(int friendSum)
 void Score::Draw()
 {
 	ScoreDraw(scorePos);
-	//#ifdef _DEBUG
-	//	Novice::ScreenPrintf(10, 10, "Score = %d", _score);
-	//	Novice::ScreenPrintf(10, 30, "High Score= %d", _highScore);
-	//#endif // _DEBUG
 }
 
-void Score::AddScore(Enemy* enemy)
+void Score::AddScore(Enemy* enemy, bool longKill)
 {
 	Enemy::Type type = enemy->Get_type();
 	int addScore = 0;
 	switch (type)
 	{
 	case Enemy::tSnake:
-		addScore = 10;
+		addScore = 100;
 		break;
 	case Enemy::tEagles:
-		addScore = 10;
+		addScore = 100;
 		break;
 	case Enemy::tSpider:
-		addScore = 10;
+		addScore = 100;
 		break;
 	case Enemy::tBee:
-		addScore = 10;
+		addScore = 100;
 		break;
 	}
+	if (longKill)
+		addScore *= 2;
 	if (_friendSum >= _friendMax)
-		addScore = 100;
+		addScore = 300;
 
 	addScore *= _magnification;
 	_score += addScore;

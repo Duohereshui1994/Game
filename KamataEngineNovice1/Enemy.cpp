@@ -83,12 +83,44 @@ void Enemy::ToDead()
 		_sprite = EnemyManager::_spEagles_hurt;
 		break;
 	case Enemy::tSpider:
+		_sprite = EnemyManager::_spSpider_hurt;
 		break;
 	case Enemy::tBee:
 		break;
 	case Enemy::tPlayer:
 		break;
 	}
+
+	//传入数据
+	_affine = { _scale,_rotate,_pos };
+	Matrix3x3 worldMatrix_ = math_->MakeAffine(_affine);
+	Matrix3x3 wvpVpMatrix_ = math_->WvpVpMatrix(worldMatrix_, _camera->GetVpVpMatrix());
+	Vertex local = {
+		{ -_spriteSize.x / 2.0f, +_spriteSize.y / 2.0f},
+		{ +_spriteSize.x / 2.0f, +_spriteSize.y / 2.0f},
+		{ -_spriteSize.x / 2.0f, -_spriteSize.y / 2.0f},
+		{ +_spriteSize.x / 2.0f, -_spriteSize.y / 2.0f},
+	};
+	_screen = math_->TransformSprite(local, wvpVpMatrix_);
+}
+
+void Enemy::ToGetPlayer()
+{
+	int aniTime = 30;
+	float t = tools->_currentTimes[0] / (float)aniTime;
+	//颜色
+	alphaValue = int((tools->EaseOutQuint(t)) * 255);
+	if (alphaValue < 0)
+		alphaValue = 0;
+	_color = 0x039be500 | alphaValue << 0;//透明度を制御する
+	//尺寸
+	_scale.x = std::lerp(_scale.x, 0.f, tools->EaseInCirc(t));
+	_scale.y = std::lerp(_scale.y, 0.f, tools->EaseInCirc(t));
+	//位移
+	Vector2 dir = (_targetPos + Vector2{ 0,-100 } - _pos).Normalize();
+	_pos += dir * _speed * 2;
+	if (tools->FrameTimeWatch(aniTime, 0, false))
+		EnemyManager::ReleaseEnemy(this);
 
 	//传入数据
 	_affine = { _scale,_rotate,_pos };
@@ -289,10 +321,12 @@ bool EnemyTools::FrameTimeWatch(int frame, int index, bool first)
 void EnemyManager::Update(char keys[], char preKeys[])
 {
 	for (Enemy* it : _updatePool) {
-		if (!it->Get_isDead())
-			it->Update(keys, preKeys);
-		else
+		if (it->Get_isDead())
 			it->ToDead();
+		else if (it->Get_isGetPlayer())
+			it->ToGetPlayer();
+		else
+			it->Update(keys, preKeys);
 	}
 }
 
@@ -498,7 +532,8 @@ void EnemyManager::LoadRes()
 	_spSnake_hurt = Novice::LoadTexture("./RS/Enemy/snake_hurt.png");
 	_spEagles = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
 	_spEagles_hurt = Novice::LoadTexture("./RS/Enemy/hawk_hurt.png");
-	_spSpider = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
+	_spSpider = Novice::LoadTexture("./RS/Enemy/spider_walk.png");
+	_spSpider_hurt = Novice::LoadTexture("./RS/Enemy/spider_hurt.png");
 	_spBee = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
 	_spPlayer_walk = Novice::LoadTexture("./RS/Enemy/friend_walk.png");
 	_spPlayer_fly = Novice::LoadTexture("./RS/Enemy/friend_fly.png");
