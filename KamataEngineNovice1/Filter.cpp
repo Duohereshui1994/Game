@@ -11,8 +11,9 @@ Filter::Filter()
 	//加载图片
 	textureFilter_ = Novice::LoadTexture("./RS/UI/UI_filter.png");
 
-	upViewScale = { 1.0f,1.0f };
-	downViewScale = { 2.0f,2.0f };
+	upViewScale = { 0.7f,0.7f };
+	downViewScale = { 2.2f,2.2f };
+	upViewScale_target = upViewScale;
 
 	// 初始化 Mono 结构体成员
 	obj_.width = FILTER_WIDTH;
@@ -54,24 +55,45 @@ void Filter::Initialize()
 	affine_.translate = { 640.0f, 360.0f };
 }
 
-void Filter::Update(Player* player, Camera* camera)
+void Filter::Update(Player* player, Camera* camera, int friendSum)
 {
+	//根据朋友数量变化光照大小
+	if (friendSum >= 14) {
+		upViewScale_target = { 1.1f,1.1f };
+	}
+	else if (friendSum >= 11) {
+		upViewScale_target = { 1.0f,1.0f };
+	}
+	else if (friendSum >= 8) {
+		upViewScale_target = { 0.9f,0.9f };
+	}
+	else if (friendSum >= 4) {
+		upViewScale_target = { 0.8f,0.8f };
+	}
+	else if (friendSum >= 0) {
+		upViewScale_target = { 0.7f,0.7f };
+	}
+	//改变光照的插值
+	if (upViewScale != upViewScale_target) {
+		upViewScale = math_->Lerp(upViewScale, upViewScale_target, 0.1f);
+	}
+	//上下切换
 	switch (player->GetState())
 	{
-		case PlayerState::OnGround:
-			obj_.scale = upViewScale;
-			break;
-		case PlayerState::UnderGround:
-			obj_.scale = downViewScale;
-			break;
-		case PlayerState::Up:
-			obj_.scale = math_->Lerp(downViewScale, upViewScale, player->GetUpFrame() / (float)(MAX_UPFRAME - 1));
-			break;
-		case PlayerState::Down:
-			obj_.scale = math_->Lerp(upViewScale, downViewScale, player->GetDownFrame() / (float)(MAX_DOWNFRAME - 1));
-			break;
-		default:
-			break;
+	case PlayerState::OnGround:
+		obj_.scale = upViewScale;
+		break;
+	case PlayerState::UnderGround:
+		obj_.scale = downViewScale;
+		break;
+	case PlayerState::Up:
+		obj_.scale = math_->Lerp(downViewScale, upViewScale, player->GetUpFrame() / (float)(MAX_UPFRAME - 1));
+		break;
+	case PlayerState::Down:
+		obj_.scale = math_->Lerp(upViewScale, downViewScale, player->GetDownFrame() / (float)(MAX_DOWNFRAME - 1));
+		break;
+	default:
+		break;
 	}
 	affine_.scale = obj_.scale;
 	//更新变换矩阵

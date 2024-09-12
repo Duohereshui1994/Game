@@ -29,6 +29,7 @@ private:
 
 	Vector2 upViewScale;
 	Vector2 downViewScale;
+	Vector2 upViewScale_target;
 
 	MathFunc* math_ = nullptr;	//数学函数类的指针
 
@@ -40,7 +41,7 @@ public:
 	//初始化
 	void Initialize();
 	//更新
-	void Update(Player* player,Camera* camera);
+	void Update(Player* player, Camera* camera, int friendSum);
 	//描画
 	void Draw();
 	void DrawTexture(int leftTopX, int leftTopY, int width, int height, int textureHandle);

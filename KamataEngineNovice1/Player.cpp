@@ -274,15 +274,7 @@ void Player::Draw()
 						(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeftControl_, WHITE);
 				}
 			}
-
-			//BULLET
-			for (auto& bullet : bullets_)
-			{
-				bullet.Draw();
-			}
-
 			//手
-
 			Novice::DrawQuad(
 				(int)screenHand_.leftTop.x, (int)screenHand_.leftTop.y,
 				(int)screenHand_.rightTop.x, (int)screenHand_.rightTop.y,
@@ -291,6 +283,11 @@ void Player::Draw()
 				(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleHand2_, WHITE);
 			//本体
 			DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_);
+			//BULLET
+			for (auto& bullet : bullets_)
+			{
+				bullet.Draw();
+			}
 		}
 		else if (mousePosX > affine_.translate.x) {
 			//friends
@@ -310,13 +307,6 @@ void Player::Draw()
 						(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRightControl_, WHITE);
 				}
 			}
-
-			//BULLET
-			for (auto& bullet : bullets_)
-			{
-				bullet.Draw();
-			}
-
 			//手
 			Novice::DrawQuad(
 				(int)screenHand_.leftTop.x, (int)screenHand_.leftTop.y,
@@ -326,7 +316,11 @@ void Player::Draw()
 				(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleHand1_, WHITE);
 			//本体
 			DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_);
-
+			//BULLET
+			for (auto& bullet : bullets_)
+			{
+				bullet.Draw();
+			}
 		}
 		break;
 
@@ -455,7 +449,11 @@ void Player::Attack(Camera* camera)
 			{
 				if (!bullet.GetIsShot())
 				{
-					bullet.SetPos(affine_.translate);
+					Vector2 shootOffset = { -40,30 };
+					if (mousePosX < affine_.translate.x)
+						bullet.SetPos(affine_.translate + shootOffset);
+					else
+						bullet.SetPos(affine_.translate + Vector2{ -shootOffset.x,shootOffset.y });
 					bullet.SetTargetPos(mousePosWorld);
 					bullet.Shoot(bullet.GetTargetPos(), UpPos);  // 发射子弹
 					bullet.bulletSwitch_ = !bullet.bulletSwitch_;

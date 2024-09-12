@@ -49,20 +49,19 @@ void GameStage::Update(char keys[], char preKeys[])
 		finished_ = true;
 	}
 
-	EnemyManager::BornEnemy(camera_, Score::GetScore(), 0);//生成敌人(相机，分数，小伙伴人数)
+	EnemyManager::BornEnemy(camera_, Score::GetScore(), player_->GetFriendCount());//生成敌人(相机，分数，小伙伴人数)
 
 	camera_->Update(keys);
 	player_->Update(keys, preKeys);
 	EnemyManager::Update(keys, preKeys);
 	player_->Update(keys, preKeys, camera_);
 	bg_->Update(camera_);
-	filter_->Update(player_, camera_);
+	filter_->Update(player_, camera_, player_->GetFriendCount());
 	emotion_->Update(player_, camera_);
-	filter_->Update(player_, camera_);
 	ParticleManager::Update();
 
 	IsCollision();			//碰撞检测
-	Score::Update(0);		//分数计算（要传入当前小伙伴数量）
+	Score::Update(player_->GetFriendCount());		//分数计算（要传入当前小伙伴数量）
 
 #ifdef _DEBUG
 	//Particle test
