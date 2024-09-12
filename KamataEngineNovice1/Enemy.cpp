@@ -2,8 +2,11 @@
 
 void Enemy::Move()
 {
-	//移动
 	Vector2 dir = (_targetPos - _pos).Normalize();
+	//左右翻转
+	if (dir.x > 0 && _scale.y > 0)
+		_scale.y *= -1;
+	//移动
 	float length = (_targetPos - _pos).Length();
 	if (length > 5)
 		_pos += dir * _speed;
@@ -53,6 +56,8 @@ void Enemy::Control(char keys[], char preKeys[])
 
 void Enemy::PlayerSad()
 {
+	_rotate = 0;
+	_scale = { 1,1 };
 	_sprite = EnemyManager::_spPlayer_sad;
 	_frameSum = 2;
 	_spriteSize = { 192.f / _frameSum,96 };
@@ -125,7 +130,7 @@ void Enemy::ToGetPlayer()
 	int aniTime = 30;
 	float t = tools->_currentTimes[0] / (float)aniTime;
 	//颜色
-	alphaValue = int((tools->EaseOutQuint(t)) * 255);
+	alphaValue = int((tools->EaseOutQuint(1 - t)) * 255);
 	if (alphaValue < 0)
 		alphaValue = 0;
 	_color = 0xFFFFFF00 | alphaValue << 0;//透明度を制御する
@@ -135,6 +140,8 @@ void Enemy::ToGetPlayer()
 	//位移
 	Vector2 dir = (_targetPos + Vector2{ 0,-100 } - _pos).Normalize();
 	_pos += dir * _speed * 2;
+	//旋转
+	_rotate = atan2(dir.y, dir.x) + acosf(-1);
 	if (tools->FrameTimeWatch(aniTime, 0, false))
 		EnemyManager::ReleaseEnemy(this);
 
@@ -393,7 +400,7 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 	_enemyType_fly[1] = { Enemy::tEagles };
 	//按照分数调整难度
 	if (score < 100000) {
-		_linesSum = 2;								//当前多少条线路
+		_linesSum = 6;								//当前多少条线路
 		_lineTime = 60;								//进行随机选择路线的时间
 		_eachBornMax = 2;							//每回至多生成敌人数量
 	}
@@ -448,9 +455,6 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 		for (int i = 0; i < enemySum; i++) {
 			Vector2 bornPos = _targetPos + _bornPosOffset[lineNum];
 			Enemy* it = AcquireEnemy(camera, bornPos, enemyType, _targetPos);
-			//根据路线最后调整一下贴图的左右翻转(因为角度随着方向改变，所以是翻转Y轴)
-			if (lineNum == 0 || lineNum % 2 == 0)
-				it->Set_scale({ it->Get_scale().x ,it->Get_scale().y * -1 });
 			_enemyLines[lineNum].push(it);
 		}
 	}
@@ -484,9 +488,6 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 			Enemy* it = AcquireEnemy(camera, bornPos, Enemy::tPlayer, _targetPos);
 			it->Set_sprite(sprite);
 			it->Set_spriteSize(spriteSize);
-			//根据路线最后调整一下贴图的左右翻转(因为角度随着方向改变，所以是翻转Y轴)
-			if (lineNum == 0 || lineNum % 2 == 0)
-				it->Set_scale({ it->Get_scale().x ,it->Get_scale().y * -1 });
 			_enemyLines[lineNum].push(it);
 			for (int i = 0; i < _bornFriendSpace; i++)//后占位
 				_enemyLines[lineNum].push(nullptr);

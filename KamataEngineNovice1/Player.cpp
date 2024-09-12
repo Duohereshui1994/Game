@@ -567,17 +567,15 @@ float Player::HandCal()
 
 void Player::OnEnenyCollide(Camera* camera)
 {
-	// 如果当前索引对应的 friend 活跃
-	if (friends_[currentFriendIndex + 1].isAlive_) {
-		friends_[currentFriendIndex + 1].isAlive_ = false;
-		//特效
-		ParticleManager::ADD_Particle(camera, affineFriends_[currentFriendIndex + 1].translate, Emitter::friendDead);
+	//如果13号，最后一号也没有激活，但是也被敌人碰撞，那么就要结束游戏
+	//现在先不结束游戏
+	if (!friends_[13].isAlive_)
+		return;
 
-		// 增加索引以便下次操作下一个 friend
-		currentFriendIndex++;
-	}
-
-
+	ParticleManager::ADD_Particle(camera, affineFriends_[currentFriendIndex + 1].translate, Emitter::friendDead);//特效
+	friends_[currentFriendIndex + 1].isAlive_ = false;//激活
+	// 增加索引以便下次操作下一个 friend
+	currentFriendIndex++;
 	// 如果索引超过范围，重置为 
 	if (currentFriendIndex > 13) {
 		currentFriendIndex = 13;
@@ -586,21 +584,16 @@ void Player::OnEnenyCollide(Camera* camera)
 
 void Player::OnFriendCollide(Camera* camera)
 {
-	// 如果当前索引对应的 friend 不活跃
-	if (!friends_[currentFriendIndex].isAlive_) {
-		friends_[currentFriendIndex].isAlive_ = true;
-		//特效
-		ParticleManager::ADD_Particle(camera, affineFriends_[currentFriendIndex].translate, Emitter::friendAdd);
+	if (friends_[0].isAlive_)//如果0号也已经被激活，就不要增加小伙伴了
+		return;
 
-		// 增加索引以便下次操作下一个 friend
-		currentFriendIndex--;
-	}
-
-
-
+	ParticleManager::ADD_Particle(camera, affineFriends_[currentFriendIndex].translate, Emitter::friendAdd);//特效
+	friends_[currentFriendIndex].isAlive_ = true;//激活
+	// 增加索引以便下次操作下一个 friend
+	currentFriendIndex--;
 	// 如果索引超过范围，重置为 0
-	if (currentFriendIndex < -1) {
-		currentFriendIndex = -1;
+	if (currentFriendIndex < 0) {
+		currentFriendIndex = 0;
 	}
 }
 
