@@ -40,6 +40,8 @@ private:
 	int emotionRecover_;				//情绪回复倍率
 
 	int currentFriendIndex = 13;  // 当前小伙伴数组下标
+	int friendCount;			// 友方数量
+	float radiusParam_;			// 半径参数
 
 	//==================camera=================================
 
@@ -118,7 +120,7 @@ public:
 
 	Vector2 GetTranslate() { return affine_.translate; }							//获取中心点
 	void SetTranslate(const Vector2& translate) { affine_.translate = translate; }	//设置中心点
-	float GetRadian() { return obj_.width / 2.0f; }									//获取图片宽度的一半当半径
+	float GetRadius() { return obj_.width / 2.0f * radiusParam_; }					//获取图片宽度的一半当半径
 
 	void OnEnenyCollide();															//玩家与敌人碰撞运行
 	void OnFriendCollide();															//玩家与友方碰撞运行

@@ -34,6 +34,8 @@ Player::Player()
 	emotionValue_ = 50;
 	emotionRecover_ = RECOVER_SPEED;
 
+	friendCount = 0;
+
 
 	// 初始化 MathFunc 对象
 	math_ = new MathFunc();
@@ -117,6 +119,8 @@ void Player::Initialize()
 
 	emotionValue_ = 50;
 
+	friendCount = 0;
+
 	affine_ = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
 	affine_.translate = UpPos;
 
@@ -136,6 +140,7 @@ void Player::Initialize()
 
 void Player::Update(char keys[], char preKeys[])
 {
+	//debug
 	if (keys[DIK_J] && !preKeys[DIK_J]) {
 		OnFriendCollide();
 
@@ -166,6 +171,16 @@ void Player::Update(char keys[], char preKeys[], Camera* camera)
 
 	//==================friends================
 
+	//参数计算
+	friendCount = 13 - currentFriendIndex;
+	if (friendCount > 0 && friendCount <= 3) {
+		radiusParam_ = 1.5f;
+	}
+	else if (friendCount >= 4) {
+		radiusParam_ = 3.0f;
+	}
+
+	//位置计算
 	for (int i = 0; i < 14; i++) {
 		worldMatrixFriends_[i] = math_->MakeAffine(affineFriends_[i]);
 		wvpVpMatrixFriends_[i] = math_->WvpVpMatrix(worldMatrixFriends_[i], camera->GetVpVpMatrix());

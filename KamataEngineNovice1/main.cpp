@@ -3,7 +3,7 @@
 #include "GameStage.h"
 #include "ClearStage.h"
 
-const char kWindowTitle[] = "6004_Game";
+const char kWindowTitle[] = "6004_モグラの守り手";
 
 enum class Scene {
 	kUnkonwn = 0,
