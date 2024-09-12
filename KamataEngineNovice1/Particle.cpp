@@ -92,7 +92,7 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 	case friendDead: {
 		_spriteSize = { 29,4 };
 		_sprite = ParticleManager::_spFriendDead;
-		_scale = { 2.f,2.f };
+		_scale = { 1.f,2.f };
 		_speed = 0.5f;
 		std::uniform_real_distribution dis_dirX(-1.f, 1.f);
 		_dir.x = dis_dirX(gen);

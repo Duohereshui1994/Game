@@ -26,14 +26,19 @@ void Score::AddScore(Enemy* enemy, bool longKill)
 	case Enemy::tEagles:
 	case Enemy::tSpider:
 	case Enemy::tBee:
-		addScore = 1;
+		addScore = 5;
+		break;
+	case Enemy::tPlayer:
+		addScore -= 100;
 		break;
 	}
-	if (longKill)
-		addScore *= 5;
+	if (longKill && !Enemy::tPlayer)
+		addScore = 10;
 
 	addScore *= _magnification;
 	_score += addScore;
+	if (_score < 0)
+		_score = 0;
 }
 
 void Score::GameOverScore()
@@ -110,10 +115,19 @@ void Score::ScoreDraw(Vector2 pos)
 	}
 }
 
-void Score::AddMagnification()
+void Score::AddMagnification(Enemy* enemy)
 {
-	if (_magnification < 99)
-		_magnification++;
+	switch (enemy->Get_type())
+	{
+	case Enemy::tPlayer:
+		_magnification += 3;
+		break;
+	default:
+		_magnification += 1;
+		break;
+	}
+	if (_magnification >= 99)
+		_magnification = 99;
 }
 
 void Score::ClearMagnification()

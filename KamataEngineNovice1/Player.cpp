@@ -46,6 +46,9 @@ Player::Player()
 
 	handRotate_ = 0;
 
+	_bullet_now = _bullet_targetMax;
+	_bullet_max = _bullet_targetMax;
+
 
 	// 初始化 MathFunc 对象
 	math_ = new MathFunc();
@@ -58,7 +61,7 @@ Player::Player()
 	obj_.scale = Vector2(1.0f, 1.0f);
 	obj_.rotate = 0.0f;
 	//子弹
-	bullets_.resize(10);
+	bullets_.resize(50);
 
 	//==================camera=================================
 	//プレイヤーのローカル座標
@@ -150,6 +153,9 @@ void Player::Initialize()
 
 	handRotate_ = 0;
 
+	_bullet_max = _bullet_targetMax;
+	_bullet_now = _bullet_targetMax;
+
 	affine_ = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
 	affine_.translate = UpPos;
 
@@ -195,7 +201,7 @@ void Player::Update(char keys[], char preKeys[], Camera* camera)
 
 	SwithGround(keys, preKeys, camera);
 
-	Attack(camera);
+	Attack(keys, preKeys, camera);
 
 	Novice::GetMousePosition(&mousePosX, &mousePosY);
 	mousePos = Vector2((float)mousePosX, (float)mousePosY);
@@ -438,9 +444,9 @@ void Player::SetFriendArray()
 	friends_[0] = { { 640.0f,220.0f + PLAYER_HEIGHT * 2.0f },{ UpPos.x,UnderPos.y },0xFFFFFFFF,false };
 }
 
-void Player::Attack(Camera* camera)
+void Player::Attack(char keys[], char preKeys[], Camera* camera)
 {
-
+	keys, preKeys;
 	if (attackCD_ <= 0) {
 		attackCD_ = 0.0f;
 	}
@@ -451,11 +457,12 @@ void Player::Attack(Camera* camera)
 	if (state_ == PlayerState::OnGround) {
 		for (auto& bullet : bullets_)
 		{
-			if (Novice::IsPressMouse(0) && attackCD_ <= 0)
+			//鼠标点击
+			if (Novice::IsTriggerMouse(0) && attackCD_ <= 0)
 			{
-				if (!bullet.GetIsShot())
+				if (!bullet.GetIsShot() && _bullet_now > 0)
 				{
-					Vector2 shootOffset = { -40,30 };
+					Vector2 shootOffset = { -40,20 };
 					if (mousePosX < affine_.translate.x)
 						bullet.SetPos(affine_.translate + shootOffset);
 					else
@@ -465,6 +472,26 @@ void Player::Attack(Camera* camera)
 					bullet.bulletSwitch_ = !bullet.bulletSwitch_;
 					bullet.SetIsShot(true);
 					attackCD_ = ATTACK_COOLDOWN;
+					_bullet_now--;//计算子弹数
+					break;  // 只发射一颗子弹
+				}
+			}
+			//键盘按键
+			if (keys[DIK_F] && !preKeys[DIK_F] && attackCD_ <= 0)
+			{
+				if (!bullet.GetIsShot() && _bullet_now > 0)
+				{
+					Vector2 shootOffset = { -40,20 };
+					if (mousePosX < affine_.translate.x)
+						bullet.SetPos(affine_.translate + shootOffset);
+					else
+						bullet.SetPos(affine_.translate + Vector2{ -shootOffset.x,shootOffset.y });
+					bullet.SetTargetPos(mousePosWorld);
+					bullet.Shoot(bullet.GetTargetPos(), UpPos);  // 发射子弹
+					bullet.bulletSwitch_ = !bullet.bulletSwitch_;
+					bullet.SetIsShot(true);
+					attackCD_ = ATTACK_COOLDOWN;
+					_bullet_now--;//计算子弹数
 					break;  // 只发射一颗子弹
 				}
 			}
@@ -513,6 +540,8 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 
 		//回复心情
 		emotionValue_ += (int)(deltaTime_ * RECOVER_SPEED);
+		//回复子弹
+		_bullet_now = _bullet_max;
 		break;
 
 	case PlayerState::Up:
@@ -573,13 +602,16 @@ float Player::HandCal()
 
 void Player::OnEnenyCollide(Camera* camera)
 {
-	//如果13号，最后一号也没有激活，但是也被敌人碰撞，那么就要结束游戏
+	//如果13号也没有激活，但是也被敌人碰撞，那么就要结束游戏
 	//现在先不结束游戏
 	if (!friends_[13].isAlive_)
 		return;
 
-	ParticleManager::ADD_Particle(camera, affineFriends_[currentFriendIndex + 1].translate, Emitter::friendDead);//特效
-	friends_[currentFriendIndex + 1].isAlive_ = false;//激活
+	ParticleManager::ADD_Particle(camera, affineFriends_[currentFriendIndex].translate, Emitter::friendDead);//特效
+	_bullet_max--;//减少子弹上限
+	if (_bullet_max < _bullet_targetMax)
+		_bullet_max = _bullet_targetMax;
+	friends_[currentFriendIndex].isAlive_ = false;//激活
 	// 增加索引以便下次操作下一个 friend
 	currentFriendIndex++;
 	// 如果索引超过范围，重置为 
@@ -594,6 +626,7 @@ void Player::OnFriendCollide(Camera* camera)
 		return;
 
 	ParticleManager::ADD_Particle(camera, affineFriends_[currentFriendIndex].translate, Emitter::friendAdd);//特效
+	_bullet_max++;//增加子弹上限
 	friends_[currentFriendIndex].isAlive_ = true;//激活
 	// 增加索引以便下次操作下一个 friend
 	currentFriendIndex--;

@@ -403,10 +403,10 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 	_enemyType_fly[0] = { Enemy::tEagles };
 	_enemyType_fly[1] = { Enemy::tEagles };
 	//按照分数调整难度
-	if (score < 100000) {
-		_linesSum = 6;								//当前多少条线路
+	if (score < 1000) {
+		_linesSum = 2;								//当前多少条线路
 		_lineTime = 60;								//进行随机选择路线的时间
-		_eachBornMax = 0;							//每回至多生成敌人数量
+		_eachBornMax = 2;							//每回至多生成敌人数量
 	}
 	else if (score < 4000) {
 		_linesSum = 4;

@@ -26,6 +26,46 @@ void Grid::DrawBullet(int currentBullet, int maxBullet)
 	for (int i = 1; i < maxBullet; i++) {
 		Novice::DrawSprite(int(_bulletPos.x + i * cutLineNextX), int(_bulletPos.y + 3), _spBullet_cutline, 1, 1, 0.0f, WHITE);
 	}
+
+	//空子弹时候的抖动
+	if (currentBullet <= 0 && Novice::IsTriggerMouse(0))
+		_isBulletShake = true;
+	if (_isBulletShake) {
+		if (FrameTimeWatch_ani(30, 0, false))
+			_isBulletShake = false;
+		BulletShake();
+	}
+	else
+		_bulletShakeOffset = { 0,0 };
+}
+
+void Grid::BulletShake()
+{
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<float> dis_moveX(-_randBulletShake, _randBulletShake);
+	std::uniform_real_distribution<float> dis_moveY(-_randBulletShake, _randBulletShake);
+	_bulletShakeOffset = Vector2{ dis_moveX(rd),dis_moveY(rd) };
+	_bulletPos = _bulletPosOffset + _bulletShakeOffset;
+}
+
+bool Grid::FrameTimeWatch_ani(int frame, int index, bool first)
+{
+	if (!first) {
+		if (_currentFrame_ani[index] > frame) {
+			_currentFrame_ani[index] = 0;
+			return true;
+		}
+		_currentFrame_ani[index]++;
+	}
+	else {
+		if (_currentFrame_ani[index] <= 0) {
+			_currentFrame_ani[index] = frame;
+			return true;
+		}
+		_currentFrame_ani[index]--;
+	}
+	return false;
 }
 
 Grid::Grid()

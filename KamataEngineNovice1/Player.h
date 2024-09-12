@@ -47,7 +47,7 @@ private:
 	float upFrame_;				//钻出土动画的帧数序号
 
 	int emotionValue_;				//情绪值
-	int emotionRecover_;				//情绪回复倍率
+	int emotionRecover_;			//情绪回复倍率
 
 	int currentFriendIndex = 13;  // 当前小伙伴数组下标
 	int friendCount;			// 友方数量
@@ -117,6 +117,9 @@ private:
 
 public:
 	//子弹数组
+	int _bullet_now = 0;		//当前子弹数
+	int _bullet_max = 0;		//当前子弹最大上限
+	int _bullet_targetMax = 5;	//这个值决定最初决定子弹的上限
 	std::vector<Bullet> bullets_;
 	//友方数组 最多14个友方
 	Friends friends_[14];
@@ -136,7 +139,7 @@ public:
 	void SetFriendArray();
 
 	//攻击
-	void Attack(Camera* camera);
+	void Attack(char keys[], char preKeys[], Camera* camera);
 	//地面地下状态切换
 	void SwithGround(char keys[], char preKeys[], Camera* camera);
 	//计算手的旋转
