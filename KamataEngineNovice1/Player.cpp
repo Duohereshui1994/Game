@@ -217,11 +217,17 @@ void Player::Update(char keys[], char preKeys[], Camera* camera)
 			//手的角度
 			handRotate_ = HandCal();
 			affineHand_.theta = handRotate_ - (float)M_PI;
+			if (affineHand_.theta > -4.8f && affineHand_.theta < -0.75) {
+				affineHand_.theta = -0.75f;
+			}
 		}
 		else if (mousePosWorld.x > affine_.translate.x) {
 			//手的角度
 			handRotate_ = HandCal();
 			affineHand_.theta = handRotate_;
+			if (affineHand_.theta > 0.75) {
+				affineHand_.theta = 0.75;
+			}
 		}
 
 	}

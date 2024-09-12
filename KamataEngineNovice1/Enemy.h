@@ -45,7 +45,7 @@ private:
 
 	void Move();
 	void Control(char keys[], char preKeys[]);//这个函数会操控敌人，只用作测试使用
-	void PlayerSad();
+	void PlayerSadWait();
 
 public:
 	//类型

@@ -54,15 +54,17 @@ void Enemy::Control(char keys[], char preKeys[])
 	}
 }
 
-void Enemy::PlayerSad()
+void Enemy::PlayerSadWait()
 {
 	_rotate = 0;
 	_scale = { 1,1 };
+	_pos = { _pos.x,260 };
 	_sprite = EnemyManager::_spPlayer_sad;
 	_frameSum = 2;
 	_spriteSize = { 192.f / _frameSum,96 };
+	//在等待途中碰到别的敌人，就会被吃掉
 	for (Enemy* it : EnemyManager::_updatePool) {
-		if (it != this) {
+		if (it->_type != tPlayer) {
 			float length = (it->GetTranslate() - _pos).Length();
 			if (length < it->GetRadian() + _size.x) {
 				ParticleManager::ADD_Particle(_camera, _pos, Emitter::friendDead);
@@ -139,9 +141,11 @@ void Enemy::ToGetPlayer()
 	_scale.y = std::lerp(_scale.y > 0 ? 1.f : -1.f, 0.f, tools->EaseInCirc(t));
 	//位移
 	Vector2 dir = (_targetPos + Vector2{ 0,-100 } - _pos).Normalize();
+	float length = (_targetPos + Vector2{ 0,-100 } - _pos).Length();
 	_pos += dir * _speed * 2;
 	//旋转
-	_rotate = atan2(dir.y, dir.x) + acosf(-1);
+	if (length > 5)
+		_rotate = atan2(dir.y, dir.x) + acosf(-1);
 	if (tools->FrameTimeWatch(aniTime, 0, false))
 		EnemyManager::ReleaseEnemy(this);
 
@@ -212,7 +216,7 @@ void Enemy::Initialize(Camera* camera, Vector2 pos, Type type, Vector2 targetPos
 		_sprite = EnemyManager::_spPlayer_walk;
 		_frameSum = 4;
 		_spriteSize = { 384.f / _frameSum,96 };
-		_size = { 64,64 };
+		_size = { 74,74 };
 		break;
 	}
 
@@ -228,7 +232,7 @@ void Enemy::Update(char keys[], char preKeys[])
 	if (!_isFriendWiat)
 		Move();//移动
 	else
-		PlayerSad();
+		PlayerSadWait();
 
 	//传入数据
 	_affine = { _scale,_rotate,_pos };
@@ -402,7 +406,7 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 	if (score < 100000) {
 		_linesSum = 6;								//当前多少条线路
 		_lineTime = 60;								//进行随机选择路线的时间
-		_eachBornMax = 2;							//每回至多生成敌人数量
+		_eachBornMax = 0;							//每回至多生成敌人数量
 	}
 	else if (score < 4000) {
 		_linesSum = 4;

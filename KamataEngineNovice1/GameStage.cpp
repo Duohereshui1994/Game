@@ -136,6 +136,12 @@ void GameStage::IsCollision()
 	}
 	//敌人和玩家
 	for (Enemy* it : EnemyManager::_updatePool) {
+		//补充条件，如果小伙伴在等待，那么玩家升上来的时候就直接获救
+		if (it->Get_type() == Enemy::tPlayer && it->Get_isFriendWiat() && player_->GetState() == PlayerState::OnGround) {
+			player_->OnFriendCollide(camera_);
+			it->Set_isGetPlayer(true);
+			EnemyManager::ReleaseEnemy(it);
+		}
 		if (!it->Get_isDead() && !it->Get_isGetPlayer()) {
 			Vector2 playerUpPos = { 640.0f, 220.0f };//因为玩家会上下运动，所以直接使用地面的坐标
 			float length = (it->GetTranslate() - playerUpPos).Length();
@@ -148,7 +154,8 @@ void GameStage::IsCollision()
 						EnemyManager::ReleaseEnemy(it);
 					}
 					else {
-						it->Set_isFriendWiat(true);
+						if (!it->Get_isFriendWiat())
+							it->Set_isFriendWiat(true);
 					}
 				}
 				else {
