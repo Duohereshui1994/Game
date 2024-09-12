@@ -14,6 +14,10 @@ Player::Player()
 {
 	textureHandleLeft_ = Novice::LoadTexture("./RS/Player/player_Up_Idle_Left.png");
 	textureHandleRight_ = Novice::LoadTexture("./RS/Player/player_Up_Idle_Right.png");
+
+	textureHandleLeftPure_ = Novice::LoadTexture("./RS/Player/player_Up_Idle_Left_2.png");
+	textureHandleRightPure_ = Novice::LoadTexture("./RS/Player/player_Up_Idle_Right_2.png");
+
 	textureHandleUnder_ = Novice::LoadTexture("./RS/Player/player_Under_Idle.png");
 	textureHandleDown_ = Novice::LoadTexture("./RS/Player/player_Down.png");
 	textureHandleUp_ = Novice::LoadTexture("./RS/Player/player_UP.png");
@@ -255,12 +259,18 @@ void Player::Draw()
 				//friends
 				for (int i = 0; i < 14; i++) {
 					if (friends_[i].isAlive_) {
+						if (i < 10) {
+							textureHandleLeftControl_ = textureHandleLeftPure_;
+						}
+						else {
+							textureHandleLeftControl_ = textureHandleLeft_;
+						}
 						Novice::DrawQuad(
 							(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
 							(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
 							(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
 							(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
-							(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_, WHITE);
+							(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeftControl_, WHITE);
 					}
 				}
 
@@ -285,12 +295,18 @@ void Player::Draw()
 				//friends
 				for (int i = 0; i < 14; i++) {
 					if (friends_[i].isAlive_) {
+						if (i < 10) {
+							textureHandleRightControl_ = textureHandleRightPure_;
+						}
+						else {
+							textureHandleRightControl_ = textureHandleRight_;
+						}
 						Novice::DrawQuad(
 							(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
 							(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
 							(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
 							(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
-							(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_, WHITE);
+							(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRightControl_, WHITE);
 					}
 				}
 

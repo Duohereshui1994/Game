@@ -25,6 +25,13 @@ class Player : public Character
 private:
 	int textureHandleLeft_;		//地面上面向左侧贴图
 	int textureHandleRight_;	//地面下面向右侧贴图
+
+	int textureHandleLeftPure_;
+	int textureHandleRightPure_;
+
+	int textureHandleLeftControl_;
+	int textureHandleRightControl_;
+
 	int textureHandleUnder_;	//地下待机贴图
 	int textureHandleDown_;		//钻进土里贴图
 	int textureHandleUp_;		//钻出土贴图
