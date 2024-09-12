@@ -69,7 +69,7 @@ void GameStage::Draw()
 	Novice::DrawBox(-50, -50, 1280 + 100, 720 + 100, 0, BLACK, kFillModeSolid);//最下面的黑色背景，防止穿帮
 
 	bg_->Draw();
-	camera_->Draw();
+	//camera_->Draw();
 	EnemyManager::Draw();
 	player_->Draw();
 	ParticleManager::Draw();

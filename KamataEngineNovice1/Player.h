@@ -158,5 +158,7 @@ public:
 	float GetUpFrame() { return upFrame_; }
 	float GetDownFrame() { return downFrame_; }
 
+	int GetFriendCount() { return friendCount; }
+
 };
 
