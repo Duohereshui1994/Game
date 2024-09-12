@@ -1,8 +1,8 @@
-#define ATTACK_COOLDOWN 0.2f		// 攻击冷却时间（秒）如果要改变攻速 就改这里
+#define ATTACK_COOLDOWN 0.1f		//攻击冷却时间（秒）如果要改变攻速 就改这里
 #define MAX_UPFRAME 4.0f			//从土里钻出来的动画的最大帧数
 #define MAX_DOWNFRAME 7.0f			//钻进土里去的动画的最大帧数
 #define MAX_IDLEFRAME 4.0f			//在地面或者在地下待机的动画最大帧数（共用一个）
-#define UP_DOWN_TIME_SCALE 15.0f		//钻进钻出的动画速度
+#define UP_DOWN_TIME_SCALE 15.0f	//钻进钻出的动画速度
 #define IDLE_TIME_SCALE 2.0f		//待机的动画速度
 #define RECOVER_SPEED 120			//恢复速度
 #define PLAYER_WIDTH 96.0f

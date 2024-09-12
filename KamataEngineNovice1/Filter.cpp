@@ -59,19 +59,19 @@ void Filter::Update(Player* player, Camera* camera, int friendSum)
 {
 	//根据朋友数量变化光照大小
 	if (friendSum >= 14) {
-		upViewScale_target = { 1.1f,1.1f };
-	}
-	else if (friendSum >= 11) {
-		upViewScale_target = { 1.0f,1.0f };
-	}
-	else if (friendSum >= 8) {
 		upViewScale_target = { 0.9f,0.9f };
 	}
-	else if (friendSum >= 4) {
+	else if (friendSum >= 11) {
+		upViewScale_target = { 0.85f,0.85f };
+	}
+	else if (friendSum >= 8) {
 		upViewScale_target = { 0.8f,0.8f };
 	}
+	else if (friendSum >= 4) {
+		upViewScale_target = { 0.75f,0.75f };
+	}
 	else if (friendSum >= 0) {
-		upViewScale_target = { 0.7f,0.7f };
+		upViewScale_target = { 0.67f,0.67f };
 	}
 	//改变光照的插值
 	if (upViewScale != upViewScale_target) {
