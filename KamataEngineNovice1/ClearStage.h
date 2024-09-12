@@ -1,4 +1,5 @@
 #pragma once
+#include "ClearBackground.h"
 
 //结算界面stage
 class ClearStage
@@ -6,6 +7,8 @@ class ClearStage
 private:
 	//Scene切换用参数
 	bool finished_ = false;
+
+	ClearBackground* cBG_ = nullptr;
 
 public:
 	ClearStage();
