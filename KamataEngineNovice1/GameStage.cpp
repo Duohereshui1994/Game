@@ -63,6 +63,14 @@ void GameStage::Update(char keys[], char preKeys[])
 
 	IsCollision();			//碰撞检测
 	Score::Update(0);		//分数计算（要传入当前小伙伴数量）
+
+	//Particle test
+	if (keys[DIK_1] && !preKeys[DIK_1]) {
+		ParticleManager::ADD_Particle(camera_, player_->GetTranslate(), Emitter::happy);
+	}
+	if (keys[DIK_2] && !preKeys[DIK_2]) {
+		ParticleManager::ADD_Particle(camera_, player_->GetTranslate(), Emitter::unHappy);
+	}
 }
 
 void GameStage::Draw()

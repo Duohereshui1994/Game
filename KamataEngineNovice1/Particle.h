@@ -28,6 +28,8 @@ public:
 		emotion_sad,
 		friendDead,
 		friendAdd,
+		happy,
+		unHappy,
 	}_particleType;
 
 	Vector2 _pos;
@@ -82,6 +84,8 @@ public:
 		emotion_sad,
 		friendDead,
 		friendAdd,
+		happy,
+		unHappy,
 	}_particleType;
 
 	Vector2 _pos;
@@ -131,6 +135,8 @@ public:
 	inline static int _spEmotion_sad = 0;
 	inline static int _spFriendAdd = 0;
 	inline static int _spFriendDead = 0;
+	inline static int _spHappy = 0;
+	inline static int _spUnHappy = 0;
 	inline static int _spListBite = 0;
 	static void LoadRes();//预先载入本地地图，在游戏最开始载入
 

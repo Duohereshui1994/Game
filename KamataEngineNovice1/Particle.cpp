@@ -108,6 +108,36 @@ void Particle::Initialize(Camera* camera, Vector2 pos, TYPE type)
 		_lifeTime = 240;
 		break;
 	}
+	case happy: {
+		_spriteSize = { 22,22 };
+		_sprite = ParticleManager::_spHappy;
+		_speed = 0.2f;
+		std::uniform_real_distribution dis_dirX(-0.7f, 0.7f);
+		std::uniform_real_distribution dis_dirY(0.f, 2.f);
+		_dir = { dis_dirX(gen), dis_dirY(gen) };
+		std::uniform_real_distribution dis_angle(-10.f, 10.f);
+		_angle = dis_angle(gen);
+		std::uniform_real_distribution dis_scale(0.5f, 0.7f);
+		float randScale = dis_scale(gen);
+		_scale = { randScale,randScale };
+		std::uniform_int_distribution dis_life(60, 80);
+		_lifeTime = dis_life(gen);
+		break;
+	}
+	case unHappy: {
+		_spriteSize = { 22,22 };
+		_sprite = ParticleManager::_spUnHappy;
+		_speed = 0.2f;
+		std::uniform_real_distribution dis_dirX(-0.5f, 0.5f);
+		_dir.x = dis_dirX(gen);
+		std::uniform_real_distribution dis_dirY(2.f, 2.5f);
+		_dir.y = dis_dirY(gen) * -1;
+		std::uniform_real_distribution dis_angle(-10.f, 10.f);
+		_angle = dis_angle(gen);
+		std::uniform_int_distribution dis_life(60, 80);
+		_lifeTime = dis_life(gen);
+		break;
+	}
 	}
 }
 
@@ -213,6 +243,46 @@ void Particle::Move()
 		}
 		break;
 	}
+	case happy: {
+		_acc.x = _dir.x * _speed * 0.5f;
+		_acc.y = _dir.y * _speed;
+		if (_currentTime < 10) {
+			_vel.x += _acc.x;
+			_vel.y += _acc.y;
+		}
+		else {
+			_vel.y *= 0.95f;
+		}
+		_pos = { _pos.x + _vel.x,_pos.y + _vel.y };
+		if (_alphaValue > 5) {
+			_color = 0xFFFFFF00 | _alphaValue << 0;
+			_alphaValue -= 5;
+		}
+		_scale.x += 0.01f;
+		_scale.y += 0.01f;
+		break;
+	}
+	case unHappy: {
+		if (_alphaValue > 5 && _currentTime > _lifeTime - 30) {
+			_color = 0xFFFFFF00 | _alphaValue << 0;
+			_alphaValue -= 5;
+		}
+		float gravity = -0.1f;
+		Vector2 backupPos = { _pos.x,_pos.y };
+		_angle += 0.1f;
+		_acc.y = _dir.y * _speed;
+		if (_currentTime < 10) {
+			_vel.y += _acc.y;
+		}
+		_vel.y -= gravity;
+		_pos.y -= _vel.y;
+		_acc.x = _dir.x * _speed;
+		if (_currentTime < 10) {
+			_vel.x += _acc.x;
+		}
+		_pos.x += _vel.x;
+		break;
+	}
 	}
 
 	_currentTime++;
@@ -272,6 +342,8 @@ void Particle::PreDraw()
 	case emotion_happy:
 	case emotion_normal:
 	case emotion_sad:
+	case happy:
+	case unHappy:
 		Novice::DrawQuad(
 			(int)_screen.leftTop.x, (int)_screen.leftTop.y,
 			(int)_screen.rightTop.x, (int)_screen.rightTop.y,
@@ -356,6 +428,12 @@ void Emitter::Initialize(Camera* camera, Vector2 pos, TYPE type)
 		_particleGetTime = 10;
 		_isFirst = false;
 		_scale = { 20,20 };
+		break;
+	case happy:
+	case unHappy:
+		_width = 20;
+		_height = 10;
+		_particleSum = 8;
 		break;
 	}
 }
@@ -498,6 +576,9 @@ void ParticleManager::LoadRes()
 	_spEmotion_sad = Novice::LoadTexture("./RS/Particle/emotion_3.png");
 	_spFriendAdd = Novice::LoadTexture("./RS/Particle/friendAdd.png");
 	_spFriendDead = Novice::LoadTexture("./RS/Particle/friendDead.png");
+	_spHappy = Novice::LoadTexture("./RS/Particle/happy.png");
+	_spUnHappy = Novice::LoadTexture("./RS/Particle/unHappy.png");
+
 	_spListBite = Novice::LoadTexture("./RS/Particle/bite.png");
 }
 

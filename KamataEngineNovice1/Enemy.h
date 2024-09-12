@@ -39,7 +39,7 @@ private:
 	bool _isGetPlayer = false;
 
 	//工具
-	EnemyTools* tools;
+	EnemyTools* tools = nullptr;
 
 	void Move();
 	void Control(char keys[], char preKeys[]);//这个函数会操控敌人，只用作测试使用

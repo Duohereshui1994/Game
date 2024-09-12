@@ -474,7 +474,8 @@ void EnemyManager::ClearAllEnemy()
 		while (!_enemyLines[i].empty())
 		{
 			Enemy* it = _enemyLines[i].top();
-			ReleaseEnemy(it);
+			if (it != nullptr)
+				ReleaseEnemy(it);
 			_enemyLines[i].pop();
 		}
 	}
