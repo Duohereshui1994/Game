@@ -38,5 +38,9 @@ private:
 	//Scene切换
 	bool finished_ = false;
 
+	//test
+	int currentBullet = 5;
+	int maxBullet = 5;
+
 };
 

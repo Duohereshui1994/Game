@@ -64,6 +64,7 @@ void GameStage::Update(char keys[], char preKeys[])
 	IsCollision();			//碰撞检测
 	Score::Update(0);		//分数计算（要传入当前小伙伴数量）
 
+#ifdef _DEBUG
 	//Particle test
 	if (keys[DIK_1] && !preKeys[DIK_1]) {
 		ParticleManager::ADD_Particle(camera_, player_->GetTranslate(), Emitter::happy);
@@ -71,6 +72,19 @@ void GameStage::Update(char keys[], char preKeys[])
 	if (keys[DIK_2] && !preKeys[DIK_2]) {
 		ParticleManager::ADD_Particle(camera_, player_->GetTranslate(), Emitter::unHappy);
 	}
+	if (keys[DIK_3] && !preKeys[DIK_3]) {
+		currentBullet++;
+	}
+	if (keys[DIK_4] && !preKeys[DIK_4]) {
+		currentBullet--;
+	}
+	if (keys[DIK_5] && !preKeys[DIK_5]) {
+		maxBullet++;
+	}
+	if (keys[DIK_6] && !preKeys[DIK_6]) {
+		maxBullet--;
+	}
+#endif // _DEBUG
 }
 
 void GameStage::Draw()
@@ -83,7 +97,7 @@ void GameStage::Draw()
 	player_->Draw();
 	ParticleManager::Draw();
 	filter_->Draw();
-	grid_->Draw();
+	grid_->Draw(currentBullet, maxBullet);
 
 	ParticleManager::PreDraw();
 	Score::Draw();
