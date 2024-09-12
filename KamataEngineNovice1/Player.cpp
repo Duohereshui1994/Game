@@ -17,6 +17,9 @@ Player::Player()
 	textureHandleUnder_ = Novice::LoadTexture("./RS/Player/player_Under_Idle.png");
 	textureHandleDown_ = Novice::LoadTexture("./RS/Player/player_Down.png");
 	textureHandleUp_ = Novice::LoadTexture("./RS/Player/player_UP.png");
+	textureHandleHand1_ = Novice::LoadTexture("./RS/Player/player_up_hand.png");
+	textureHandleHand2_ = Novice::LoadTexture("./RS/Player/player_up_hand2.png");
+
 	mousePosX = 0;
 	mousePosY = 0;
 	mousePos = Vector2(0, 0);
@@ -35,6 +38,8 @@ Player::Player()
 	emotionRecover_ = RECOVER_SPEED;
 
 	friendCount = 0;
+
+	handRotate_ = 0;
 
 
 	// 初始化 MathFunc 对象
@@ -58,8 +63,18 @@ Player::Player()
 		{ -obj_.width / 2.0f, -obj_.height / 2.0f},
 		{ +obj_.width / 2.0f, -obj_.height / 2.0f},
 	};
+
+	localHand_ = {
+	{ -obj_.width / 2.0f, +obj_.height / 2.0f},
+	{ +obj_.width / 2.0f, +obj_.height / 2.0f},
+	{ -obj_.width / 2.0f, -obj_.height / 2.0f},
+	{ +obj_.width / 2.0f, -obj_.height / 2.0f},
+	};
+
 	//プレイヤー 拡縮・回転・移動
 	affine_ = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
+
+	affineHand_ = { obj_.scale,handRotate_,{0.0f,0.0f} };
 
 	for (int i = 0; i < 14; i++) {
 		affineFriends_[i] = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
@@ -68,6 +83,8 @@ Player::Player()
 
 	//スクリーン座標系に変化に使う
 	screen_ = {};
+
+	screenHand_ = {};
 
 	for (int i = 0; i < 14; i++) {
 
@@ -78,8 +95,13 @@ Player::Player()
 
 	//ワールドマトリックス
 	worldMatrix_ = {};
+
+	worldMatrixHand_ = {};
+
 	//wvpVp
 	wvpVpMatrix_ = {};
+
+	wvpVpMatrixHand_ = {};
 
 	//=========================================================
 
@@ -121,8 +143,13 @@ void Player::Initialize()
 
 	friendCount = 0;
 
+	handRotate_ = 0;
+
 	affine_ = { obj_.scale,obj_.rotate,{0.0f,0.0f} };
 	affine_.translate = UpPos;
+
+	affineHand_ = { obj_.scale,handRotate_,{0.0f,0.0f} };
+	affineHand_.translate = UpPos;
 
 
 	for (int i = 0; i < 14; i++) {
@@ -180,12 +207,32 @@ void Player::Update(char keys[], char preKeys[], Camera* camera)
 		radiusParam_ = 3.0f;
 	}
 
+	if (state_ == PlayerState::OnGround) {
+		if (mousePosWorld.x < affine_.translate.x) {
+			//手的角度
+			handRotate_ = HandCal();
+			affineHand_.theta = handRotate_ - (float)M_PI ;
+		}
+		else if (mousePosWorld.x > affine_.translate.x) {
+			//手的角度
+			handRotate_ = HandCal();
+			affineHand_.theta = handRotate_;
+		}
+
+	}
+
 	//位置计算
 	for (int i = 0; i < 14; i++) {
 		worldMatrixFriends_[i] = math_->MakeAffine(affineFriends_[i]);
 		wvpVpMatrixFriends_[i] = math_->WvpVpMatrix(worldMatrixFriends_[i], camera->GetVpVpMatrix());
 		screenFriends_[i] = math_->TransformSprite(localFriends_[i], wvpVpMatrixFriends_[i]);
 	}
+
+	worldMatrixHand_ = math_->MakeAffine(affineHand_);
+
+	wvpVpMatrixHand_ = math_->WvpVpMatrix(worldMatrixHand_, camera->GetVpVpMatrix());
+
+	screenHand_ = math_->TransformSprite(localHand_, wvpVpMatrixHand_);
 
 	worldMatrix_ = math_->MakeAffine(affine_);
 
@@ -201,9 +248,6 @@ void Player::Update(char keys[], char preKeys[], Camera* camera)
 
 void Player::Draw()
 {
-	for (int i = 0; i < 14; i++) {
-		Novice::ScreenPrintf(0, 30 + 15 * i, "x = %0.2f,y = %0.2f  ,trans.x = %0.2f,trans.y = %0.2f", friends_[i].pos_.x, friends_[i].pos_.y, affineFriends_[i].translate.x, affineFriends_[i].translate.y);
-	}
 	switch (state_) {
 		case PlayerState::OnGround:
 
@@ -226,6 +270,14 @@ void Player::Draw()
 					bullet.Draw();
 				}
 
+				//手
+
+				Novice::DrawQuad(
+					(int)screenHand_.leftTop.x, (int)screenHand_.leftTop.y,
+					(int)screenHand_.rightTop.x, (int)screenHand_.rightTop.y,
+					(int)screenHand_.leftBottom.x, (int)screenHand_.leftBottom.y,
+					(int)screenHand_.rightBottom.x, (int)screenHand_.rightBottom.y,
+					(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleHand2_, WHITE);
 				//本体
 				DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_);
 			}
@@ -248,6 +300,13 @@ void Player::Draw()
 					bullet.Draw();
 				}
 
+				//手
+				Novice::DrawQuad(
+					(int)screenHand_.leftTop.x, (int)screenHand_.leftTop.y,
+					(int)screenHand_.rightTop.x, (int)screenHand_.rightTop.y,
+					(int)screenHand_.leftBottom.x, (int)screenHand_.leftBottom.y,
+					(int)screenHand_.rightBottom.x, (int)screenHand_.rightBottom.y,
+					(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleHand1_, WHITE);
 				//本体
 				DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_);
 
@@ -446,7 +505,7 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 			affine_.translate = math_->Lerp(UnderPos, UpPos, upFrame_ / (float)(MAX_UPFRAME - 1));
 
 			for (int i = 0; i < 14; i++) {
-				affineFriends_[i].translate = math_->Lerp(friends_[i].underPos_, friends_[i].pos_, upFrame_ / (float)(MAX_DOWNFRAME - 1));
+				affineFriends_[i].translate = math_->Lerp(friends_[i].underPos_, friends_[i].pos_, upFrame_ / (float)(MAX_UPFRAME - 1));
 			}
 			//相机倍率缩放
 			Vector2 cameraUpScale = math_->Lerp(DownCameraScale, UpCameraScale, upFrame_ / (float)(MAX_UPFRAME - 1));
@@ -482,6 +541,13 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 			}
 			break;
 	}
+}
+
+float Player::HandCal()
+{
+	float result;
+	result = atan2(mousePosWorld.y - affineHand_.translate.y, mousePosWorld.x - affineHand_.translate.x);
+	return result;
 }
 
 void Player::OnEnenyCollide()

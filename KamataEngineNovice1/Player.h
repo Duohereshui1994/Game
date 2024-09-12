@@ -28,6 +28,9 @@ private:
 	int textureHandleUnder_;	//地下待机贴图
 	int textureHandleDown_;		//钻进土里贴图
 	int textureHandleUp_;		//钻出土贴图
+	int textureHandleHand1_;		//手贴图1
+	int textureHandleHand2_;		//手贴图1
+
 	int mousePosX;				//鼠标x坐标保存位置
 	int mousePosY;				//鼠标y坐标保存位置
 	Vector2 mousePos;			//用向量保存上面两个鼠标位置
@@ -43,30 +46,42 @@ private:
 	int friendCount;			// 友方数量
 	float radiusParam_;			// 半径参数
 
+	float handRotate_;
+
 	//==================camera=================================
 
 	//プレイヤーのローカル座標
 	Vertex local_;
+
+	Vertex localHand_;
 
 	Vertex localFriends_[14];
 
 	//プレイヤー 拡縮・回転・移動
 	Affine affine_;
 
+	Affine affineHand_;
+
 	Affine affineFriends_[14];
 
 	//スクリーン座標系に変化に使う
 	Vertex screen_;
+
+	Vertex screenHand_;
 
 	Vertex screenFriends_[14];
 
 	//ワールドマトリックス
 	Matrix3x3 worldMatrix_;
 
+	Matrix3x3 worldMatrixHand_;
+
 	Matrix3x3 worldMatrixFriends_[14];
 
 	//wvpVp
 	Matrix3x3 wvpVpMatrix_;
+
+	Matrix3x3 wvpVpMatrixHand_;
 
 	Matrix3x3 wvpVpMatrixFriends_[14];
 	//=========================================================
@@ -117,6 +132,8 @@ public:
 	void Attack(Camera* camera);
 	//地面地下状态切换
 	void SwithGround(char keys[], char preKeys[], Camera* camera);
+	//计算手的旋转
+	float HandCal();
 
 	Vector2 GetTranslate() { return affine_.translate; }							//获取中心点
 	void SetTranslate(const Vector2& translate) { affine_.translate = translate; }	//设置中心点
