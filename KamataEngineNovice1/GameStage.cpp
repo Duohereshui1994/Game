@@ -115,7 +115,7 @@ void GameStage::IsCollision()
 					//打中敌人
 					else {
 						//是否是远距离击中
-						if (enemy->GetTranslate().x > 330 && enemy->GetTranslate().x < 1280 - 330
+						if (enemy->GetTranslate().x > 300 && enemy->GetTranslate().x < 1280 - 300
 							&& enemy->GetTranslate().y>150 && enemy->GetTranslate().y < 720 - 150) {
 							ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore);
 							Score::AddScore(enemy, false);

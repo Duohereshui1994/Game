@@ -35,7 +35,8 @@ void Score::AddScore(Enemy* enemy, bool longKill)
 	if (longKill && !Enemy::tPlayer)
 		addScore = 10;
 
-	addScore *= _magnification;
+	if (type != Enemy::tPlayer)
+		addScore *= _magnification;
 	_score += addScore;
 	if (_score < 0)
 		_score = 0;
