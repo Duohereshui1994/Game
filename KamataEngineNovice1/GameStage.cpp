@@ -136,11 +136,13 @@ void GameStage::IsCollision()
 			if (length < it->GetRadian() + player_->GetRadian()) {
 				if (it->Get_type() == Enemy::tPlayer) {
 					//和小伙伴触碰
+					player_->OnFriendCollide();
 					EnemyManager::ReleaseEnemy(it);
 				}
 				else {
 					//和敌人触碰
 					it->Set_isGetPlayer(true);
+					player_->OnEnenyCollide();
 				}
 			}
 		}
