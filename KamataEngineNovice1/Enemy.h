@@ -8,6 +8,7 @@
 #include <random>
 #include "Character.h"
 #include "Camera.h"
+#include "Particle.h"
 class EnemyTools;
 
 class Enemy : public Character
@@ -37,12 +38,14 @@ private:
 	//状态
 	bool _isDead = false;
 	bool _isGetPlayer = false;
+	bool _isFriendWiat = false;
 
 	//工具
 	EnemyTools* tools = nullptr;
 
 	void Move();
 	void Control(char keys[], char preKeys[]);//这个函数会操控敌人，只用作测试使用
+	void PlayerSad();
 
 public:
 	//类型
@@ -80,6 +83,8 @@ public:
 	const Vector2& Get_spriteSize() const { return _spriteSize; };
 	const bool& Get_isGetPlayer() const { return _isGetPlayer; };
 	void Set_isGetPlayer(const bool& flag) { _isGetPlayer = flag; };
+	const bool& Get_isFriendWiat() const { return _isFriendWiat; };
+	void Set_isFriendWiat(const bool& flag) { _isFriendWiat = flag; };
 
 	const Vector2& GetTranslate() const { return _affine.translate; }				//获取中心点
 	void SetTranslate(const Vector2& translate) { _affine.translate = translate; }	//设置中心点
@@ -123,6 +128,7 @@ public:
 	inline static int _spBee = 0;
 	inline static int _spPlayer_walk = 0;
 	inline static int _spPlayer_fly = 0;
+	inline static int _spPlayer_sad = 0;
 	static void LoadRes();//预先载入本地地图，在游戏最开始载入
 
 	//Manager主函数

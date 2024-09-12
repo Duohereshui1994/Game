@@ -3,24 +3,12 @@
 void Score::Initialize()
 {
 	_score = 0;
-	_magnification = 0;
-	_friendSum = 0;
+	_magnification = 1;
 	_sprite = Novice::LoadTexture("./RS/UI/number42x42.png");
 }
 
-void Score::Update(int friendSum)
+void Score::Update()
 {
-	friendSum = _friendSum;
-	if (friendSum <= 5)
-		_magnification = 1;
-	else if (friendSum <= 10)
-		_magnification = 2;
-	else if (friendSum <= 15)
-		_magnification = 3;
-	else if (friendSum <= 20)
-		_magnification = 5;
-	else
-		_magnification = 10;
 }
 
 void Score::Draw()
@@ -35,22 +23,14 @@ void Score::AddScore(Enemy* enemy, bool longKill)
 	switch (type)
 	{
 	case Enemy::tSnake:
-		addScore = 100;
-		break;
 	case Enemy::tEagles:
-		addScore = 100;
-		break;
 	case Enemy::tSpider:
-		addScore = 100;
-		break;
 	case Enemy::tBee:
-		addScore = 100;
+		addScore = 1;
 		break;
 	}
 	if (longKill)
-		addScore *= 2;
-	if (_friendSum >= _friendMax)
-		addScore = 300;
+		addScore *= 5;
 
 	addScore *= _magnification;
 	_score += addScore;
@@ -114,7 +94,7 @@ void Score::ScoreDraw(Vector2 pos)
 		mDigits.push_back(digit);
 		temp /= 10;
 	}
-	std::reverse(mDigits.begin(), mDigits.end());
+	//std::reverse(mDigits.begin(), mDigits.end());
 	// 画图
 	if (mDigits.size() == 0) {
 		Novice::DrawSpriteRect((int)(mPos.x - listSize.y / 2.f), (int)mPos.y, (int)listSize.y * 0, 0, (int)listSize.y, (int)listSize.y, sprite, listSize.y / listSize.x, 1, 0, WHITE);
@@ -128,5 +108,16 @@ void Score::ScoreDraw(Vector2 pos)
 			numDigit++;
 		}
 	}
+}
+
+void Score::AddMagnification()
+{
+	if (_magnification < 99)
+		_magnification++;
+}
+
+void Score::ClearMagnification()
+{
+	_magnification = 1;
 }
 

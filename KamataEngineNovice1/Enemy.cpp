@@ -51,6 +51,22 @@ void Enemy::Control(char keys[], char preKeys[])
 	}
 }
 
+void Enemy::PlayerSad()
+{
+	_sprite = EnemyManager::_spPlayer_sad;
+	_frameSum = 2;
+	_spriteSize = { 192.f / _frameSum,96 };
+	for (Enemy* it : EnemyManager::_updatePool) {
+		if (it != this) {
+			float length = (it->GetTranslate() - _pos).Length();
+			if (length < it->GetRadian() + _size.x) {
+				ParticleManager::ADD_Particle(_camera, _pos, Emitter::friendDead);
+				_isDead = true;
+			}
+		}
+	}
+}
+
 void Enemy::ToDead()
 {
 	int aniTime = 30;
@@ -112,10 +128,10 @@ void Enemy::ToGetPlayer()
 	alphaValue = int((tools->EaseOutQuint(t)) * 255);
 	if (alphaValue < 0)
 		alphaValue = 0;
-	_color = 0x039be500 | alphaValue << 0;//透明度を制御する
+	_color = 0xFFFFFF00 | alphaValue << 0;//透明度を制御する
 	//尺寸
-	_scale.x = std::lerp(_scale.x, 0.f, tools->EaseInCirc(t));
-	_scale.y = std::lerp(_scale.y, 0.f, tools->EaseInCirc(t));
+	_scale.x = std::lerp(1.f, 0.f, tools->EaseInCirc(t));
+	_scale.y = std::lerp(_scale.y > 0 ? 1.f : -1.f, 0.f, tools->EaseInCirc(t));
 	//位移
 	Vector2 dir = (_targetPos + Vector2{ 0,-100 } - _pos).Normalize();
 	_pos += dir * _speed * 2;
@@ -154,23 +170,13 @@ Enemy::~Enemy()
 
 void Enemy::Initialize(Camera* camera, Vector2 pos, Type type, Vector2 targetPos)
 {
-	_camera = camera;
-	_pos = pos;
-	_rotate = 0;
-	_type = type;
-	_size = { 96,96 };
-	_spriteSize = { 128,128 };
-	_frameSum = 1;
-	_scale = { 1,1 };
-	_color = WHITE;
-	alphaValue = 255;
-	hpMax_ = 1;
-	attack_ = 1;
-	_speed = 3;
+	_camera = camera; _pos = pos; _rotate = 0; _scale = { 1,1 };
+	_size = { 96,96 }; _spriteSize = { 128,128 }; _frameSum = 1;
+	_type = type; _color = WHITE; alphaValue = 255;
+	hpMax_ = 1; attack_ = 1; _speed = 3;
 	_targetPos = targetPos;
 
-	_isDead = false;
-	_isGetPlayer = false;
+	_isDead = false; _isGetPlayer = false; _isFriendWiat = false;
 
 	switch (_type)
 	{
@@ -212,7 +218,10 @@ void Enemy::Update(char keys[], char preKeys[])
 	keys; preKeys;
 	//Control(keys, preKeys);
 
-	Move();//移动
+	if (!_isFriendWiat)
+		Move();//移动
+	else
+		PlayerSad();
 
 	//传入数据
 	_affine = { _scale,_rotate,_pos };
@@ -538,5 +547,6 @@ void EnemyManager::LoadRes()
 	_spBee = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
 	_spPlayer_walk = Novice::LoadTexture("./RS/Enemy/friend_walk.png");
 	_spPlayer_fly = Novice::LoadTexture("./RS/Enemy/friend_fly.png");
+	_spPlayer_sad = Novice::LoadTexture("./RS/Enemy/player_sad.png");
 }
 

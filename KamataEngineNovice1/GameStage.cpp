@@ -61,7 +61,7 @@ void GameStage::Update(char keys[], char preKeys[])
 	ParticleManager::Update();
 
 	IsCollision();			//碰撞检测
-	Score::Update(player_->GetFriendCount());		//分数计算（要传入当前小伙伴数量）
+	Score::Update();		//分数计算
 
 #ifdef _DEBUG
 	//Particle test
@@ -98,29 +98,35 @@ void GameStage::IsCollision()
 			for (auto& bullet : player_->bullets_) {
 				float length = (enemy->GetTranslate() - bullet.GetPos()).Length();
 				if (length < enemy->GetRadian() + bullet.GetWidth() / 2.f) {
-					//特效
+					//子弹特效
 					ParticleManager::ADD_Particle(camera_, bullet.GetPos(), Emitter::bulletHurt);
+					//分数特效永远在屏幕内
 					Vector2 enemyPos = enemy->GetTranslate();
-					//地面的情况要将特效收缩到屏幕内
 					if (player_->GetState() == PlayerState::OnGround) {
 						enemyPos.x = std::clamp(enemyPos.x, 50.f, 1280.f - 50.f);
 						enemyPos.y = std::clamp(enemyPos.y, 50.f, 720.f - 50.f);
 					}
-					if (enemy->Get_type() == Enemy::tPlayer)
+					//打中小伙伴
+					if (enemy->Get_type() == Enemy::tPlayer) {
 						ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::minusScore);
+						Score::ClearMagnification();//清除连击
+					}
+					//打中敌人
 					else {
+						//是否是远距离击中
 						if (enemy->GetTranslate().x > 0 && enemy->GetTranslate().x < 1280
 							&& enemy->GetTranslate().y>0 && enemy->GetTranslate().y < 720)
 							ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore);
 						else
 							ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore_long);
+						//分数(判断是否远距离击杀)
+						if (enemy->GetTranslate().x > 0 && enemy->GetTranslate().x < 1280
+							&& enemy->GetTranslate().y>0 && enemy->GetTranslate().y < 720)
+							Score::AddScore(enemy, false);
+						else
+							Score::AddScore(enemy, true);
+						Score::AddMagnification();
 					}
-					//分数(判断是否远距离击杀)
-					if (enemy->GetTranslate().x > 0 && enemy->GetTranslate().x < 1280
-						&& enemy->GetTranslate().y>0 && enemy->GetTranslate().y < 720)
-						Score::AddScore(enemy, false);
-					else
-						Score::AddScore(enemy, true);
 					//回收子弹和敌人
 					bullet.Initialize();
 					enemy->Set_isDead(true);
@@ -135,15 +141,21 @@ void GameStage::IsCollision()
 			float length = (it->GetTranslate() - playerUpPos).Length();
 			if (length < it->GetRadian() + player_->GetRadius()) {
 				if (it->Get_type() == Enemy::tPlayer) {
-					//和小伙伴触碰
-					player_->OnFriendCollide(camera_);
-					it->Set_isGetPlayer(true);
-					EnemyManager::ReleaseEnemy(it);
+					//和小伙伴触碰（并且在地面的时候）
+					if (player_->GetState() == PlayerState::OnGround) {
+						player_->OnFriendCollide(camera_);
+						it->Set_isGetPlayer(true);
+						EnemyManager::ReleaseEnemy(it);
+					}
+					else {
+						it->Set_isFriendWiat(true);
+					}
 				}
 				else {
 					//和敌人触碰
 					it->Set_isGetPlayer(true);
 					player_->OnEnenyCollide(camera_);
+					Score::ClearMagnification();//清除连击
 				}
 			}
 		}
