@@ -19,33 +19,33 @@ ClearStage* clearStage_ = nullptr;
 
 void ChangeScene() {
 	switch (scene) {
-		case Scene::kTitle:
-			if (titleStage_->IsFinished()) {
-				scene = Scene::kGame;
-				delete titleStage_;
-				titleStage_ = nullptr;
-				gamestage_ = new GameStage();
-				gamestage_->Initialize();
-			}
-			break;
-		case Scene::kGame:
-			if (gamestage_->IsFinished()) {
-				scene = Scene::kClear;
-				delete gamestage_;
-				gamestage_ = nullptr;
-				clearStage_ = new ClearStage();
-				clearStage_->Initialize();
-			}
-			break;
-		case Scene::kClear:
-			if (clearStage_->IsFinished()) {
-				scene = Scene::kTitle;
-				delete clearStage_;
-				clearStage_ = nullptr;
-				titleStage_ = new TitleStage();
-				titleStage_->Initialize();
-			}
-			break;
+	case Scene::kTitle:
+		if (titleStage_->IsFinished()) {
+			scene = Scene::kGame;
+			delete titleStage_;
+			titleStage_ = nullptr;
+			gamestage_ = new GameStage();
+			gamestage_->Initialize();
+		}
+		break;
+	case Scene::kGame:
+		if (gamestage_->IsFinished()) {
+			scene = Scene::kClear;
+			delete gamestage_;
+			gamestage_ = nullptr;
+			clearStage_ = new ClearStage();
+			clearStage_->Initialize();
+		}
+		break;
+	case Scene::kClear:
+		if (clearStage_->IsFinished()) {
+			scene = Scene::kTitle;
+			delete clearStage_;
+			clearStage_ = nullptr;
+			titleStage_ = new TitleStage();
+			titleStage_->Initialize();
+		}
+		break;
 	}
 }
 
@@ -59,13 +59,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
+	//贴图
+	int _spMouse = Novice::LoadTexture("./RS/UI/mouse.png");
+	Novice::SetMouseCursorVisibility(false);//不显示鼠标图标
 
 	gamestage_ = new GameStage();
-
 	//gamestage_->Initialize();
-
 	titleStage_ = new TitleStage();
-
 	//titleStage_->Initialize();
 
 	// 最初のシーンの初期化
@@ -84,7 +84,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 		///
-		
+
 		//titleStage_->Update();
 
 		//gamestage_->Update(keys, preKeys);
@@ -93,15 +93,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//Update Scene
 		switch (scene) {
-			case Scene::kTitle:
-				titleStage_->Update(keys, preKeys);
-				break;
-			case Scene::kGame:
-				gamestage_->Update(keys, preKeys);
-				break;
-			case Scene::kClear:
-				clearStage_->Update(keys, preKeys);
-				break;
+		case Scene::kTitle:
+			titleStage_->Update(keys, preKeys);
+			break;
+		case Scene::kGame:
+			gamestage_->Update(keys, preKeys);
+			break;
+		case Scene::kClear:
+			clearStage_->Update(keys, preKeys);
+			break;
 		}
 
 		///
@@ -117,16 +117,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//gamestage_->Draw();
 
 		switch (scene) {
-			case Scene::kTitle:
-				titleStage_->Draw();
-				break;
-			case Scene::kGame:
-				gamestage_->Draw();
-				break;
-			case Scene::kClear:
-				clearStage_->Draw();
-				break;
+		case Scene::kTitle:
+			titleStage_->Draw();
+			break;
+		case Scene::kGame:
+			gamestage_->Draw();
+			break;
+		case Scene::kClear:
+			clearStage_->Draw();
+			break;
 		}
+
+		//Mouse图标
+		int mouseX = 0, mouseY = 0;
+		Novice::GetMousePosition(&mouseX, &mouseY);
+		Novice::DrawSprite(mouseX - 32, mouseY - 32, _spMouse, 1, 1, 0, WHITE);
 
 		///
 		/// ↑描画処理ここまで

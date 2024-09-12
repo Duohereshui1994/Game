@@ -80,7 +80,7 @@ void GameStage::Draw()
 	Novice::DrawBox(-50, -50, 1280 + 100, 720 + 100, 0, BLACK, kFillModeSolid);//最下面的黑色背景，防止穿帮
 
 	bg_->Draw();
-	camera_->Draw();
+	//camera_->Draw();
 	EnemyManager::Draw();
 	player_->Draw();
 	ParticleManager::Draw();
@@ -132,17 +132,19 @@ void GameStage::IsCollision()
 	//敌人和玩家
 	for (Enemy* it : EnemyManager::_updatePool) {
 		if (!it->Get_isDead() && !it->Get_isGetPlayer()) {
-			float length = (it->GetTranslate() - player_->GetTranslate()).Length();
-			if (length < it->GetRadian() + player_->GetRadian()) {
+			Vector2 playerUpPos = { 640.0f, 220.0f };//因为玩家会上下运动，所以直接使用地面的坐标
+			float length = (it->GetTranslate() - playerUpPos).Length();
+			if (length < it->GetRadian() + player_->GetRadius()) {
 				if (it->Get_type() == Enemy::tPlayer) {
 					//和小伙伴触碰
-					player_->OnFriendCollide();
+					player_->OnFriendCollide(camera_);
+					it->Set_isGetPlayer(true);
 					EnemyManager::ReleaseEnemy(it);
 				}
 				else {
 					//和敌人触碰
 					it->Set_isGetPlayer(true);
-					player_->OnEnenyCollide();
+					player_->OnEnenyCollide(camera_);
 				}
 			}
 		}

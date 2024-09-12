@@ -181,13 +181,13 @@ void Enemy::Initialize(Camera* camera, Vector2 pos, Type type, Vector2 targetPos
 		break;
 	case Enemy::tEagles:
 		_sprite = EnemyManager::_spEagles;
-		_spriteSize = { 1152 / 6.f,128 };
 		_frameSum = 6;
+		_spriteSize = { 1152.f / _frameSum,128 };
 		break;
 	case Enemy::tSpider:
 		_sprite = EnemyManager::_spSpider;
-		_spriteSize = { 1152 / 6.f,128 };
 		_frameSum = 6;
+		_spriteSize = { 1152.f / _frameSum,128 };
 		break;
 	case Enemy::tBee:
 		_sprite = EnemyManager::_spBee;
@@ -199,6 +199,7 @@ void Enemy::Initialize(Camera* camera, Vector2 pos, Type type, Vector2 targetPos
 		_sprite = EnemyManager::_spPlayer_walk;
 		_frameSum = 4;
 		_spriteSize = { 384.f / _frameSum,96 };
+		_size = { 64,64 };
 		break;
 	}
 
@@ -382,24 +383,24 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 	_enemyType_fly[0] = { Enemy::tEagles };
 	_enemyType_fly[1] = { Enemy::tEagles };
 	//按照分数调整难度
-	if (score < 100) {
+	if (score < 1000) {
 		_linesSum = 2;								//当前多少条线路
 		_lineTime = 60;								//进行随机选择路线的时间
-		_eachBornMax = 4;							//每回至多生成敌人数量
+		_eachBornMax = 2;							//每回至多生成敌人数量
 	}
-	else if (score < 400) {
+	else if (score < 4000) {
 		_linesSum = 4;
 		_lineTime = 60;
 		_eachBornMax = 4;
 		_enemyType_walk[1] = { Enemy::tSpider };
 	}
-	else if (score < 800) {
+	else if (score < 8000) {
 		_linesSum = 6;
 		_lineTime = 60;
 		_eachBornMax = 4;
 		_enemyType_fly[1] = { Enemy::tBee };
 	}
-	else if (score < 1000) {
+	else if (score < 10000) {
 		_linesSum = 6;
 		_lineTime = 60;
 		_eachBornMax = 6;

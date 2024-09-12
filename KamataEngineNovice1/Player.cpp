@@ -9,6 +9,7 @@
 #define PLAYER_HEIGHT 96.0f
 #include "Player.h"
 #include "Novice.h"
+#include "Particle.h"
 
 Player::Player()
 {
@@ -142,11 +143,11 @@ void Player::Update(char keys[], char preKeys[])
 {
 	//debug
 	if (keys[DIK_J] && !preKeys[DIK_J]) {
-		OnFriendCollide();
+		//OnFriendCollide();
 
 	}
 	if (keys[DIK_K] && !preKeys[DIK_K]) {
-		OnEnenyCollide();
+		//OnEnenyCollide();
 
 	}
 	if (keys[DIK_U] && !preKeys[DIK_U]) {
@@ -202,65 +203,12 @@ void Player::Update(char keys[], char preKeys[], Camera* camera)
 void Player::Draw()
 {
 	for (int i = 0; i < 14; i++) {
-		Novice::ScreenPrintf(0, 30 + 15 * i, "x = %0.2f,y = %0.2f  ,trans.x = %0.2f,trans.y = %0.2f", friends_[i].pos_.x, friends_[i].pos_.y, affineFriends_[i].translate.x, affineFriends_[i].translate.y);
+		//Novice::ScreenPrintf(0, 30 + 15 * i, "x = %0.2f,y = %0.2f  ,trans.x = %0.2f,trans.y = %0.2f", friends_[i].pos_.x, friends_[i].pos_.y, affineFriends_[i].translate.x, affineFriends_[i].translate.y);
 	}
 	switch (state_) {
-		case PlayerState::OnGround:
+	case PlayerState::OnGround:
 
-			if (mousePosX < affine_.translate.x) {
-				//friends
-				for (int i = 0; i < 14; i++) {
-					if (friends_[i].isAlive_) {
-						Novice::DrawQuad(
-							(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
-							(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
-							(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
-							(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
-							(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_, WHITE);
-					}
-				}
-
-				//BULLET
-				for (auto& bullet : bullets_)
-				{
-					bullet.Draw();
-				}
-
-				//本体
-				DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_);
-			}
-			else if (mousePosX > affine_.translate.x) {
-				//friends
-				for (int i = 0; i < 14; i++) {
-					if (friends_[i].isAlive_) {
-						Novice::DrawQuad(
-							(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
-							(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
-							(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
-							(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
-							(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_, WHITE);
-					}
-				}
-
-				//BULLET
-				for (auto& bullet : bullets_)
-				{
-					bullet.Draw();
-				}
-
-				//本体
-				DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_);
-
-			}
-			break;
-
-		case PlayerState::UnderGround:
-			//BULLET
-			for (auto& bullet : bullets_)
-			{
-				bullet.Draw();
-			}
-
+		if (mousePosX < affine_.translate.x) {
 			//friends
 			for (int i = 0; i < 14; i++) {
 				if (friends_[i].isAlive_) {
@@ -269,20 +217,20 @@ void Player::Draw()
 						(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
 						(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
 						(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
-						(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleUnder_, WHITE);
+						(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_, WHITE);
 				}
 			}
 
-			DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleUnder_);
-			break;
-
-		case PlayerState::Up:
 			//BULLET
 			for (auto& bullet : bullets_)
 			{
 				bullet.Draw();
 			}
 
+			//本体
+			DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleLeft_);
+		}
+		else if (mousePosX > affine_.translate.x) {
 			//friends
 			for (int i = 0; i < 14; i++) {
 				if (friends_[i].isAlive_) {
@@ -291,34 +239,87 @@ void Player::Draw()
 						(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
 						(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
 						(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
-						(int)upFrame_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleUp_, WHITE);
+						(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_, WHITE);
 				}
 			}
 
-			DrawTexture((int)upFrame_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleUp_);
-			break;
-
-		case PlayerState::Down:
 			//BULLET
 			for (auto& bullet : bullets_)
 			{
 				bullet.Draw();
 			}
 
-			//friends
-			for (int i = 0; i < 14; i++) {
-				if (friends_[i].isAlive_) {
-					Novice::DrawQuad(
-						(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
-						(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
-						(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
-						(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
-						(int)downFrame_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleDown_, WHITE);
-				}
-			}
+			//本体
+			DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleRight_);
 
-			DrawTexture((int)downFrame_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleDown_);
-			break;
+		}
+		break;
+
+	case PlayerState::UnderGround:
+		//BULLET
+		for (auto& bullet : bullets_)
+		{
+			bullet.Draw();
+		}
+
+		//friends
+		for (int i = 0; i < 14; i++) {
+			if (friends_[i].isAlive_) {
+				Novice::DrawQuad(
+					(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
+					(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
+					(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
+					(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
+					(int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleUnder_, WHITE);
+			}
+		}
+
+		DrawTexture((int)frameNum_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleUnder_);
+		break;
+
+	case PlayerState::Up:
+		//BULLET
+		for (auto& bullet : bullets_)
+		{
+			bullet.Draw();
+		}
+
+		//friends
+		for (int i = 0; i < 14; i++) {
+			if (friends_[i].isAlive_) {
+				Novice::DrawQuad(
+					(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
+					(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
+					(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
+					(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
+					(int)upFrame_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleUp_, WHITE);
+			}
+		}
+
+		DrawTexture((int)upFrame_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleUp_);
+		break;
+
+	case PlayerState::Down:
+		//BULLET
+		for (auto& bullet : bullets_)
+		{
+			bullet.Draw();
+		}
+
+		//friends
+		for (int i = 0; i < 14; i++) {
+			if (friends_[i].isAlive_) {
+				Novice::DrawQuad(
+					(int)screenFriends_[i].leftTop.x, (int)screenFriends_[i].leftTop.y,
+					(int)screenFriends_[i].rightTop.x, (int)screenFriends_[i].rightTop.y,
+					(int)screenFriends_[i].leftBottom.x, (int)screenFriends_[i].leftBottom.y,
+					(int)screenFriends_[i].rightBottom.x, (int)screenFriends_[i].rightBottom.y,
+					(int)downFrame_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleDown_, WHITE);
+			}
+		}
+
+		DrawTexture((int)downFrame_ * (int)PLAYER_WIDTH, 0, (int)obj_.width, (int)obj_.height, textureHandleDown_);
+		break;
 	}
 
 }
@@ -400,100 +401,101 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 {
 
 	switch (state_) {
-		case PlayerState::OnGround:
+	case PlayerState::OnGround:
 
-			if (frameNum_ > MAX_IDLEFRAME - 1) {
-				frameNum_ = 0;
-			}
-			else {
-				frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
-			}
+		if (frameNum_ > MAX_IDLEFRAME - 1) {
+			frameNum_ = 0;
+		}
+		else {
+			frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
+		}
 
-			if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
-				downFrame_ = 0;
-				state_ = PlayerState::Down;
-			}
+		if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
+			downFrame_ = 0;
+			state_ = PlayerState::Down;
+		}
 
-			break;
+		break;
 
-		case PlayerState::UnderGround:
+	case PlayerState::UnderGround:
 
-			if (frameNum_ > MAX_IDLEFRAME - 1) {
-				frameNum_ = 0;
-			}
-			else {
-				frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
-			}
+		if (frameNum_ > MAX_IDLEFRAME - 1) {
+			frameNum_ = 0;
+		}
+		else {
+			frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
+		}
 
-			if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
-				upFrame_ = 0;
-				state_ = PlayerState::Up;
-			}
+		if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
+			upFrame_ = 0;
+			state_ = PlayerState::Up;
+		}
 
 
-			//回复心情
-			emotionValue_ += (int)(deltaTime_ * RECOVER_SPEED);
-			break;
+		//回复心情
+		emotionValue_ += (int)(deltaTime_ * RECOVER_SPEED);
+		break;
 
-		case PlayerState::Up:
-			if (upFrame_ > MAX_UPFRAME) {
-				upFrame_ = MAX_UPFRAME;
-			}
-			else {
-				upFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
-			}
-			//player本体移动
-			affine_.translate = math_->Lerp(UnderPos, UpPos, upFrame_ / (float)(MAX_UPFRAME - 1));
+	case PlayerState::Up:
+		if (upFrame_ > MAX_UPFRAME) {
+			upFrame_ = MAX_UPFRAME;
+		}
+		else {
+			upFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
+		}
+		//player本体移动
+		affine_.translate = math_->Lerp(UnderPos, UpPos, upFrame_ / (float)(MAX_UPFRAME - 1));
 
-			for (int i = 0; i < 14; i++) {
-				affineFriends_[i].translate = math_->Lerp(friends_[i].underPos_, friends_[i].pos_, upFrame_ / (float)(MAX_DOWNFRAME - 1));
-			}
-			//相机倍率缩放
-			Vector2 cameraUpScale = math_->Lerp(DownCameraScale, UpCameraScale, upFrame_ / (float)(MAX_UPFRAME - 1));
-			camera->SetScale(cameraUpScale);
+		for (int i = 0; i < 14; i++) {
+			affineFriends_[i].translate = math_->Lerp(friends_[i].underPos_, friends_[i].pos_, upFrame_ / (float)(MAX_UPFRAME - 1));
+		}
+		//相机倍率缩放
+		Vector2 cameraUpScale = math_->Lerp(DownCameraScale, UpCameraScale, upFrame_ / (float)(MAX_UPFRAME - 1));
+		camera->SetScale(cameraUpScale);
 
-			if (upFrame_ > MAX_UPFRAME - 1) {
-				upFrame_ = 0;
-				state_ = PlayerState::OnGround;
-				frameNum_ = 0;
-			}
-			break;
+		if (upFrame_ > MAX_UPFRAME - 1) {
+			upFrame_ = 0;
+			state_ = PlayerState::OnGround;
+			frameNum_ = 0;
+		}
+		break;
 
-		case PlayerState::Down:
-			if (downFrame_ > MAX_DOWNFRAME) {
-				downFrame_ = MAX_DOWNFRAME;
-			}
-			else {
-				downFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
-			}
-			//player本体移动
-			affine_.translate = math_->Lerp(UpPos, UnderPos, downFrame_ / (float)(MAX_DOWNFRAME - 1));
+	case PlayerState::Down:
+		if (downFrame_ > MAX_DOWNFRAME) {
+			downFrame_ = MAX_DOWNFRAME;
+		}
+		else {
+			downFrame_ += deltaTime_ * UP_DOWN_TIME_SCALE;
+		}
+		//player本体移动
+		affine_.translate = math_->Lerp(UpPos, UnderPos, downFrame_ / (float)(MAX_DOWNFRAME - 1));
 
-			for (int i = 0; i < 14; i++) {
-				affineFriends_[i].translate = math_->Lerp(friends_[i].pos_, friends_[i].underPos_, downFrame_ / (float)(MAX_DOWNFRAME - 1));
-			}
-			//相机倍率缩放
-			Vector2 cameraDownScale = math_->Lerp(UpCameraScale, DownCameraScale, downFrame_ / (float)(MAX_DOWNFRAME - 1));
-			camera->SetScale(cameraDownScale);
-			if (downFrame_ > MAX_DOWNFRAME - 1) {
-				downFrame_ = 0;
-				state_ = PlayerState::UnderGround;
-				frameNum_ = 0;
-			}
-			break;
+		for (int i = 0; i < 14; i++) {
+			affineFriends_[i].translate = math_->Lerp(friends_[i].pos_, friends_[i].underPos_, downFrame_ / (float)(MAX_DOWNFRAME - 1));
+		}
+		//相机倍率缩放
+		Vector2 cameraDownScale = math_->Lerp(UpCameraScale, DownCameraScale, downFrame_ / (float)(MAX_DOWNFRAME - 1));
+		camera->SetScale(cameraDownScale);
+		if (downFrame_ > MAX_DOWNFRAME - 1) {
+			downFrame_ = 0;
+			state_ = PlayerState::UnderGround;
+			frameNum_ = 0;
+		}
+		break;
 	}
 }
 
-void Player::OnEnenyCollide()
+void Player::OnEnenyCollide(Camera* camera)
 {
 	// 如果当前索引对应的 friend 活跃
 	if (friends_[currentFriendIndex + 1].isAlive_) {
 		friends_[currentFriendIndex + 1].isAlive_ = false;
+		//特效
+		ParticleManager::ADD_Particle(camera, affineFriends_[currentFriendIndex + 1].translate, Emitter::friendDead);
 
 		// 增加索引以便下次操作下一个 friend
 		currentFriendIndex++;
 	}
-
 
 
 	// 如果索引超过范围，重置为 
@@ -502,11 +504,13 @@ void Player::OnEnenyCollide()
 	}
 }
 
-void Player::OnFriendCollide()
+void Player::OnFriendCollide(Camera* camera)
 {
 	// 如果当前索引对应的 friend 不活跃
 	if (!friends_[currentFriendIndex].isAlive_) {
 		friends_[currentFriendIndex].isAlive_ = true;
+		//特效
+		ParticleManager::ADD_Particle(camera, affineFriends_[currentFriendIndex].translate, Emitter::friendAdd);
 
 		// 增加索引以便下次操作下一个 friend
 		currentFriendIndex--;

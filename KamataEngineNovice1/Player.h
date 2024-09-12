@@ -122,8 +122,8 @@ public:
 	void SetTranslate(const Vector2& translate) { affine_.translate = translate; }	//设置中心点
 	float GetRadius() { return obj_.width / 2.0f * radiusParam_; }					//获取图片宽度的一半当半径
 
-	void OnEnenyCollide();															//玩家与敌人碰撞运行
-	void OnFriendCollide();															//玩家与友方碰撞运行
+	void OnEnenyCollide(Camera* camera);											//玩家与敌人碰撞运行
+	void OnFriendCollide(Camera* camera);											//玩家与友方碰撞运行
 
 	PlayerState GetState() { return state_; }	//获取玩家状态
 	EmotionState GetEmotion() { return emotionState_; }//获取玩家情绪状态

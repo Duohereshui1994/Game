@@ -105,7 +105,7 @@ private:
 	inline static Enemy::Type _enemyType_fly[2] = { Enemy::tEagles,Enemy::tEagles };
 	//生成小伙伴
 	inline static int _bornFriendTime = 60;			//生成小伙伴的判断时间
-	inline static int _bornFriendSpace = 10;		//小伙伴的前后要空多少个位置
+	inline static int _bornFriendSpace = 3;			//小伙伴的前后要空多少个位置(不知道为什么数字太大会出Bug)
 	inline static int _bornFriendRandom = 1;		//生成的几率
 
 	//工具
