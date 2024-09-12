@@ -72,18 +72,6 @@ void GameStage::Update(char keys[], char preKeys[])
 	if (keys[DIK_2] && !preKeys[DIK_2]) {
 		ParticleManager::ADD_Particle(camera_, player_->GetTranslate(), Emitter::unHappy);
 	}
-	if (keys[DIK_3] && !preKeys[DIK_3]) {
-		currentBullet++;
-	}
-	if (keys[DIK_4] && !preKeys[DIK_4]) {
-		currentBullet--;
-	}
-	if (keys[DIK_5] && !preKeys[DIK_5]) {
-		maxBullet++;
-	}
-	if (keys[DIK_6] && !preKeys[DIK_6]) {
-		maxBullet--;
-	}
 #endif // _DEBUG
 }
 
@@ -97,7 +85,7 @@ void GameStage::Draw()
 	player_->Draw();
 	ParticleManager::Draw();
 	filter_->Draw();
-	grid_->Draw(currentBullet, maxBullet);
+	grid_->Draw(0, 0);
 
 	ParticleManager::PreDraw();
 	Score::Draw();
