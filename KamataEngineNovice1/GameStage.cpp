@@ -116,11 +116,13 @@ void GameStage::IsCollision()
 				//和小伙伴触碰
 				//可以使用下面提供的这个坐标去生成一个小伙伴，这样就可以无缝衔接上了
 				Vector2 friendPos = it->GetTranslate();
+				player_->OnFriendCollide();
 				EnemyManager::ReleaseEnemy(it);
 			}
 			else {
 				//和敌人触碰
 				//需要提供一个小伙伴的坐标，这样我才知道要去哪里抓小伙伴
+				//player_->OnEnenyCollide();
 			}
 		}
 	}

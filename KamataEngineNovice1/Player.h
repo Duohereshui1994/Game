@@ -83,6 +83,7 @@ private:
 
 	typedef struct {
 		Vector2 pos_;
+		Vector2 underPos_;
 		unsigned int color;
 		bool isAlive_;
 	}Friends;
@@ -97,6 +98,7 @@ public:
 	Friends friends_[14];
 
 	Player();
+
 	~Player();
 	//初始化 重写
 	void Initialize() override;
@@ -106,6 +108,9 @@ public:
 	//描画 重写
 	void Draw() override;
 	void DrawTexture(int leftTopX, int leftTopY, int width, int height, int textureHandle);
+
+	void SetFriendArray();
+
 	//攻击
 	void Attack(Camera* camera);
 	//地面地下状态切换
@@ -126,5 +131,6 @@ public:
 
 	float GetUpFrame() { return upFrame_; }
 	float GetDownFrame() { return downFrame_; }
+
 };
 

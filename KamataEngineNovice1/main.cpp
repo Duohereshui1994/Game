@@ -1,6 +1,7 @@
 #include <Novice.h>
 #include "TitleStage.h"
 #include "GameStage.h"
+#include "ClearStage.h"
 
 const char kWindowTitle[] = "6004_Game";
 
@@ -8,11 +9,13 @@ enum class Scene {
 	kUnkonwn = 0,
 	kTitle,
 	kGame,
+	kClear,
 };
 Scene scene = Scene::kUnkonwn;
 
 GameStage* gamestage_ = nullptr;
 TitleStage* titleStage_ = nullptr;
+ClearStage* clearStage_ = nullptr;
 
 void ChangeScene() {
 	switch (scene) {
@@ -27,9 +30,18 @@ void ChangeScene() {
 			break;
 		case Scene::kGame:
 			if (gamestage_->IsFinished()) {
-				scene = Scene::kTitle;
+				scene = Scene::kClear;
 				delete gamestage_;
 				gamestage_ = nullptr;
+				clearStage_ = new ClearStage();
+				clearStage_->Initialize();
+			}
+			break;
+		case Scene::kClear:
+			if (clearStage_->IsFinished()) {
+				scene = Scene::kTitle;
+				delete clearStage_;
+				clearStage_ = nullptr;
 				titleStage_ = new TitleStage();
 				titleStage_->Initialize();
 			}
@@ -87,6 +99,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			case Scene::kGame:
 				gamestage_->Update(keys, preKeys);
 				break;
+			case Scene::kClear:
+				clearStage_->Update(keys, preKeys);
+				break;
 		}
 
 		///
@@ -108,6 +123,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			case Scene::kGame:
 				gamestage_->Draw();
 				break;
+			case Scene::kClear:
+				clearStage_->Draw();
+				break;
 		}
 
 		///
@@ -125,6 +143,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	delete titleStage_;
 	delete gamestage_;
+	delete clearStage_;
 
 	// ライブラリの終了
 	Novice::Finalize();
