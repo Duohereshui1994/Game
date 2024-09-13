@@ -106,8 +106,9 @@ private:
 	inline static int _eachBornMax = 0;				//每回至多生成敌人数量
 	inline static int _bornEnemySpace = 3;			//敌人后面后要空多少个位置
 	//生成敌人种类(最初能生成的种类，随着难度，会调整这个数组中的敌人类型)
-	inline static Enemy::Type _enemyType_walk[2] = { Enemy::tSnake,Enemy::tSnake };
-	inline static Enemy::Type _enemyType_fly[2] = { Enemy::tEagles,Enemy::tEagles };
+	inline static int _enemyTypeSum = 5;
+	inline static Enemy::Type _enemyType_walk[5] = { Enemy::tSnake,Enemy::tSnake,Enemy::tSnake,Enemy::tSnake,Enemy::tSnake };
+	inline static Enemy::Type _enemyType_fly[5] = { Enemy::tBee,Enemy::tBee,Enemy::tBee,Enemy::tBee,Enemy::tBee };
 	//生成小伙伴
 	inline static int _bornFriendTime = 60;			//生成小伙伴的判断时间
 	inline static int _bornFriendSpace = 5;			//小伙伴的前后要空多少个位置
@@ -138,6 +139,7 @@ public:
 	//敌人生成相关函数
 	static void BornEnemy(Camera* camera, int score, int friendSum);	//生成敌人(相机,分数,小伙伴数量)
 	static void ClearAllEnemy();										//清除并回收所有激活的敌人
+	static void RestartData();											//重置数据
 
 	//对象池相关
 	inline static std::vector<Enemy*> _updatePool;	//更新对象池

@@ -396,43 +396,68 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 	std::random_device rd;
 	std::mt19937 gen(rd());
 
-	_bornEnemyTime = 40;							//路线中生成敌人的时间
-	_enemyType_walk[0] = { Enemy::tSnake };			//修改能生成的敌人队列
-	_enemyType_walk[1] = { Enemy::tSnake };
-	_enemyType_fly[0] = { Enemy::tEagles };
-	_enemyType_fly[1] = { Enemy::tEagles };
+	_bornEnemyTime = 45;							//路线中生成敌人的时间
+
 	//按照分数调整难度
-	if (score < 200) {
-		_linesSum = 2;								//当前多少条线路
-		_lineTime = 10;								//进行随机选择路线的时间
-		_eachBornMax = 2;							//每回至多生成敌人数量
+	if (score > 3000) {
+		_linesSum = 6;				//当前多少条线路
+		_lineTime = 30;				//进行随机选择路线的时间
+		_eachBornMax = 5;			//每回至多生成敌人数量
+		_enemyType_fly[3] = { Enemy::tEagles };
 	}
-	else if (score < 400) {
-		_linesSum = 4;
-		_lineTime = 20;
-		_eachBornMax = 2;
+	else if (score > 2500) {
+		_linesSum = 6;
+		_lineTime = 30;
+		_eachBornMax = 5;
 	}
-	else if (score < 700) {
+	else if (score > 2000) {
+		_linesSum = 6;
+		_lineTime = 40;
+		_eachBornMax = 5;
+		_enemyType_fly[2] = { Enemy::tEagles };
+	}
+	else if (score > 1700) {
+		_linesSum = 6;
+		_lineTime = 50;
+		_eachBornMax = 4;
+	}
+	else if (score > 1300) {
+		_linesSum = 6;
+		_lineTime = 60;
+		_eachBornMax = 4;
+		_enemyType_fly[1] = { Enemy::tEagles };
+	}
+	else if (score > 1000) {
+		_linesSum = 5;
+		_lineTime = 60;
+		_eachBornMax = 4;
+		_enemyType_walk[2] = { Enemy::tSpider };
+	}
+	else if (score > 700) {
+		_linesSum = 5;
+		_lineTime = 50;
+		_eachBornMax = 3;
+	}
+	else if (score > 400) {
 		_linesSum = 4;
 		_lineTime = 20;
 		_eachBornMax = 3;
 		_enemyType_walk[1] = { Enemy::tSpider };
 	}
-	else if (score < 1000) {
-		_linesSum = 6;
-		_lineTime = 50;
-		_eachBornMax = 3;
+	else if (score > 200) {
+		_linesSum = 4;
+		_lineTime = 20;
+		_eachBornMax = 2;
 	}
-	else if (score < 1300) {
-		_linesSum = 6;
-		_lineTime = 50;
-		_eachBornMax = 4;
-		_enemyType_fly[1] = { Enemy::tBee };
+	else if (score > 100) {
+		_linesSum = 3;
+		_lineTime = 15;
+		_eachBornMax = 2;
 	}
 	else {
-		_linesSum = 6;
-		_lineTime = 30;
-		_eachBornMax = 4;
+		_linesSum = 2;
+		_lineTime = 10;
+		_eachBornMax = 2;
 	}
 
 	//按照小伙伴人数调整生成新的小伙伴的几率
@@ -452,12 +477,12 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 		Enemy::Type enemyType = Enemy::tSnake;
 		if (lineNum == 0 || lineNum == 1) {
 			//地面路线
-			std::uniform_int_distribution<int> dis_enemyIndex(0, 1);
+			std::uniform_int_distribution<int> dis_enemyIndex(0, _enemyTypeSum - 1);
 			enemyType = _enemyType_walk[dis_enemyIndex(gen)];
 		}
 		else {
 			//天空路线
-			std::uniform_int_distribution<int> dis_enemyIndex(0, 1);
+			std::uniform_int_distribution<int> dis_enemyIndex(0, _enemyTypeSum - 1);
 			enemyType = _enemyType_fly[dis_enemyIndex(gen)];
 		}
 		//往路线中填入多少个敌人
@@ -538,6 +563,15 @@ void EnemyManager::ClearAllEnemy()
 		ReleaseEnemy(it);
 	}
 	_updatePool.clear();
+}
+
+void EnemyManager::RestartData()
+{
+	//重置能生成的敌人类型队列
+	for (int i = 0; i < _enemyTypeSum; i++) {
+		_enemyType_walk[i] = { Enemy::tSnake };
+		_enemyType_fly[i] = { Enemy::tBee };
+	}
 }
 
 void EnemyManager::ReleaseEnemy(Enemy* enemy)

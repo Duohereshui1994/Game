@@ -31,6 +31,7 @@ void GameStage::Initialize()
 	camera_ = new Camera(cameraCenter, cameraSpeed);//インスタンス
 
 	EnemyManager::ClearAllEnemy();	//清除所有敌人
+	EnemyManager::RestartData();
 	Score::Initialize();			//重置分数
 	ParticleManager::ClearAll();	//清除粒子
 
@@ -61,6 +62,8 @@ void GameStage::Update(char keys[], char preKeys[])
 	filter_->Update(player_, camera_, player_->GetFriendCount());
 	emotion_->Update(player_, camera_);
 	ParticleManager::Update();
+
+	//特殊修改
 	//刷新分数的Combo
 	//if (player_->GetState() == PlayerState::OnGround)
 	//	_isRefreshCombo = true;
@@ -68,6 +71,10 @@ void GameStage::Update(char keys[], char preKeys[])
 	//	Score::RefreshMagnification();
 	//	_isRefreshCombo = false;
 	//}
+	//缺少子弹的声音
+	if (Novice::IsTriggerMouse(0) && player_->_bullet_now <= 0
+		|| Novice::IsTriggerMouse(1) && player_->_bullet_now <= 0)
+		Novice::PlayAudio(audioClip_->audioTama, false, 2.0f);
 
 	IsCollision();			//碰撞检测
 	Score::Update();		//分数计算

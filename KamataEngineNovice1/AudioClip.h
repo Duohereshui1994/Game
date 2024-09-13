@@ -16,6 +16,7 @@ public:
 	int audioMushroom;//蘑菇发射	1
 	int audioStone;//石头发射	1
 	int audioUpAndDown;//钻地	1
+	int audioTama;//缺子弹	1
 
 	AudioClip();
 

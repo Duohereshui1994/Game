@@ -15,4 +15,5 @@ AudioClip::AudioClip()
 	audioMushroom = Novice::LoadAudio("./RS/BGM/mushroom.mp3");
 	audioStone = Novice::LoadAudio("./RS/BGM/stone.mp3");
 	audioUpAndDown = Novice::LoadAudio("./RS/BGM/space_up_down.mp3");
+	audioTama = Novice::LoadAudio("./RS/BGM/tama.mp3");
 }
