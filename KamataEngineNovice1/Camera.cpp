@@ -135,7 +135,10 @@ void Camera::Move(char* keys)
 
 void Camera::Update(char* keys)
 {
+	keys;
+#ifdef _DEBUG
 	Move(keys);
+#endif // _DEBUG
 	//屏幕的Shake
 	if (_isHurtShake) {
 		if (FrameTimeWatch(30, 0, false))

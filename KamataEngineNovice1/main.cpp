@@ -130,7 +130,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		case Scene::kTitle:
 			Novice::StopAudio(voiceHandleGame_);
 			if (Novice::IsPlayingAudio(voiceHandleTitle_) == 0 || voiceHandleTitle_ == -1) {
-				voiceHandleTitle_ = Novice::PlayAudio(audioClip_->audioTitle_, true, 0.3f);
+				voiceHandleTitle_ = Novice::PlayAudio(audioClip_->audioTitle_, true, 0.0f);
 			}
 			titleStage_->Update();
 			break;
