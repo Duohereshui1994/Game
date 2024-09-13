@@ -162,7 +162,7 @@ void Score::DrawCombo()
 	Vector2 numPos = { _comboPos.x + 110,_comboPos.y - 14 };	//数字的开始位置
 
 	//画出标记
-	Novice::DrawSprite((int)_comboPos.x, (int)_comboPos.y, _spCombo, 1, 1, 0, WHITE);
+	Novice::DrawSprite((int)_comboPos.x, (int)_comboPos.y, _spCombo, 1, 1, 0, _comboColor);
 	//拆分数字并储存
 	std::vector<int> digits;
 	int temp = _combo;
@@ -189,11 +189,6 @@ void Score::DrawCombo()
 void Score::ComboShake()
 {
 	if (_isComboShake) {
-		if (FrameTimeWatch(30, 0, false))
-		{
-			_isComboShake = false;
-			_comboColor = WHITE;
-		}
 		std::random_device rd;
 		std::mt19937 gen(rd());
 		std::uniform_real_distribution<float> dis_moveX(-_randComboShake, _randComboShake);
@@ -201,6 +196,12 @@ void Score::ComboShake()
 		_comboShakeOffset = Vector2{ dis_moveX(rd),dis_moveY(rd) };
 		_comboPos = _comboPosOffset + _comboShakeOffset;
 		_comboColor = RED;
+		if (FrameTimeWatch(30, 0, false))
+		{
+			_comboShakeOffset = { 0,0 };
+			_comboColor = WHITE;
+			_isComboShake = false;
+		}
 	}
 }
 
