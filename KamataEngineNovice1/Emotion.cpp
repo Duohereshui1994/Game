@@ -57,23 +57,23 @@ void Emotion::Update(Player* player, Camera* camera)
 	if (currentState_ != previousState_) {
 		switch (currentState_)
 		{
-			case EmotionState::Happy:
-				ParticleManager::ADD_Particle(camera, affine_.translate, Emitter::emotion_happy);
-				previousState_ = EmotionState::Happy;
-				break;
+		case EmotionState::Happy:
+			//ParticleManager::ADD_Particle(camera, affine_.translate, Emitter::emotion_happy);
+			previousState_ = EmotionState::Happy;
+			break;
 
-			case EmotionState::General:
-				ParticleManager::ADD_Particle(camera, affine_.translate, Emitter::emotion_normal);
-				previousState_ = EmotionState::General;
-				break;
+		case EmotionState::General:
+			//ParticleManager::ADD_Particle(camera, affine_.translate, Emitter::emotion_normal);
+			previousState_ = EmotionState::General;
+			break;
 
-			case EmotionState::Sad:
-				ParticleManager::ADD_Particle(camera, affine_.translate, Emitter::emotion_sad);
-				previousState_ = EmotionState::Sad;
-				break;
+		case EmotionState::Sad:
+			//ParticleManager::ADD_Particle(camera, affine_.translate, Emitter::emotion_sad);
+			previousState_ = EmotionState::Sad;
+			break;
 		}
 	}
-	
+
 	//更新变换矩阵
 	worldMatrix_ = math_->MakeAffine(affine_);
 

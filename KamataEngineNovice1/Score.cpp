@@ -48,7 +48,8 @@ void Score::AddScore(Enemy* enemy, bool longKill)
 
 void Score::GameOverScore()
 {
-	_highScore = _score;
+	if (_score > _highScore)
+		_highScore = _score;
 }
 
 void Score::RefreshMagnification()

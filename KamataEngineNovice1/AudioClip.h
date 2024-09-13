@@ -8,10 +8,10 @@ public:
 	int audioGameBgm_;//游戏音乐	1
 
 	//effect
-	int audioHitEnemy;//打中敌人
-	int audioHitFriend;//打中友军
-	int audioJoinFriend;//伙伴加入
-	int audioDeadFrend;//伙伴死亡
+	int audioHitEnemy;//打中敌人		1
+	int audioHitFriend;//打中友军	1
+	int audioJoinFriend;//伙伴加入	1
+	int audioDeadFrend;//伙伴死亡	1
 	int audioScore;//得分
 	int audioMushroom;//蘑菇发射	1
 	int audioStone;//石头发射	1

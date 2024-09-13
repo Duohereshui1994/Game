@@ -479,10 +479,10 @@ void Player::Attack(char keys[], char preKeys[], Camera* camera)
 					bullet.Shoot(bullet.GetTargetPos(), UpPos);  // 发射子弹
 					bullet.bulletSwitch_ = !bullet.bulletSwitch_;
 					if (bullet.GetBulletState() == BulletType::Mushroom) {
-						Novice::PlayAudio(audioClip_->audioMushroom, false, 1.0f);
+						Novice::PlayAudio(audioClip_->audioStone, false, 2.0f);
 					}
 					else {
-						Novice::PlayAudio(audioClip_->audioStone, false, 1.0f);
+						Novice::PlayAudio(audioClip_->audioMushroom, false, 1.0f);
 					}
 					bullet.SetIsShot(true);
 					attackCD_ = ATTACK_COOLDOWN;

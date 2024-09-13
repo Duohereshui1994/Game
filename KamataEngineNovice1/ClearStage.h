@@ -1,6 +1,7 @@
 #pragma once
 #include "ClearBackground.h"
 #include "AudioClip.h"
+#include "Score.h"
 
 enum class ClearButtonType {
 	kNull,
@@ -22,6 +23,10 @@ private:
 
 	AudioClip* audioClip_ = nullptr;
 
+	int _spListNum = 0;
+	Vector2 _scorePos = { 530,240 };
+	Vector2 _scoreHighPos = { 530,350 };
+
 public:
 	ClearStage();
 
@@ -32,6 +37,8 @@ public:
 	void Update(char keys[], char preKeys[]);
 
 	void Draw();
+
+	void DrawScore(Vector2 pos, int score);
 
 	bool IsFinished() const { return finished_; }
 

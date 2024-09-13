@@ -131,6 +131,7 @@ void GameStage::IsCollision()
 						ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);
 						Score::AddScore(enemy, false);
 						Score::ClearMagnification();//清除连击
+						Novice::PlayAudio(audioClip_->audioHitFriend, false, 1.0f);
 					}
 					//打中敌人
 					else {
@@ -139,10 +140,12 @@ void GameStage::IsCollision()
 							&& enemy->GetTranslate().y>150 && enemy->GetTranslate().y < 720 - 150) {
 							ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore);
 							Score::AddScore(enemy, false);
+							Novice::PlayAudio(audioClip_->audioHitEnemy, false, 1.0f);
 						}
 						else {
 							ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore_long);
 							Score::AddScore(enemy, true);
+							Novice::PlayAudio(audioClip_->audioHitEnemy, false, 0.5f);
 						}
 						Score::AddCombo(enemy);//增加连击
 					}
@@ -161,6 +164,7 @@ void GameStage::IsCollision()
 			player_->OnFriendCollide(camera_);
 			it->Set_isGetPlayer(true);
 			EnemyManager::ReleaseEnemy(it);
+			Novice::PlayAudio(audioClip_->audioJoinFriend, false, 1.0f);
 			break;
 		}
 		if (!it->Get_isDead() && !it->Get_isGetPlayer()) {
@@ -174,6 +178,7 @@ void GameStage::IsCollision()
 						player_->OnFriendCollide(camera_);
 						it->Set_isGetPlayer(true);
 						EnemyManager::ReleaseEnemy(it);
+						Novice::PlayAudio(audioClip_->audioJoinFriend, false, 1.0f);
 					}
 					else {
 						if (!it->Get_isFriendWiat())
@@ -187,6 +192,7 @@ void GameStage::IsCollision()
 					player_->OnEnenyCollide(camera_);
 					Score::ClearMagnification();//清除连击
 					camera_->Set_isHurtShake(true);
+					Novice::PlayAudio(audioClip_->audioDeadFrend, false, 1.0f);
 				}
 			}
 		}
