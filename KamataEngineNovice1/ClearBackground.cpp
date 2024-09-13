@@ -5,7 +5,10 @@ ClearBackground::ClearBackground()
 {
 	textureClearBackground_ = Novice::LoadTexture("./RS/ClearStage/result.png");
 
-	param_ = 1;
+	mousePosX = 0;
+	mousePosY = 0;
+
+	param_ = 0;
 }
 
 ClearBackground::~ClearBackground()
@@ -15,26 +18,21 @@ ClearBackground::~ClearBackground()
 
 void ClearBackground::Initialize()
 {
-	param_ = 1;
+	param_ = 0;
 }
 
-void ClearBackground::Update(char keys[], char preKeys[])
+void ClearBackground::Update()
 {
-	if (keys[DIK_UP] && !preKeys[DIK_UP]) {
-		if (param_ <= 1) {
-			param_ = 1;
-		}
-		else {
-			param_--;
-		}
+	Novice::GetMousePosition(&mousePosX, &mousePosY);
+
+	if (mousePosX > 981 && mousePosX < 1187 && mousePosY>519 && mousePosY < 568) {
+		param_ = 1;
 	}
-	else if (keys[DIK_DOWN] && !preKeys[DIK_DOWN]) {
-		if (param_ >= 2) {
-			param_ = 2;
-		}
-		else {
-			param_++;
-		}
+	else if (mousePosX > 981 && mousePosX < 1187 && mousePosY>580 && mousePosY < 629) {
+		param_ = 2;
+	}
+	else {
+		param_ = 0;
 	}
 }
 

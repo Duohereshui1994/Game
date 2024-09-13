@@ -416,7 +416,6 @@ void Particle::ScreenDraw()
 		rotatedPos = { aditionX,aditionY };
 		rotatedPos = { rotatedPos.x + _pos.x ,rotatedPos.y + _pos.y };
 		Novice::DrawSpriteRect((int)(rotatedPos.x), (int)(rotatedPos.y), listX, listY, int(_spriteSize.x), int(_spriteSize.y), _sprite, _spriteSize.x / listW * _scale.x, _spriteSize.y / listH * _scale.y, _angle, _color);
-		Novice::ConsolePrintf("%d,%d\n", (int)(rotatedPos.x), (int)(rotatedPos.y));
 		break;
 	}
 }

@@ -14,10 +14,14 @@ GameStage::~GameStage()
 	delete bg_;
 	delete filter_;
 	delete emotion_;
+	delete audioClip_;
+
 }
 
 void GameStage::Initialize()
 {
+	audioClip_ = new AudioClip();
+
 	player_ = new Player();
 	player_->Initialize();
 
@@ -46,11 +50,6 @@ void GameStage::Initialize()
 
 void GameStage::Update(char keys[], char preKeys[])
 {
-	//scene 切换 test
-	if (keys[DIK_R] && !preKeys[DIK_R]) {
-		finished_ = true;
-	}
-
 	EnemyManager::BornEnemy(camera_, Score::GetScore(), player_->GetFriendCount());//生成敌人(相机，分数，小伙伴人数)
 
 	camera_->Update(keys);
@@ -72,7 +71,17 @@ void GameStage::Update(char keys[], char preKeys[])
 	IsCollision();			//碰撞检测
 	Score::Update();		//分数计算
 
+	//判断玩家是否死亡
+	if (player_->_isDead) {
+		finished_ = true;
+		Score::GameOverScore();
+	}
 #ifdef _DEBUG
+	Novice::ConsolePrintf("friends:%d\n", player_->GetFriendCount());
+	//scene 切换 test
+	if (keys[DIK_R] && !preKeys[DIK_R]) {
+		finished_ = true;
+	}
 	//Particle test
 	if (keys[DIK_1] && !preKeys[DIK_1]) {
 		ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);

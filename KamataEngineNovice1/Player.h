@@ -3,6 +3,7 @@
 #include "Character.h"
 #include "Bullet.h"
 #include "Camera.h"
+#include "AudioClip.h"
 
 //玩家状态
 enum class PlayerState {
@@ -23,6 +24,8 @@ enum class EmotionState {
 class Player : public Character
 {
 private:
+	AudioClip* audioClip_;		//播放音效
+
 	int textureHandleLeft_;		//地面上面向左侧贴图
 	int textureHandleRight_;	//地面下面向右侧贴图
 
@@ -123,6 +126,8 @@ public:
 	std::vector<Bullet> bullets_;
 	//友方数组 最多14个友方
 	Friends friends_[14];
+	//玩家是否死亡
+	bool _isDead = false;
 
 	Player();
 

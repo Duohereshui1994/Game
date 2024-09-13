@@ -408,22 +408,20 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 		_lineTime = 10;								//进行随机选择路线的时间
 		_eachBornMax = 2;							//每回至多生成敌人数量
 	}
-	else if (score < 4000) {
+	else if (score < 2000) {
 		_linesSum = 4;
 		_lineTime = 20;
 		_eachBornMax = 2;
 	}
-	else if (score < 7000) {
+	else if (score < 4000) {
 		_linesSum = 4;
 		_lineTime = 20;
 		_eachBornMax = 3;
-		//_enemyType_walk[1] = { Enemy::tSpider };
 	}
-	else if (score < 10000) {
+	else if (score < 7000) {
 		_linesSum = 6;
 		_lineTime = 30;
 		_eachBornMax = 3;
-		//_enemyType_fly[1] = { Enemy::tBee };
 	}
 	else {
 		_linesSum = 6;

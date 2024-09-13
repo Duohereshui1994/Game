@@ -173,18 +173,27 @@ void Player::Initialize()
 	}
 
 	currentFriendIndex = 13;  // 当前小伙伴数组下标
+	_isDead = false;
+
+	audioClip_ = new AudioClip();
 
 }
 
 void Player::Update(char keys[], char preKeys[])
 {
+	keys, preKeys;
+}
+
+void Player::Update(char keys[], char preKeys[], Camera* camera)
+{
+#ifdef _DEBUG
 	//debug
 	if (keys[DIK_J] && !preKeys[DIK_J]) {
-		//OnFriendCollide();
+		OnFriendCollide(camera);
 
 	}
 	if (keys[DIK_K] && !preKeys[DIK_K]) {
-		//OnEnenyCollide();
+		OnEnenyCollide(camera);
 
 	}
 	if (keys[DIK_U] && !preKeys[DIK_U]) {
@@ -193,10 +202,8 @@ void Player::Update(char keys[], char preKeys[])
 	if (keys[DIK_I] && !preKeys[DIK_I]) {
 		emotionValue_ -= 10;
 	}
-}
+#endif // _DEBUG
 
-void Player::Update(char keys[], char preKeys[], Camera* camera)
-{
 	EmotionUpdate();
 
 	SwithGround(keys, preKeys, camera);
@@ -471,6 +478,12 @@ void Player::Attack(char keys[], char preKeys[], Camera* camera)
 					bullet.SetTargetPos(mousePosWorld);
 					bullet.Shoot(bullet.GetTargetPos(), UpPos);  // 发射子弹
 					bullet.bulletSwitch_ = !bullet.bulletSwitch_;
+					if (bullet.GetBulletState() == BulletType::Mushroom) {
+						Novice::PlayAudio(audioClip_->audioMushroom, false, 1.0f);
+					}
+					else {
+						Novice::PlayAudio(audioClip_->audioStone, false, 1.0f);
+					}
 					bullet.SetIsShot(true);
 					attackCD_ = ATTACK_COOLDOWN;
 					_bullet_now--;//计算子弹数
@@ -505,6 +518,7 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 
 		if (isStateChange) {
 			downFrame_ = 0;
+			Novice::PlayAudio(audioClip_->audioUpAndDown, false, 1.0f);
 			state_ = PlayerState::Down;
 		}
 
@@ -522,6 +536,7 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 		if (!isStateChange)
 		{
 			upFrame_ = 0;
+			Novice::PlayAudio(audioClip_->audioUpAndDown, false, 1.0f);
 			state_ = PlayerState::Up;
 		}
 
@@ -593,15 +608,18 @@ void Player::OnEnenyCollide(Camera* camera)
 	//如果13号也没有激活，但是也被敌人碰撞，那么就要结束游戏
 	//现在先不结束游戏
 	if (!friends_[13].isAlive_)
+	{
+		_isDead = true;
 		return;
+	}
 
-	ParticleManager::ADD_Particle(camera, affineFriends_[currentFriendIndex].translate, Emitter::friendDead);//特效
+	// 增加索引
+	currentFriendIndex++;
 	_bullet_max--;//减少子弹上限
+	ParticleManager::ADD_Particle(camera, affineFriends_[currentFriendIndex].translate, Emitter::friendDead);//特效
 	if (_bullet_max < _bullet_targetMax)
 		_bullet_max = _bullet_targetMax;
 	friends_[currentFriendIndex].isAlive_ = false;//激活
-	// 增加索引以便下次操作下一个 friend
-	currentFriendIndex++;
 	// 如果索引超过范围，重置为 
 	if (currentFriendIndex > 13) {
 		currentFriendIndex = 13;
@@ -619,9 +637,9 @@ void Player::OnFriendCollide(Camera* camera)
 	// 增加索引以便下次操作下一个 friend
 	currentFriendIndex--;
 	// 如果索引超过范围，重置为 0
-	if (currentFriendIndex < 0) {
-		currentFriendIndex = 0;
-	}
+	//if (currentFriendIndex < 0) {
+	//	currentFriendIndex = 0;
+	//}
 }
 
 void Player::EmotionUpdate()

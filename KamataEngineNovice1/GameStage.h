@@ -10,6 +10,7 @@
 #include "Grid.h"
 #include "Score.h"
 #include "Particle.h"
+#include "AudioClip.h"
 
 class GameStage
 {
@@ -34,6 +35,7 @@ private:
 	Filter* filter_ = nullptr;
 	Emotion* emotion_ = nullptr;
 	Grid* grid_ = nullptr;
+	AudioClip* audioClip_ = nullptr;
 
 	//Scene切换
 	bool finished_ = false;
