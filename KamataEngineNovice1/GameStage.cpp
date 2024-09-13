@@ -66,7 +66,7 @@ void GameStage::Update(char keys[], char preKeys[])
 #ifdef _DEBUG
 	//Particle test
 	if (keys[DIK_1] && !preKeys[DIK_1]) {
-		ParticleManager::ADD_Particle(camera_, player_->GetTranslate(), Emitter::happy);
+		ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);
 	}
 	if (keys[DIK_2] && !preKeys[DIK_2]) {
 		ParticleManager::ADD_Particle(camera_, player_->GetTranslate(), Emitter::unHappy);
@@ -88,6 +88,7 @@ void GameStage::Draw()
 
 	ParticleManager::PreDraw();
 	Score::Draw();
+	ParticleManager::ScreenDraw();
 }
 
 void GameStage::IsCollision()
@@ -109,6 +110,7 @@ void GameStage::IsCollision()
 					//打中小伙伴
 					if (enemy->Get_type() == Enemy::tPlayer) {
 						ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::minusScore);
+						ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);
 						Score::AddScore(enemy, false);
 						Score::ClearMagnification();//清除连击
 					}
@@ -162,6 +164,7 @@ void GameStage::IsCollision()
 				}
 				else {
 					//和敌人触碰
+					ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);
 					it->Set_isGetPlayer(true);
 					player_->OnEnenyCollide(camera_);
 					Score::ClearMagnification();//清除连击

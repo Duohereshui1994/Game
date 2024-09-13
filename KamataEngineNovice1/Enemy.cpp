@@ -417,13 +417,13 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 		_linesSum = 4;
 		_lineTime = 20;
 		_eachBornMax = 3;
-		_enemyType_walk[1] = { Enemy::tSpider };
+		//_enemyType_walk[1] = { Enemy::tSpider };
 	}
 	else if (score < 10000) {
 		_linesSum = 6;
 		_lineTime = 30;
 		_eachBornMax = 3;
-		_enemyType_fly[1] = { Enemy::tBee };
+		//_enemyType_fly[1] = { Enemy::tBee };
 	}
 	else {
 		_linesSum = 6;
