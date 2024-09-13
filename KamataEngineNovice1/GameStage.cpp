@@ -168,6 +168,7 @@ void GameStage::IsCollision()
 					it->Set_isGetPlayer(true);
 					player_->OnEnenyCollide(camera_);
 					Score::ClearMagnification();//清除连击
+					camera_->Set_isHurtShake(true);
 				}
 			}
 		}

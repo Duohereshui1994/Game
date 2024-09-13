@@ -34,6 +34,18 @@ private:
 	//vpVp
 	Matrix3x3 vpVpMatrix_;
 
+	//Shake变量
+	float _randHurtShake = 3;					//抖动幅度(想要改变效果修改这个)
+	Vector2 _hurtShakeOffset{};					//抖动的偏差值
+	Vector2 _hurtPosOffset = affine_.translate;	//原始坐标值
+	bool _isHurtShake = false;
+	void HurtShake();
+
+	//工具
+	int _currentFrame_ani[3] = { 0 };								// 这个用于计时器的使用
+	int _currentFrameIndex[3] = { 0 };								//用以计算播放到第几帧
+	bool FrameTimeWatch_ani(int frame, int index, bool first);		// 计时器：帧时间、编号、首次是否输出
+
 public:
 
 	/// <summary>
@@ -89,5 +101,7 @@ public:
 
 	Vector2 GetTranslate() { return affine_.translate; };
 	void SetTranslate(Vector2 translate) { affine_.translate = translate; };
+
+	void Set_isHurtShake(const bool& flag) { _isHurtShake = flag; };
 };
 

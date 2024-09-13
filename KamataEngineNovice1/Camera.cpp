@@ -1,6 +1,36 @@
 #include "Camera.h"
 #include "Player.h"
 #include <Novice.h>
+#include <random>
+
+void Camera::HurtShake()
+{
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<float> dis_moveX(-_randHurtShake, _randHurtShake);
+	std::uniform_real_distribution<float> dis_moveY(-_randHurtShake, _randHurtShake);
+	_hurtShakeOffset = Vector2{ dis_moveX(rd),dis_moveY(rd) };
+	affine_.translate = _hurtPosOffset + _hurtShakeOffset;
+}
+
+bool Camera::FrameTimeWatch_ani(int frame, int index, bool first)
+{
+	if (!first) {
+		if (_currentFrame_ani[index] > frame) {
+			_currentFrame_ani[index] = 0;
+			return true;
+		}
+		_currentFrame_ani[index]++;
+	}
+	else {
+		if (_currentFrame_ani[index] <= 0) {
+			_currentFrame_ani[index] = frame;
+			return true;
+		}
+		_currentFrame_ani[index]--;
+	}
+	return false;
+}
 
 Camera::Camera(Affine center, Speed speed)
 {
@@ -38,6 +68,11 @@ Camera::Camera(Affine center, Speed speed)
 	viewportMatrix_ = {};
 
 	vpVpMatrix_ = {};
+
+	//Shake
+	_hurtShakeOffset = { 0,0 };
+	_hurtPosOffset = affine_.translate;;
+	_isHurtShake = false;
 }
 
 Camera::~Camera()
@@ -101,6 +136,15 @@ void Camera::Move(char* keys)
 void Camera::Update(char* keys)
 {
 	Move(keys);
+	//屏幕的Shake
+	if (_isHurtShake) {
+		if (FrameTimeWatch_ani(30, 0, false))
+			_isHurtShake = false;
+		HurtShake();
+	}
+	else
+		_hurtShakeOffset = { 0,0 };
+
 	cameraMatrix_ = math_->MakeAffine(affine_);
 	viewMatrix_ = math_->ViewMatrix(cameraMatrix_);
 	orthoMatrix_ = math_->OrthoMatrix(vertex_);
