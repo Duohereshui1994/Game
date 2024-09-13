@@ -3,6 +3,7 @@
 #include "Character.h"
 #include "Bullet.h"
 #include "Camera.h"
+#include "AudioClip.h"
 
 //玩家状态
 enum class PlayerState {
@@ -23,6 +24,8 @@ enum class EmotionState {
 class Player : public Character
 {
 private:
+	AudioClip* audioClip_;		//播放音效
+
 	int textureHandleLeft_;		//地面上面向左侧贴图
 	int textureHandleRight_;	//地面下面向右侧贴图
 

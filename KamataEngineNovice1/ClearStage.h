@@ -1,5 +1,13 @@
 #pragma once
 #include "ClearBackground.h"
+#include "AudioClip.h"
+
+enum class ClearButtonType {
+	kNull,
+	kRestart,
+	kMenu,
+};
+
 
 //结算界面stage
 class ClearStage
@@ -9,6 +17,10 @@ private:
 	bool finished_ = false;
 
 	ClearBackground* cBG_ = nullptr;
+
+	ClearButtonType buttonType_;
+
+	AudioClip* audioClip_ = nullptr;
 
 public:
 	ClearStage();
@@ -22,5 +34,7 @@ public:
 	void Draw();
 
 	bool IsFinished() const { return finished_; }
+
+	ClearButtonType GetButtonType() const { return buttonType_; }
 };
 

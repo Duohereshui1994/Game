@@ -2,6 +2,7 @@
 #include "TitleStage.h"
 #include "GameStage.h"
 #include "ClearStage.h"
+#include "AudioClip.h"
 
 const char kWindowTitle[] = "6004_モグラの守り手";
 
@@ -16,36 +17,55 @@ Scene scene = Scene::kUnkonwn;
 GameStage* gamestage_ = nullptr;
 TitleStage* titleStage_ = nullptr;
 ClearStage* clearStage_ = nullptr;
+AudioClip* audioClip_ = nullptr;
+
+bool isGameOver = false;
 
 void ChangeScene() {
 	switch (scene) {
-	case Scene::kTitle:
-		if (titleStage_->IsFinished()) {
-			scene = Scene::kGame;
-			delete titleStage_;
-			titleStage_ = nullptr;
-			gamestage_ = new GameStage();
-			gamestage_->Initialize();
-		}
-		break;
-	case Scene::kGame:
-		if (gamestage_->IsFinished()) {
-			scene = Scene::kClear;
-			delete gamestage_;
-			gamestage_ = nullptr;
-			clearStage_ = new ClearStage();
-			clearStage_->Initialize();
-		}
-		break;
-	case Scene::kClear:
-		if (clearStage_->IsFinished()) {
-			scene = Scene::kTitle;
-			delete clearStage_;
-			clearStage_ = nullptr;
-			titleStage_ = new TitleStage();
-			titleStage_->Initialize();
-		}
-		break;
+		case Scene::kTitle:
+			if (titleStage_->IsFinished()) {
+				if (titleStage_->GetButtonType() == TitleButtonType::kStart) {
+					scene = Scene::kGame;
+					delete titleStage_;
+					titleStage_ = nullptr;
+					gamestage_ = new GameStage();
+					gamestage_->Initialize();
+				}
+				else if (titleStage_->GetButtonType() == TitleButtonType::kExit) {
+					isGameOver = true;
+				}
+			}
+
+			break;
+		case Scene::kGame:
+			if (gamestage_->IsFinished()) {
+				scene = Scene::kClear;
+				delete gamestage_;
+				gamestage_ = nullptr;
+				clearStage_ = new ClearStage();
+				clearStage_->Initialize();
+			}
+			break;
+		case Scene::kClear:
+			if (clearStage_->IsFinished()) {
+				if (clearStage_->GetButtonType() == ClearButtonType::kRestart) {
+					scene = Scene::kGame;
+					delete clearStage_;
+					clearStage_ = nullptr;
+					gamestage_ = new GameStage();
+					gamestage_->Initialize();
+
+				}
+				else if (clearStage_->GetButtonType() == ClearButtonType::kMenu) {
+					scene = Scene::kTitle;
+					delete clearStage_;
+					clearStage_ = nullptr;
+					titleStage_ = new TitleStage();
+					titleStage_->Initialize();
+				}
+			}
+			break;
 	}
 }
 
@@ -59,17 +79,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
+
+	//sound
+	int voiceHandleTitle_ = -1;
+	int voiceHandleGame_ = -1;
+	
+
+
+
+	isGameOver = false;
+
 	//贴图
 	int _spMouse = Novice::LoadTexture("./RS/UI/mouse.png");
 	Novice::SetMouseCursorVisibility(false);//不显示鼠标图标
 
 	gamestage_ = new GameStage();
-	//gamestage_->Initialize();
+
 	titleStage_ = new TitleStage();
-	//titleStage_->Initialize();
+
+	clearStage_ = new ClearStage();
+
+	audioClip_ = new AudioClip();
 
 	// 最初のシーンの初期化
 	scene = Scene::kTitle;
+	titleStage_->Initialize();
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -93,15 +127,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//Update Scene
 		switch (scene) {
-		case Scene::kTitle:
-			titleStage_->Update(keys, preKeys);
-			break;
-		case Scene::kGame:
-			gamestage_->Update(keys, preKeys);
-			break;
-		case Scene::kClear:
-			clearStage_->Update(keys, preKeys);
-			break;
+			case Scene::kTitle:
+				Novice::StopAudio(voiceHandleGame_);
+				if (Novice::IsPlayingAudio(voiceHandleTitle_) == 0 || voiceHandleTitle_ == -1) {
+					voiceHandleTitle_ = Novice::PlayAudio(audioClip_->audioTitle_, true, 0.3f);
+				}
+				titleStage_->Update();
+				break;
+			case Scene::kGame:
+				Novice::StopAudio(voiceHandleTitle_);
+				if (Novice::IsPlayingAudio(voiceHandleGame_) == 0 || voiceHandleGame_ == -1) {
+					voiceHandleGame_ = Novice::PlayAudio(audioClip_->audioGameBgm_, true, 0.3f);
+				}
+				gamestage_->Update(keys, preKeys);
+				break;
+			case Scene::kClear:
+				Novice::StopAudio(voiceHandleTitle_);
+				Novice::StopAudio(voiceHandleGame_);
+				clearStage_->Update(keys, preKeys);
+				break;
 		}
 
 		///
@@ -117,15 +161,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//gamestage_->Draw();
 
 		switch (scene) {
-		case Scene::kTitle:
-			titleStage_->Draw();
-			break;
-		case Scene::kGame:
-			gamestage_->Draw();
-			break;
-		case Scene::kClear:
-			clearStage_->Draw();
-			break;
+			case Scene::kTitle:
+				titleStage_->Draw();
+				break;
+			case Scene::kGame:
+				gamestage_->Draw();
+				break;
+			case Scene::kClear:
+				clearStage_->Draw();
+				break;
 		}
 
 		//Mouse图标
@@ -142,6 +186,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// ESCキーが押されたらループを抜ける
 		if (preKeys[DIK_ESCAPE] == 0 && keys[DIK_ESCAPE] != 0) {
+			break;
+		}
+		if (isGameOver) {
 			break;
 		}
 	}

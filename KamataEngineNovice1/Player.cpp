@@ -174,6 +174,8 @@ void Player::Initialize()
 
 	currentFriendIndex = 13;  // 当前小伙伴数组下标
 
+	audioClip_ = new AudioClip();
+
 }
 
 void Player::Update(char keys[], char preKeys[])
@@ -470,6 +472,12 @@ void Player::Attack(char keys[], char preKeys[], Camera* camera)
 					bullet.SetTargetPos(mousePosWorld);
 					bullet.Shoot(bullet.GetTargetPos(), UpPos);  // 发射子弹
 					bullet.bulletSwitch_ = !bullet.bulletSwitch_;
+					if (bullet.GetBulletState() == BulletType::Mushroom) {
+						Novice::PlayAudio(audioClip_->audioMushroom, false, 1.0f);
+					}
+					else {
+						Novice::PlayAudio(audioClip_->audioStone, false, 1.0f);
+					}
 					bullet.SetIsShot(true);
 					attackCD_ = ATTACK_COOLDOWN;
 					_bullet_now--;//计算子弹数
@@ -518,6 +526,7 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 
 		if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
 			downFrame_ = 0;
+			Novice::PlayAudio(audioClip_->audioUpAndDown, false, 1.0f);
 			state_ = PlayerState::Down;
 		}
 
@@ -534,6 +543,7 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 
 		if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
 			upFrame_ = 0;
+			Novice::PlayAudio(audioClip_->audioUpAndDown, false, 1.0f);
 			state_ = PlayerState::Up;
 		}
 

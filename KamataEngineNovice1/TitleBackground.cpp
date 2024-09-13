@@ -6,9 +6,13 @@
 TitleBackground::TitleBackground()
 {
 	textureTitleBackground_ = Novice::LoadTexture("./RS/Title/title.png");
+	textureHelpBackground_ = Novice::LoadTexture("./RS/Title/help.png");
 
-	frameNum_ = 0;
-	deltaTime_ = 1.0f / 60.0f;
+	mousePosX = 0;
+	mousePosY = 0;
+
+	param_ = 0;
+
 }
 
 TitleBackground::~TitleBackground()
@@ -18,22 +22,41 @@ TitleBackground::~TitleBackground()
 
 void TitleBackground::Initialize()
 {
-	frameNum_ = 0;
-	deltaTime_ = 1.0f / 60.0f;
+	param_ = 0;
 }
 
 void TitleBackground::Update()
 {
-	//背景帧数变化
-	if (frameNum_ > MAX_TBG_FRAME - 1) {
-		frameNum_ = 0;
+	Novice::GetMousePosition(&mousePosX, &mousePosY);
+
+
+	if (mousePosX > 143 && mousePosX < 427 && mousePosY>580 && mousePosY < 648) {
+		param_ = 1;
+	}
+	else if (mousePosX > 497 && mousePosX < 781 && mousePosY>580 && mousePosY < 648) {
+		param_ = 2;
+	}
+	else if (mousePosX > 845 && mousePosX < 1126 && mousePosY>580 && mousePosY < 648) {
+		param_ = 3;
 	}
 	else {
-		frameNum_ += deltaTime_ * TBG_TIME_SCALE;
+		param_ = 0;
 	}
+
+
 }
 
 void TitleBackground::Draw()
 {
-	Novice::DrawSpriteRect(0, 0, (int)frameNum_ * 1280, 0, 1280, 720, textureTitleBackground_, 1 / 4.0f, 1, 0.0, WHITE);
+	Novice::DrawSpriteRect(0, 0, (int)param_ * 1280, 0, 1280, 720, textureTitleBackground_, 1 / 4.0f, 1, 0.0, WHITE);
+}
+
+void TitleBackground::DrawHelp()
+{
+	Novice::DrawSprite(0, 0, textureHelpBackground_, 1, 1, 0.0f, WHITE);
+}
+
+void TitleBackground::SetParam(int param)
+{
+	param_ = param;
 }

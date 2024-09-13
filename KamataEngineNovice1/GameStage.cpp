@@ -14,10 +14,14 @@ GameStage::~GameStage()
 	delete bg_;
 	delete filter_;
 	delete emotion_;
+	delete audioClip_;
+
 }
 
 void GameStage::Initialize()
 {
+	audioClip_ = new AudioClip();
+
 	player_ = new Player();
 	player_->Initialize();
 
