@@ -40,6 +40,8 @@ void GameStage::Initialize()
 
 	grid_ = new Grid();
 	grid_->Initialize();
+
+	_isRefreshCombo = false;
 }
 
 void GameStage::Update(char keys[], char preKeys[])
@@ -59,6 +61,13 @@ void GameStage::Update(char keys[], char preKeys[])
 	filter_->Update(player_, camera_, player_->GetFriendCount());
 	emotion_->Update(player_, camera_);
 	ParticleManager::Update();
+	//刷新分数的Combo
+	if (player_->GetState() == PlayerState::OnGround)
+		_isRefreshCombo = true;
+	if (player_->GetState() == PlayerState::Up && _isRefreshCombo) {
+		Score::RefreshMagnification();
+		_isRefreshCombo = false;
+	}
 
 	IsCollision();			//碰撞检测
 	Score::Update();		//分数计算
@@ -126,7 +135,7 @@ void GameStage::IsCollision()
 							ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore_long);
 							Score::AddScore(enemy, true);
 						}
-						Score::AddMagnification(enemy);//增加连击
+						Score::AddCombo(enemy);//增加连击
 					}
 					//回收子弹和敌人
 					bullet.Initialize();
@@ -139,7 +148,7 @@ void GameStage::IsCollision()
 	for (Enemy* it : EnemyManager::_updatePool) {
 		//补充条件，如果小伙伴在等待，那么玩家升上来的时候就直接获救
 		if (it->Get_type() == Enemy::tPlayer && it->Get_isFriendWiat() && player_->GetState() == PlayerState::OnGround) {
-			Score::AddMagnification(it);//增加连击
+			Score::AddCombo(it);//增加连击
 			player_->OnFriendCollide(camera_);
 			it->Set_isGetPlayer(true);
 			EnemyManager::ReleaseEnemy(it);
@@ -152,7 +161,7 @@ void GameStage::IsCollision()
 				if (it->Get_type() == Enemy::tPlayer) {
 					//和小伙伴触碰（并且在地面的时候）
 					if (player_->GetState() == PlayerState::OnGround) {
-						Score::AddMagnification(it);//增加连击
+						Score::AddCombo(it);//增加连击
 						player_->OnFriendCollide(camera_);
 						it->Set_isGetPlayer(true);
 						EnemyManager::ReleaseEnemy(it);

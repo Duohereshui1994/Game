@@ -37,5 +37,6 @@ private:
 
 	//Scene切换
 	bool finished_ = false;
+	bool _isRefreshCombo = false;//是否刷新Combo
 };
 

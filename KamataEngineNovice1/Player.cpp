@@ -463,7 +463,7 @@ void Player::Attack(char keys[], char preKeys[], Camera* camera)
 			{
 				if (!bullet.GetIsShot() && _bullet_now > 0)
 				{
-					Vector2 shootOffset = { -40,20 };
+					Vector2 shootOffset = { 0,20 };
 					if (mousePosX < affine_.translate.x)
 						bullet.SetPos(affine_.translate + shootOffset);
 					else

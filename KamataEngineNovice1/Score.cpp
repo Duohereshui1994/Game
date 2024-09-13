@@ -4,7 +4,10 @@ void Score::Initialize()
 {
 	_score = 0;
 	_magnification = 1;
+	_combo = 0;
 	_sprite = Novice::LoadTexture("./RS/UI/number42x42.png");
+	_spCombo = Novice::LoadTexture("./RS/UI/combo.png");
+	_spComboNums = Novice::LoadTexture("./RS/UI/comboNums.png");
 }
 
 void Score::Update()
@@ -13,7 +16,8 @@ void Score::Update()
 
 void Score::Draw()
 {
-	ScoreDraw(scorePos);
+	DrawScore(scorePos);
+	DrawCombo();
 }
 
 void Score::AddScore(Enemy* enemy, bool longKill)
@@ -47,7 +51,30 @@ void Score::GameOverScore()
 	_highScore = _score;
 }
 
-void Score::ScoreDraw(Vector2 pos)
+void Score::RefreshMagnification()
+{
+	_magnification = _combo;
+	if (_magnification < 1)
+		_magnification = 1;
+	else if (_magnification > 99)
+		_magnification = 99;
+	_combo = 0;
+}
+
+void Score::AddCombo(Enemy* enemy)
+{
+	switch (enemy->Get_type())
+	{
+	case Enemy::tPlayer:
+		_combo += 2;
+		break;
+	default:
+		_combo += 1;
+		break;
+	}
+}
+
+void Score::DrawScore(Vector2 pos)
 {
 	Vector2 listSize = { 462,42 };			//整张数字图集的大小(中间的图都是正方形的)
 	float scoreNextLength = -12;			//两个数字贴图之间的间隔距离
@@ -116,23 +143,35 @@ void Score::ScoreDraw(Vector2 pos)
 	}
 }
 
-void Score::AddMagnification(Enemy* enemy)
+void Score::DrawCombo()
 {
-	switch (enemy->Get_type())
-	{
-	case Enemy::tPlayer:
-		_magnification += 3;
-		break;
-	default:
-		_magnification += 1;
-		break;
-	}
-	if (_magnification >= 99)
-		_magnification = 99;
-}
+	Vector2 listSize = { 340,59 };								//整张数字图集的大小
+	Vector2 spriteSize = { 34,59 };								//数字图的大小
+	float scoreNextLength = 0;									//两个数字贴图之间的间隔距离
+	Vector2 numPos = { _comboPos.x + 110,_comboPos.y - 14 };	//数字的开始位置
 
-void Score::ClearMagnification()
-{
-	_magnification = 1;
+	//画出标记
+	Novice::DrawSprite((int)_comboPos.x, (int)_comboPos.y, _spCombo, 1, 1, 0, WHITE);
+	//拆分数字并储存
+	std::vector<int> digits;
+	int temp = _combo;
+	while (temp > 0) {
+		int digit = temp % 10;
+		digits.push_back(digit);
+		temp /= 10;
+	}
+	std::reverse(digits.begin(), digits.end());
+	// 画图
+	if (digits.size() == 0) {
+		Novice::DrawSpriteRect((int)numPos.x, (int)numPos.y, 0, 0, (int)(spriteSize.x), (int)spriteSize.y, _spComboNums, spriteSize.x / listSize.x, 1, 0, WHITE);
+	}
+	else {
+		int numDigit = 0;   // 当前显示到第几位
+		for (int digit : digits) {
+			Vector2 drawPos = { numPos.x + numDigit * (spriteSize.x + scoreNextLength), numPos.y };
+			Novice::DrawSpriteRect((int)drawPos.x, (int)drawPos.y, (int)(spriteSize.x * digit), 0, (int)spriteSize.x, (int)spriteSize.y, _spComboNums, spriteSize.x / listSize.x, 1, 0, WHITE);
+			numDigit++;
+		}
+	}
 }
 

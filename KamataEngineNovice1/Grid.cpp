@@ -56,13 +56,13 @@ void Grid::HelpButtom()
 		if (FrameTimeWatch(_helpStartTime, 1, false)) {
 			_isHelpStart = false;
 		}
-		if (_currentTimes[1] > 60 * 4) {
+		if (_currentTimes[1] > _helpStartTime - 60) {
 			_helpBottomScale -= Vector2{ 0.05f,0.05f };
 			if (_helpBottomScale.x < 0)
 				_helpBottomScale = { 0,0 };
 		}
 		FrameAnimation(0, 10, 5, { 48,60 }, _spHelpMouse, _helpMousePos, 0, _helpBottomScale);
-		FrameAnimation(1, 10, 15, { 131,46 }, _spHelpSpace, _helpSpacePos, 0, _helpBottomScale);
+		FrameAnimation(1, 5, 15, { 131,46 }, _spHelpSpace, _helpSpacePos, 0, _helpBottomScale);
 	}
 }
 
