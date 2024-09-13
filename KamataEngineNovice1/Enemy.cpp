@@ -405,7 +405,7 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 	//按照分数调整难度
 	if (score < 600) {
 		_linesSum = 2;								//当前多少条线路
-		_lineTime = 60;								//进行随机选择路线的时间
+		_lineTime = 10;								//进行随机选择路线的时间
 		_eachBornMax = 2;							//每回至多生成敌人数量
 	}
 	else if (score < 4000) {
@@ -457,13 +457,16 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 			enemyType = _enemyType_fly[dis_enemyIndex(gen)];
 		}
 		//往路线中填入多少个敌人
-		std::uniform_int_distribution<int> dis_enemySum(0, _eachBornMax);
+		std::uniform_int_distribution<int> dis_enemySum(1, _eachBornMax);
 		int enemySum = dis_enemySum(gen);
 		for (int i = 0; i < enemySum; i++) {
 			Vector2 bornPos = _targetPos + _bornPosOffset[lineNum];
 			Enemy* it = AcquireEnemy(camera, bornPos, enemyType, _targetPos);
 			_enemyLines[lineNum].push(it);
 		}
+		for (int i = 0; i < _bornEnemySpace; i++)//后占位，隔开敌人
+			_enemyLines[lineNum].push(nullptr);
+
 	}
 
 	//随机选择路线并填入小伙伴
@@ -506,7 +509,7 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 	if (FrameTimeWatch(_bornEnemyTime, 1, true)) {
 		for (int i = 0; i < _linesSum; i++) {
 			if (!_enemyLines[i].empty()) {
-				Enemy* it = _enemyLines[i].top();
+				Enemy* it = _enemyLines[i].front();
 				if (it != nullptr)
 					it->PushUpdate();
 				_enemyLines[i].pop();
@@ -521,7 +524,7 @@ void EnemyManager::ClearAllEnemy()
 	for (int i = 0; i < _linesSum; i++) {
 		while (!_enemyLines[i].empty())
 		{
-			Enemy* it = _enemyLines[i].top();
+			Enemy* it = _enemyLines[i].front();
 			if (it != nullptr)
 				ReleaseEnemy(it);
 			_enemyLines[i].pop();

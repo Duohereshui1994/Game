@@ -476,25 +476,6 @@ void Player::Attack(char keys[], char preKeys[], Camera* camera)
 					break;  // 只发射一颗子弹
 				}
 			}
-			//键盘按键
-			if (keys[DIK_F] && !preKeys[DIK_F] && attackCD_ <= 0)
-			{
-				if (!bullet.GetIsShot() && _bullet_now > 0)
-				{
-					Vector2 shootOffset = { -40,20 };
-					if (mousePosX < affine_.translate.x)
-						bullet.SetPos(affine_.translate + shootOffset);
-					else
-						bullet.SetPos(affine_.translate + Vector2{ -shootOffset.x,shootOffset.y });
-					bullet.SetTargetPos(mousePosWorld);
-					bullet.Shoot(bullet.GetTargetPos(), UpPos);  // 发射子弹
-					bullet.bulletSwitch_ = !bullet.bulletSwitch_;
-					bullet.SetIsShot(true);
-					attackCD_ = ATTACK_COOLDOWN;
-					_bullet_now--;//计算子弹数
-					break;  // 只发射一颗子弹
-				}
-			}
 		}
 	}
 

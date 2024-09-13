@@ -4,7 +4,6 @@
 #include <vector>
 #include <cmath>
 #include <queue>
-#include <stack>
 #include <random>
 #include "Character.h"
 #include "Camera.h"
@@ -100,17 +99,18 @@ private:
 	inline static Vector2 _bornPosOffset[_linesSumMax] = {
 		{ -1000, 0 },{ 1000, 0 },{ -1000, 500 } ,{ 1000, 500 },{ -500, 800 } ,{ 500, 800 }
 	};																	//和目标点之前的偏移
-	inline static std::stack<Enemy*> _enemyLines[_linesSumMax];			//包含每条路线中生成的敌人
+	inline static std::queue<Enemy*> _enemyLines[_linesSumMax];			//包含每条路线中生成的敌人
 	//敌人生成随机数
 	inline static int _lineTime = 0;				//进行随机选择路线的时间(具体调整写到了BornEnemy中)
 	inline static int _bornEnemyTime = 0;			//路线中生成敌人的时间
 	inline static int _eachBornMax = 0;				//每回至多生成敌人数量
+	inline static int _bornEnemySpace = 3;			//敌人后面后要空多少个位置
 	//生成敌人种类(最初能生成的种类，随着难度，会调整这个数组中的敌人类型)
 	inline static Enemy::Type _enemyType_walk[2] = { Enemy::tSnake,Enemy::tSnake };
 	inline static Enemy::Type _enemyType_fly[2] = { Enemy::tEagles,Enemy::tEagles };
 	//生成小伙伴
 	inline static int _bornFriendTime = 60;			//生成小伙伴的判断时间
-	inline static int _bornFriendSpace = 5;			//小伙伴的前后要空多少个位置(不知道为什么数字太大会出Bug)
+	inline static int _bornFriendSpace = 5;			//小伙伴的前后要空多少个位置
 	inline static int _bornFriendRandom = 1;		//生成的几率
 
 	//工具
