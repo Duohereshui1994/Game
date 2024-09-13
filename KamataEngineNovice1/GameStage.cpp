@@ -61,12 +61,12 @@ void GameStage::Update(char keys[], char preKeys[])
 	emotion_->Update(player_, camera_);
 	ParticleManager::Update();
 	//刷新分数的Combo
-	if (player_->GetState() == PlayerState::OnGround)
-		_isRefreshCombo = true;
-	if (player_->GetState() == PlayerState::Up && _isRefreshCombo) {
-		Score::RefreshMagnification();
-		_isRefreshCombo = false;
-	}
+	//if (player_->GetState() == PlayerState::OnGround)
+	//	_isRefreshCombo = true;
+	//if (player_->GetState() == PlayerState::Up && _isRefreshCombo) {
+	//	Score::RefreshMagnification();
+	//	_isRefreshCombo = false;
+	//}
 
 	IsCollision();			//碰撞检测
 	Score::Update();		//分数计算
@@ -130,7 +130,7 @@ void GameStage::IsCollision()
 						ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::minusScore);
 						ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);
 						Score::AddScore(enemy, false);
-						Score::ClearMagnification();//清除连击
+						Score::ClearComboe();//清除连击
 						Novice::PlayAudio(audioClip_->audioHitFriend, false, 1.0f);
 					}
 					//打中敌人
@@ -140,7 +140,7 @@ void GameStage::IsCollision()
 							&& enemy->GetTranslate().y>150 && enemy->GetTranslate().y < 720 - 150) {
 							ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore);
 							Score::AddScore(enemy, false);
-							Novice::PlayAudio(audioClip_->audioHitEnemy, false, 1.0f);
+							Novice::PlayAudio(audioClip_->audioHitEnemy, false, 2.0f);
 						}
 						else {
 							ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore_long);
@@ -190,7 +190,7 @@ void GameStage::IsCollision()
 					ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);
 					it->Set_isGetPlayer(true);
 					player_->OnEnenyCollide(camera_);
-					Score::ClearMagnification();//清除连击
+					Score::ClearComboe();//清除连击
 					camera_->Set_isHurtShake(true);
 					Novice::PlayAudio(audioClip_->audioDeadFrend, false, 1.0f);
 				}

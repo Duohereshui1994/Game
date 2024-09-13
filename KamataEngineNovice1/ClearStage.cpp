@@ -58,8 +58,6 @@ void ClearStage::Draw()
 	cBG_->Draw();
 	DrawScore(_scorePos, Score::GetScore(), WHITE);
 	DrawScore(_scoreHighPos, Score::GetHighScore(), 0xffeb3bff);
-	//DrawScore(_scorePos, 12345, WHITE);
-	//DrawScore(_scoreHighPos, 123456789, 0xffeb3bff);
 }
 
 void ClearStage::DrawScore(Vector2 pos, int score, int color)

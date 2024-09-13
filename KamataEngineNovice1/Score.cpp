@@ -12,6 +12,10 @@ void Score::Initialize()
 
 void Score::Update()
 {
+	//10个Combo等于1倍率
+	_magnification = int(_combo / 10);
+	if (_magnification < 1)
+		_magnification = 1;
 }
 
 void Score::Draw()
@@ -67,7 +71,7 @@ void Score::AddCombo(Enemy* enemy)
 	switch (enemy->Get_type())
 	{
 	case Enemy::tPlayer:
-		_combo += 2;
+		_combo += 3;
 		break;
 	default:
 		_combo += 1;

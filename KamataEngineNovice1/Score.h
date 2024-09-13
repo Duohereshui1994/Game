@@ -26,7 +26,7 @@ public:
 
 	static void AddScore(Enemy* enemy, bool longKill);	//增加分数
 	static void GameOverScore();						//游戏结束，分数计算
-	static void RefreshMagnification();					//刷新倍率
+	static void RefreshMagnification();					//刷新倍率(不使用了)
 	static void AddCombo(Enemy* enemy);
 	static void ClearMagnification() { _magnification = 1; };
 	static void ClearComboe() { _combo = 0; };
