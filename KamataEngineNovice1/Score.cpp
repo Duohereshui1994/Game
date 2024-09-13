@@ -8,6 +8,11 @@ void Score::Initialize()
 	_sprite = Novice::LoadTexture("./RS/UI/number42x42.png");
 	_spCombo = Novice::LoadTexture("./RS/UI/combo.png");
 	_spComboNums = Novice::LoadTexture("./RS/UI/comboNums.png");
+
+	_comboShakeOffset = { 0,0 };
+	_comboPosOffset = _comboPos;
+	_isComboShake = false;
+	_comboColor = WHITE;
 }
 
 void Score::Update()
@@ -22,6 +27,7 @@ void Score::Draw()
 {
 	DrawScore(scorePos);
 	DrawCombo();
+	ComboShake();
 }
 
 void Score::AddScore(Enemy* enemy, bool longKill)
@@ -150,8 +156,8 @@ void Score::DrawScore(Vector2 pos)
 
 void Score::DrawCombo()
 {
-	Vector2 listSize = { 340,59 };								//整张数字图集的大小
-	Vector2 spriteSize = { 34,59 };								//数字图的大小
+	Vector2 listSize = { 360,50 };								//整张数字图集的大小
+	Vector2 spriteSize = { 36,50 };								//数字图的大小
 	float scoreNextLength = 0;									//两个数字贴图之间的间隔距离
 	Vector2 numPos = { _comboPos.x + 110,_comboPos.y - 14 };	//数字的开始位置
 
@@ -168,15 +174,52 @@ void Score::DrawCombo()
 	std::reverse(digits.begin(), digits.end());
 	// 画图
 	if (digits.size() == 0) {
-		Novice::DrawSpriteRect((int)numPos.x, (int)numPos.y, 0, 0, (int)(spriteSize.x), (int)spriteSize.y, _spComboNums, spriteSize.x / listSize.x, 1, 0, WHITE);
+		Novice::DrawSpriteRect((int)numPos.x, (int)numPos.y, 0, 0, (int)(spriteSize.x), (int)spriteSize.y, _spComboNums, spriteSize.x / listSize.x, 1, 0, _comboColor);
 	}
 	else {
 		int numDigit = 0;   // 当前显示到第几位
 		for (int digit : digits) {
 			Vector2 drawPos = { numPos.x + numDigit * (spriteSize.x + scoreNextLength), numPos.y };
-			Novice::DrawSpriteRect((int)drawPos.x, (int)drawPos.y, (int)(spriteSize.x * digit), 0, (int)spriteSize.x, (int)spriteSize.y, _spComboNums, spriteSize.x / listSize.x, 1, 0, WHITE);
+			Novice::DrawSpriteRect((int)drawPos.x, (int)drawPos.y, (int)(spriteSize.x * digit), 0, (int)spriteSize.x, (int)spriteSize.y, _spComboNums, spriteSize.x / listSize.x, 1, 0, _comboColor);
 			numDigit++;
 		}
 	}
+}
+
+void Score::ComboShake()
+{
+	if (_isComboShake) {
+		if (FrameTimeWatch(30, 0, false))
+		{
+			_isComboShake = false;
+			_comboColor = WHITE;
+		}
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_real_distribution<float> dis_moveX(-_randComboShake, _randComboShake);
+		std::uniform_real_distribution<float> dis_moveY(-_randComboShake, _randComboShake);
+		_comboShakeOffset = Vector2{ dis_moveX(rd),dis_moveY(rd) };
+		_comboPos = _comboPosOffset + _comboShakeOffset;
+		_comboColor = RED;
+	}
+}
+
+bool Score::FrameTimeWatch(int frame, int index, bool first)
+{
+	if (!first) {
+		if (_currentTimes[index] > frame) {
+			_currentTimes[index] = 0;
+			return true;
+		}
+		_currentTimes[index]++;
+	}
+	else {
+		if (_currentTimes[index] <= 0) {
+			_currentTimes[index] = frame;
+			return true;
+		}
+		_currentTimes[index]--;
+	}
+	return false;
 }
 

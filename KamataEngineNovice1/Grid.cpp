@@ -66,6 +66,7 @@ void Grid::HelpButtom()
 	}
 }
 
+
 void Grid::FrameAnimation(int index, int frameTime, int frameSum, Vector2 frameSize, int sprite, Vector2 pos, float rotate, Vector2 scale, int color)
 {
 	//帧动画的帧计算

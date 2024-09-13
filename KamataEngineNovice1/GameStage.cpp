@@ -136,9 +136,10 @@ void GameStage::IsCollision()
 					//打中小伙伴
 					if (enemy->Get_type() == Enemy::tPlayer) {
 						ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::minusScore);
-						ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);
+						//ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);
 						Score::AddScore(enemy, false);
 						Score::ClearComboe();//清除连击
+						Score::Set_isComboShake(true);
 						Novice::PlayAudio(audioClip_->audioHitFriend, false, 1.0f);
 					}
 					//打中敌人
@@ -195,10 +196,11 @@ void GameStage::IsCollision()
 				}
 				else {
 					//和敌人触碰
-					ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);
+					//ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);
 					it->Set_isGetPlayer(true);
 					player_->OnEnenyCollide(camera_);
 					Score::ClearComboe();//清除连击
+					Score::Set_isComboShake(true);
 					camera_->Set_isHurtShake(true);
 					Novice::PlayAudio(audioClip_->audioDeadFrend, false, 1.0f);
 				}
