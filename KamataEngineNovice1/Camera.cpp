@@ -13,21 +13,21 @@ void Camera::HurtShake()
 	affine_.translate = _hurtPosOffset + _hurtShakeOffset;
 }
 
-bool Camera::FrameTimeWatch_ani(int frame, int index, bool first)
+bool Camera::FrameTimeWatch(int frame, int index, bool first)
 {
 	if (!first) {
-		if (_currentFrame_ani[index] > frame) {
-			_currentFrame_ani[index] = 0;
+		if (_currentTimes[index] > frame) {
+			_currentTimes[index] = 0;
 			return true;
 		}
-		_currentFrame_ani[index]++;
+		_currentTimes[index]++;
 	}
 	else {
-		if (_currentFrame_ani[index] <= 0) {
-			_currentFrame_ani[index] = frame;
+		if (_currentTimes[index] <= 0) {
+			_currentTimes[index] = frame;
 			return true;
 		}
-		_currentFrame_ani[index]--;
+		_currentTimes[index]--;
 	}
 	return false;
 }
@@ -138,7 +138,7 @@ void Camera::Update(char* keys)
 	Move(keys);
 	//屏幕的Shake
 	if (_isHurtShake) {
-		if (FrameTimeWatch_ani(30, 0, false))
+		if (FrameTimeWatch(30, 0, false))
 			_isHurtShake = false;
 		HurtShake();
 	}

@@ -1,5 +1,4 @@
 #include "Grid.h"
-#include "Novice.h"
 
 void Grid::DrawBullet(int currentBullet, int maxBullet)
 {
@@ -32,7 +31,7 @@ void Grid::DrawBullet(int currentBullet, int maxBullet)
 		|| Novice::IsTriggerMouse(1) && currentBullet <= 0)
 		_isBulletShake = true;
 	if (_isBulletShake) {
-		if (FrameTimeWatch_ani(30, 0, false))
+		if (FrameTimeWatch(30, 0, false))
 			_isBulletShake = false;
 		BulletShake();
 	}
@@ -48,6 +47,63 @@ void Grid::BulletShake()
 	std::uniform_real_distribution<float> dis_moveY(-_randBulletShake, _randBulletShake);
 	_bulletShakeOffset = Vector2{ dis_moveX(rd),dis_moveY(rd) };
 	_bulletPos = _bulletPosOffset + _bulletShakeOffset;
+}
+
+void Grid::HelpButtom()
+{
+	if (_isHelpStart)
+	{
+		if (FrameTimeWatch(_helpStartTime, 1, false)) {
+			_isHelpStart = false;
+		}
+		if (_currentTimes[1] > 60 * 4) {
+			_helpBottomScale -= Vector2{ 0.05f,0.05f };
+			if (_helpBottomScale.x < 0)
+				_helpBottomScale = { 0,0 };
+		}
+		FrameAnimation(0, 10, 5, { 48,60 }, _spHelpMouse, _helpMousePos, 0, _helpBottomScale);
+		FrameAnimation(1, 10, 15, { 131,46 }, _spHelpSpace, _helpSpacePos, 0, _helpBottomScale);
+	}
+}
+
+void Grid::FrameAnimation(int index, int frameTime, int frameSum, Vector2 frameSize, int sprite, Vector2 pos, float rotate, Vector2 scale, int color)
+{
+	//帧动画的帧计算
+	if (FrameTimeWatch_ani(frameTime, index, true))
+		_currentFrameIndex[index]++;
+	if (_currentFrameIndex[index] > frameSum - 1 || _currentFrameIndex[index] < 0)
+		_currentFrameIndex[index] = 0;
+	//绘图(直接在屏幕上)
+	int listX = int(_currentFrameIndex[index] * frameSize.x);
+	int listY = 0;
+	int listW = int(frameSum * frameSize.x);
+	int listH = int(frameSize.y);
+	Vector2 zoom = { frameSize.x / 2.f - frameSize.x / 2.f * scale.x,frameSize.y / 2.f + frameSize.y / 2.f * scale.y };
+	Vector2 rotatedPos = { -frameSize.x / 2.f + zoom.x ,frameSize.y / 2.f - zoom.y };
+	float aditionX = rotatedPos.x * cosf(rotate) - rotatedPos.y * sinf(rotate);
+	float aditionY = rotatedPos.y * cosf(rotate) + rotatedPos.x * sinf(rotate);
+	rotatedPos = { aditionX ,aditionY };
+	rotatedPos = { rotatedPos.x + pos.x ,rotatedPos.y + pos.y };
+	Novice::DrawSpriteRect((int)(rotatedPos.x), (int)(rotatedPos.y), listX, listY, int(frameSize.x), int(frameSize.y), sprite, frameSize.x / listW * scale.x, frameSize.y / listH * scale.y, rotate, color);
+}
+
+bool Grid::FrameTimeWatch(int frame, int index, bool first)
+{
+	if (!first) {
+		if (_currentTimes[index] > frame) {
+			_currentTimes[index] = 0;
+			return true;
+		}
+		_currentTimes[index]++;
+	}
+	else {
+		if (_currentTimes[index] <= 0) {
+			_currentTimes[index] = frame;
+			return true;
+		}
+		_currentTimes[index]--;
+	}
+	return false;
 }
 
 bool Grid::FrameTimeWatch_ani(int frame, int index, bool first)
@@ -75,6 +131,8 @@ Grid::Grid()
 	_spBullet_bg = Novice::LoadTexture("./RS/UI/bullet_ui_bg.png");
 	_spBullet_outline = Novice::LoadTexture("./RS/UI/bullet_ui_outline.png");
 	_spBullet_cutline = Novice::LoadTexture("./RS/UI/bullet_ui_cutline.png");
+	_spHelpMouse = Novice::LoadTexture("./RS/UI/MouseAni.png");
+	_spHelpSpace = Novice::LoadTexture("./RS/UI/SpaceKeyAni.png");
 }
 
 Grid::~Grid()
@@ -86,6 +144,8 @@ void Grid::Initialize()
 	_bulletShakeOffset = { 0,0 };
 	_bulletPosOffset = _bulletPos;
 	_isBulletShake = false;
+	_isHelpStart = true;
+	_helpBottomScale = { 1,1 };
 }
 
 void Grid::Update()
@@ -96,7 +156,8 @@ void Grid::Draw(int currentBullet, int maxBullet)
 {
 	//外边框
 	Novice::DrawSprite(0, 0, textureGrid_, 1, 1, 0.0f, WHITE);
-
 	//子弹
 	DrawBullet(currentBullet, maxBullet);
+	//最开始的按键提示
+	HelpButtom();
 }

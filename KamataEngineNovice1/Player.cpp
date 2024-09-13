@@ -487,6 +487,11 @@ void Player::Attack(char keys[], char preKeys[], Camera* camera)
 
 void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 {
+	preKeys;
+	//按住空格潜入地下，松开就钻上来
+	bool isStateChange = false;
+	if (keys[DIK_SPACE])
+		isStateChange = true;
 
 	switch (state_) {
 	case PlayerState::OnGround:
@@ -498,7 +503,7 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 			frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
 		}
 
-		if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
+		if (isStateChange) {
 			downFrame_ = 0;
 			state_ = PlayerState::Down;
 		}
@@ -514,7 +519,8 @@ void Player::SwithGround(char keys[], char preKeys[], Camera* camera)
 			frameNum_ += deltaTime_ * IDLE_TIME_SCALE;
 		}
 
-		if (keys[DIK_SPACE] && !preKeys[DIK_SPACE]) {
+		if (!isStateChange)
+		{
 			upFrame_ = 0;
 			state_ = PlayerState::Up;
 		}

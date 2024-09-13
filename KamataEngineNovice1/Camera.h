@@ -42,9 +42,8 @@ private:
 	void HurtShake();
 
 	//工具
-	int _currentFrame_ani[3] = { 0 };								// 这个用于计时器的使用
-	int _currentFrameIndex[3] = { 0 };								//用以计算播放到第几帧
-	bool FrameTimeWatch_ani(int frame, int index, bool first);		// 计时器：帧时间、编号、首次是否输出
+	int _currentTimes[10] = { 0 };								// 这个用于计时器的使用
+	bool FrameTimeWatch(int frame, int index, bool first);		// 计时器：帧时间、编号、首次是否输出true
 
 public:
 
