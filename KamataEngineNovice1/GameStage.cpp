@@ -31,7 +31,9 @@ void GameStage::Initialize()
 	camera_ = new Camera(cameraCenter, cameraSpeed);//インスタンス
 
 	EnemyManager::ClearAllEnemy();	//清除所有敌人
+	EnemyManager::RestartData();
 	Score::Initialize();			//重置分数
+	ParticleManager::ClearAll();	//清除粒子
 
 	bg_ = new Background();
 	bg_->Initialize();
@@ -44,15 +46,12 @@ void GameStage::Initialize()
 
 	grid_ = new Grid();
 	grid_->Initialize();
+
+	_isRefreshCombo = false;
 }
 
 void GameStage::Update(char keys[], char preKeys[])
 {
-	//scene 切换 test
-	if (keys[DIK_R] && !preKeys[DIK_R]) {
-		finished_ = true;
-	}
-
 	EnemyManager::BornEnemy(camera_, Score::GetScore(), player_->GetFriendCount());//生成敌人(相机，分数，小伙伴人数)
 
 	camera_->Update(keys);
@@ -64,13 +63,36 @@ void GameStage::Update(char keys[], char preKeys[])
 	emotion_->Update(player_, camera_);
 	ParticleManager::Update();
 
+	//特殊修改
+	//刷新分数的Combo
+	//if (player_->GetState() == PlayerState::OnGround)
+	//	_isRefreshCombo = true;
+	//if (player_->GetState() == PlayerState::Up && _isRefreshCombo) {
+	//	Score::RefreshMagnification();
+	//	_isRefreshCombo = false;
+	//}
+	//缺少子弹的声音
+	if (Novice::IsTriggerMouse(0) && player_->_bullet_now <= 0
+		|| Novice::IsTriggerMouse(1) && player_->_bullet_now <= 0)
+		Novice::PlayAudio(audioClip_->audioTama, false, 2.0f);
+
 	IsCollision();			//碰撞检测
 	Score::Update();		//分数计算
 
+	//判断玩家是否死亡
+	if (player_->_isDead) {
+		finished_ = true;
+		Score::GameOverScore();
+	}
 #ifdef _DEBUG
+	Novice::ConsolePrintf("friends:%d\n", player_->GetFriendCount());
+	//scene 切换 test
+	if (keys[DIK_R] && !preKeys[DIK_R]) {
+		finished_ = true;
+	}
 	//Particle test
 	if (keys[DIK_1] && !preKeys[DIK_1]) {
-		ParticleManager::ADD_Particle(camera_, player_->GetTranslate(), Emitter::happy);
+		ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);
 	}
 	if (keys[DIK_2] && !preKeys[DIK_2]) {
 		ParticleManager::ADD_Particle(camera_, player_->GetTranslate(), Emitter::unHappy);
@@ -92,6 +114,7 @@ void GameStage::Draw()
 
 	ParticleManager::PreDraw();
 	Score::Draw();
+	ParticleManager::ScreenDraw();
 }
 
 void GameStage::IsCollision()
@@ -113,8 +136,11 @@ void GameStage::IsCollision()
 					//打中小伙伴
 					if (enemy->Get_type() == Enemy::tPlayer) {
 						ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::minusScore);
+						//ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);
 						Score::AddScore(enemy, false);
-						Score::ClearMagnification();//清除连击
+						Score::ClearComboe();//清除连击
+						Score::Set_isComboShake(true);
+						Novice::PlayAudio(audioClip_->audioHitFriend, false, 1.0f);
 					}
 					//打中敌人
 					else {
@@ -123,12 +149,14 @@ void GameStage::IsCollision()
 							&& enemy->GetTranslate().y>150 && enemy->GetTranslate().y < 720 - 150) {
 							ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore);
 							Score::AddScore(enemy, false);
+							Novice::PlayAudio(audioClip_->audioHitEnemy, false, 2.0f);
 						}
 						else {
 							ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore_long);
 							Score::AddScore(enemy, true);
+							Novice::PlayAudio(audioClip_->audioHitEnemy, false, 2.0f);
 						}
-						Score::AddMagnification(enemy);//增加连击
+						Score::AddCombo(enemy);//增加连击
 					}
 					//回收子弹和敌人
 					bullet.Initialize();
@@ -141,10 +169,12 @@ void GameStage::IsCollision()
 	for (Enemy* it : EnemyManager::_updatePool) {
 		//补充条件，如果小伙伴在等待，那么玩家升上来的时候就直接获救
 		if (it->Get_type() == Enemy::tPlayer && it->Get_isFriendWiat() && player_->GetState() == PlayerState::OnGround) {
-			Score::AddMagnification(it);//增加连击
+			Score::AddCombo(it);//增加连击
 			player_->OnFriendCollide(camera_);
 			it->Set_isGetPlayer(true);
 			EnemyManager::ReleaseEnemy(it);
+			Novice::PlayAudio(audioClip_->audioJoinFriend, false, 1.0f);
+			break;
 		}
 		if (!it->Get_isDead() && !it->Get_isGetPlayer()) {
 			Vector2 playerUpPos = { 640.0f, 220.0f };//因为玩家会上下运动，所以直接使用地面的坐标
@@ -153,10 +183,11 @@ void GameStage::IsCollision()
 				if (it->Get_type() == Enemy::tPlayer) {
 					//和小伙伴触碰（并且在地面的时候）
 					if (player_->GetState() == PlayerState::OnGround) {
-						Score::AddMagnification(it);//增加连击
+						Score::AddCombo(it);//增加连击
 						player_->OnFriendCollide(camera_);
 						it->Set_isGetPlayer(true);
 						EnemyManager::ReleaseEnemy(it);
+						Novice::PlayAudio(audioClip_->audioJoinFriend, false, 1.0f);
 					}
 					else {
 						if (!it->Get_isFriendWiat())
@@ -165,9 +196,13 @@ void GameStage::IsCollision()
 				}
 				else {
 					//和敌人触碰
+					//ParticleManager::ADD_Particle(camera_, { 845,680 }, Emitter::unHappy_screen);
 					it->Set_isGetPlayer(true);
 					player_->OnEnenyCollide(camera_);
-					Score::ClearMagnification();//清除连击
+					Score::ClearComboe();//清除连击
+					Score::Set_isComboShake(true);
+					camera_->Set_isHurtShake(true);
+					Novice::PlayAudio(audioClip_->audioDeadFrend, false, 1.0f);
 				}
 			}
 		}

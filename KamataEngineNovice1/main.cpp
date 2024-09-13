@@ -23,49 +23,49 @@ bool isGameOver = false;
 
 void ChangeScene() {
 	switch (scene) {
-		case Scene::kTitle:
-			if (titleStage_->IsFinished()) {
-				if (titleStage_->GetButtonType() == TitleButtonType::kStart) {
-					scene = Scene::kGame;
-					delete titleStage_;
-					titleStage_ = nullptr;
-					gamestage_ = new GameStage();
-					gamestage_->Initialize();
-				}
-				else if (titleStage_->GetButtonType() == TitleButtonType::kExit) {
-					isGameOver = true;
-				}
+	case Scene::kTitle:
+		if (titleStage_->IsFinished()) {
+			if (titleStage_->GetButtonType() == TitleButtonType::kStart) {
+				scene = Scene::kGame;
+				delete titleStage_;
+				titleStage_ = nullptr;
+				gamestage_ = new GameStage();
+				gamestage_->Initialize();
 			}
+			else if (titleStage_->GetButtonType() == TitleButtonType::kExit) {
+				isGameOver = true;
+			}
+		}
 
-			break;
-		case Scene::kGame:
-			if (gamestage_->IsFinished()) {
-				scene = Scene::kClear;
-				delete gamestage_;
-				gamestage_ = nullptr;
-				clearStage_ = new ClearStage();
-				clearStage_->Initialize();
-			}
-			break;
-		case Scene::kClear:
-			if (clearStage_->IsFinished()) {
-				if (clearStage_->GetButtonType() == ClearButtonType::kRestart) {
-					scene = Scene::kGame;
-					delete clearStage_;
-					clearStage_ = nullptr;
-					gamestage_ = new GameStage();
-					gamestage_->Initialize();
+		break;
+	case Scene::kGame:
+		if (gamestage_->IsFinished()) {
+			scene = Scene::kClear;
+			delete gamestage_;
+			gamestage_ = nullptr;
+			clearStage_ = new ClearStage();
+			clearStage_->Initialize();
+		}
+		break;
+	case Scene::kClear:
+		if (clearStage_->IsFinished()) {
+			if (clearStage_->GetButtonType() == ClearButtonType::kRestart) {
+				scene = Scene::kGame;
+				delete clearStage_;
+				clearStage_ = nullptr;
+				gamestage_ = new GameStage();
+				gamestage_->Initialize();
 
-				}
-				else if (clearStage_->GetButtonType() == ClearButtonType::kMenu) {
-					scene = Scene::kTitle;
-					delete clearStage_;
-					clearStage_ = nullptr;
-					titleStage_ = new TitleStage();
-					titleStage_->Initialize();
-				}
 			}
-			break;
+			else if (clearStage_->GetButtonType() == ClearButtonType::kMenu) {
+				scene = Scene::kTitle;
+				delete clearStage_;
+				clearStage_ = nullptr;
+				titleStage_ = new TitleStage();
+				titleStage_->Initialize();
+			}
+		}
+		break;
 	}
 }
 
@@ -83,7 +83,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//sound
 	int voiceHandleTitle_ = -1;
 	int voiceHandleGame_ = -1;
-	
+
 
 
 
@@ -127,25 +127,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//Update Scene
 		switch (scene) {
-			case Scene::kTitle:
-				Novice::StopAudio(voiceHandleGame_);
-				if (Novice::IsPlayingAudio(voiceHandleTitle_) == 0 || voiceHandleTitle_ == -1) {
-					voiceHandleTitle_ = Novice::PlayAudio(audioClip_->audioTitle_, true, 0.3f);
-				}
-				titleStage_->Update();
-				break;
-			case Scene::kGame:
-				Novice::StopAudio(voiceHandleTitle_);
-				if (Novice::IsPlayingAudio(voiceHandleGame_) == 0 || voiceHandleGame_ == -1) {
-					voiceHandleGame_ = Novice::PlayAudio(audioClip_->audioGameBgm_, true, 0.3f);
-				}
-				gamestage_->Update(keys, preKeys);
-				break;
-			case Scene::kClear:
-				Novice::StopAudio(voiceHandleTitle_);
-				Novice::StopAudio(voiceHandleGame_);
-				clearStage_->Update(keys, preKeys);
-				break;
+		case Scene::kTitle:
+			Novice::StopAudio(voiceHandleGame_);
+			if (Novice::IsPlayingAudio(voiceHandleTitle_) == 0 || voiceHandleTitle_ == -1) {
+				voiceHandleTitle_ = Novice::PlayAudio(audioClip_->audioTitle_, true, 0.0f);
+			}
+			titleStage_->Update();
+			break;
+		case Scene::kGame:
+			Novice::StopAudio(voiceHandleTitle_);
+			if (Novice::IsPlayingAudio(voiceHandleGame_) == 0 || voiceHandleGame_ == -1) {
+				voiceHandleGame_ = Novice::PlayAudio(audioClip_->audioGameBgm_, true, 0.3f);
+			}
+			gamestage_->Update(keys, preKeys);
+			break;
+		case Scene::kClear:
+			Novice::StopAudio(voiceHandleTitle_);
+			Novice::StopAudio(voiceHandleGame_);
+			clearStage_->Update(keys, preKeys);
+			break;
 		}
 
 		///
@@ -161,15 +161,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//gamestage_->Draw();
 
 		switch (scene) {
-			case Scene::kTitle:
-				titleStage_->Draw();
-				break;
-			case Scene::kGame:
-				gamestage_->Draw();
-				break;
-			case Scene::kClear:
-				clearStage_->Draw();
-				break;
+		case Scene::kTitle:
+			titleStage_->Draw();
+			break;
+		case Scene::kGame:
+			gamestage_->Draw();
+			break;
+		case Scene::kClear:
+			clearStage_->Draw();
+			break;
 		}
 
 		//Mouse图标

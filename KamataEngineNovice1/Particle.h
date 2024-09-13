@@ -3,6 +3,7 @@
 #include <queue>
 #include <random>
 #include <Novice.h>
+#include <cmath>
 #include "struct.h"
 #include "Camera.h"
 #include "MathFunc.h"
@@ -31,6 +32,7 @@ public:
 		friendAdd,
 		happy,
 		unHappy,
+		unHappy_screen,
 	}_particleType;
 
 	Vector2 _pos;
@@ -62,6 +64,7 @@ public:
 	void Move();
 	void Draw();
 	void PreDraw();
+	void ScreenDraw();
 	void ToDead();
 	void PushUpdate();
 
@@ -88,6 +91,7 @@ public:
 		friendAdd,
 		happy,
 		unHappy,
+		unHappy_screen,
 	}_particleType;
 
 	Vector2 _pos;
@@ -116,6 +120,7 @@ public:
 	void ParticleStart();
 	void Draw();
 	void PreDraw();
+	void ScreenDraw();
 	void ToDead();
 	void PushUpdate();
 	//帧动画播放
@@ -165,4 +170,6 @@ public:
 	//描画用関数
 	static void Draw();
 	static void PreDraw();//前景绘图
+	static void ScreenDraw();//UI绘图
+	static void ClearAll();
 };

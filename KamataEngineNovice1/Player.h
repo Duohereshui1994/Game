@@ -126,6 +126,8 @@ public:
 	std::vector<Bullet> bullets_;
 	//友方数组 最多14个友方
 	Friends friends_[14];
+	//玩家是否死亡
+	bool _isDead = false;
 
 	Player();
 

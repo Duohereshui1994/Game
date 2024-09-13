@@ -4,16 +4,30 @@ void Score::Initialize()
 {
 	_score = 0;
 	_magnification = 1;
+	_combo = 0;
 	_sprite = Novice::LoadTexture("./RS/UI/number42x42.png");
+	_spCombo = Novice::LoadTexture("./RS/UI/combo.png");
+	_spComboNums = Novice::LoadTexture("./RS/UI/comboNums.png");
+
+	_comboShakeOffset = { 0,0 };
+	_comboPosOffset = _comboPos;
+	_isComboShake = false;
+	_comboColor = WHITE;
 }
 
 void Score::Update()
 {
+	//10个Combo等于1倍率
+	_magnification = int(_combo / 10);
+	if (_magnification < 1)
+		_magnification = 1;
 }
 
 void Score::Draw()
 {
-	ScoreDraw(scorePos);
+	DrawScore(scorePos);
+	DrawCombo();
+	ComboShake();
 }
 
 void Score::AddScore(Enemy* enemy, bool longKill)
@@ -32,7 +46,7 @@ void Score::AddScore(Enemy* enemy, bool longKill)
 		addScore -= 100;
 		break;
 	}
-	if (longKill && !Enemy::tPlayer)
+	if (longKill && type != Enemy::tPlayer)
 		addScore = 10;
 
 	if (type != Enemy::tPlayer)
@@ -44,14 +58,38 @@ void Score::AddScore(Enemy* enemy, bool longKill)
 
 void Score::GameOverScore()
 {
-	_highScore = _score;
+	if (_score > _highScore)
+		_highScore = _score;
 }
 
-void Score::ScoreDraw(Vector2 pos)
+void Score::RefreshMagnification()
+{
+	_magnification = _combo;
+	if (_magnification < 1)
+		_magnification = 1;
+	else if (_magnification > 99)
+		_magnification = 99;
+	_combo = 0;
+}
+
+void Score::AddCombo(Enemy* enemy)
+{
+	switch (enemy->Get_type())
+	{
+	case Enemy::tPlayer:
+		_combo += 3;
+		break;
+	default:
+		_combo += 1;
+		break;
+	}
+}
+
+void Score::DrawScore(Vector2 pos)
 {
 	Vector2 listSize = { 462,42 };			//整张数字图集的大小(中间的图都是正方形的)
 	float scoreNextLength = -12;			//两个数字贴图之间的间隔距离
-	int digitMax = 7;						//最多显示多少位数
+	int digitMax = 8;						//最多显示多少位数
 	bool isMax = false;						//是否超过所有可以显示的位数了
 	int sprite = _sprite;
 	Vector2 mPos = { pos.x + 290,pos.y };	//倍率数字的开始
@@ -67,14 +105,14 @@ void Score::ScoreDraw(Vector2 pos)
 		temp /= 10;
 	}
 	std::reverse(scoreDigits.begin(), scoreDigits.end()); // 翻转要素，让它正确显示数字顺序
-	isMax = digitMax <= scoreDigits.size() ? true : false;
+	isMax = _score >= 99999999 ? true : false;
 
 	// 画图
 	if (scoreDigits.size() == 0) {
 		Novice::DrawSpriteRect((int)pos.x, (int)pos.y, (int)listSize.y * 0, 0, (int)listSize.y, (int)listSize.y, sprite, listSize.y / listSize.x, 1, 0, WHITE);
 	}
 	else if (isMax) {
-		for (int i = 0; i < digitMax + 1; i++) {
+		for (int i = 0; i < digitMax; i++) {
 			Vector2 numPos = { pos.x + i * (listSize.y + scoreNextLength), pos.y };
 			Novice::DrawSpriteRect((int)numPos.x, (int)numPos.y, (int)(listSize.y * 9), 0, (int)listSize.y, (int)listSize.y, sprite, listSize.y / listSize.x, 1, 0, RED);
 		}
@@ -116,23 +154,73 @@ void Score::ScoreDraw(Vector2 pos)
 	}
 }
 
-void Score::AddMagnification(Enemy* enemy)
+void Score::DrawCombo()
 {
-	switch (enemy->Get_type())
-	{
-	case Enemy::tPlayer:
-		_magnification += 3;
-		break;
-	default:
-		_magnification += 1;
-		break;
+	Vector2 listSize = { 360,50 };								//整张数字图集的大小
+	Vector2 spriteSize = { 36,50 };								//数字图的大小
+	float scoreNextLength = 0;									//两个数字贴图之间的间隔距离
+	Vector2 numPos = { _comboPos.x + 110,_comboPos.y - 14 };	//数字的开始位置
+
+	//画出标记
+	Novice::DrawSprite((int)_comboPos.x, (int)_comboPos.y, _spCombo, 1, 1, 0, _comboColor);
+	//拆分数字并储存
+	std::vector<int> digits;
+	int temp = _combo;
+	while (temp > 0) {
+		int digit = temp % 10;
+		digits.push_back(digit);
+		temp /= 10;
 	}
-	if (_magnification >= 99)
-		_magnification = 99;
+	std::reverse(digits.begin(), digits.end());
+	// 画图
+	if (digits.size() == 0) {
+		Novice::DrawSpriteRect((int)numPos.x, (int)numPos.y, 0, 0, (int)(spriteSize.x), (int)spriteSize.y, _spComboNums, spriteSize.x / listSize.x, 1, 0, _comboColor);
+	}
+	else {
+		int numDigit = 0;   // 当前显示到第几位
+		for (int digit : digits) {
+			Vector2 drawPos = { numPos.x + numDigit * (spriteSize.x + scoreNextLength), numPos.y };
+			Novice::DrawSpriteRect((int)drawPos.x, (int)drawPos.y, (int)(spriteSize.x * digit), 0, (int)spriteSize.x, (int)spriteSize.y, _spComboNums, spriteSize.x / listSize.x, 1, 0, _comboColor);
+			numDigit++;
+		}
+	}
 }
 
-void Score::ClearMagnification()
+void Score::ComboShake()
 {
-	_magnification = 1;
+	if (_isComboShake) {
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_real_distribution<float> dis_moveX(-_randComboShake, _randComboShake);
+		std::uniform_real_distribution<float> dis_moveY(-_randComboShake, _randComboShake);
+		_comboShakeOffset = Vector2{ dis_moveX(rd),dis_moveY(rd) };
+		_comboPos = _comboPosOffset + _comboShakeOffset;
+		_comboColor = RED;
+		if (FrameTimeWatch(30, 0, false))
+		{
+			_comboShakeOffset = { 0,0 };
+			_comboColor = WHITE;
+			_isComboShake = false;
+		}
+	}
+}
+
+bool Score::FrameTimeWatch(int frame, int index, bool first)
+{
+	if (!first) {
+		if (_currentTimes[index] > frame) {
+			_currentTimes[index] = 0;
+			return true;
+		}
+		_currentTimes[index]++;
+	}
+	else {
+		if (_currentTimes[index] <= 0) {
+			_currentTimes[index] = frame;
+			return true;
+		}
+		_currentTimes[index]--;
+	}
+	return false;
 }
 

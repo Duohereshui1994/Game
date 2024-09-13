@@ -63,6 +63,12 @@ void Bullet::Initialize()
 
 void Bullet::Update(const Vector2& target, const Vector2& playerPos, Camera* camera) {
 
+	if (bulletSwitch_ == true) {
+		bulletState_ = BulletType::Mushroom;
+	}
+	else {
+		bulletState_ = BulletType::Stone;
+	}
 	// 射击
 	if (isShot_) {
 		Shoot(target, playerPos);
