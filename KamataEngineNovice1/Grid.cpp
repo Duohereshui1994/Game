@@ -28,7 +28,8 @@ void Grid::DrawBullet(int currentBullet, int maxBullet)
 	}
 
 	//空子弹时候的抖动
-	if (currentBullet <= 0 && Novice::IsTriggerMouse(0))
+	if (Novice::IsTriggerMouse(0) && currentBullet <= 0
+		|| Novice::IsTriggerMouse(1) && currentBullet <= 0)
 		_isBulletShake = true;
 	if (_isBulletShake) {
 		if (FrameTimeWatch_ani(30, 0, false))
@@ -82,6 +83,9 @@ Grid::~Grid()
 
 void Grid::Initialize()
 {
+	_bulletShakeOffset = { 0,0 };
+	_bulletPosOffset = _bulletPos;
+	_isBulletShake = false;
 }
 
 void Grid::Update()

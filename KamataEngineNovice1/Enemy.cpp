@@ -410,25 +410,25 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 	}
 	else if (score < 4000) {
 		_linesSum = 4;
-		_lineTime = 60;
-		_eachBornMax = 3;
+		_lineTime = 20;
+		_eachBornMax = 2;
 	}
 	else if (score < 7000) {
 		_linesSum = 4;
-		_lineTime = 60;
-		_eachBornMax = 4;
+		_lineTime = 20;
+		_eachBornMax = 3;
 		_enemyType_walk[1] = { Enemy::tSpider };
 	}
 	else if (score < 10000) {
 		_linesSum = 6;
-		_lineTime = 60;
-		_eachBornMax = 5;
+		_lineTime = 30;
+		_eachBornMax = 3;
 		_enemyType_fly[1] = { Enemy::tBee };
 	}
 	else {
 		_linesSum = 6;
 		_lineTime = 50;
-		_eachBornMax = 5;
+		_eachBornMax = 4;
 	}
 
 	//按照小伙伴人数调整生成新的小伙伴的几率
@@ -503,7 +503,6 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 				_enemyLines[lineNum].push(nullptr);
 		}
 	}
-
 
 	//将路线中储存的敌人和小伙伴释放出来
 	if (FrameTimeWatch(_bornEnemyTime, 1, true)) {

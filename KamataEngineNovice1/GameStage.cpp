@@ -141,6 +141,7 @@ void GameStage::IsCollision()
 			player_->OnFriendCollide(camera_);
 			it->Set_isGetPlayer(true);
 			EnemyManager::ReleaseEnemy(it);
+			break;
 		}
 		if (!it->Get_isDead() && !it->Get_isGetPlayer()) {
 			Vector2 playerUpPos = { 640.0f, 220.0f };//因为玩家会上下运动，所以直接使用地面的坐标

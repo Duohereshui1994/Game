@@ -1,4 +1,4 @@
-#define ATTACK_COOLDOWN 0.1f		//攻击冷却时间（秒）如果要改变攻速 就改这里
+#define ATTACK_COOLDOWN 0.07f		//攻击冷却时间（秒）如果要改变攻速 就改这里
 #define MAX_UPFRAME 4.0f			//从土里钻出来的动画的最大帧数
 #define MAX_DOWNFRAME 7.0f			//钻进土里去的动画的最大帧数
 #define MAX_IDLEFRAME 4.0f			//在地面或者在地下待机的动画最大帧数（共用一个）
@@ -458,7 +458,8 @@ void Player::Attack(char keys[], char preKeys[], Camera* camera)
 		for (auto& bullet : bullets_)
 		{
 			//鼠标点击
-			if (Novice::IsTriggerMouse(0) && attackCD_ <= 0)
+			if (Novice::IsTriggerMouse(0) && attackCD_ <= 0
+				|| Novice::IsTriggerMouse(1) && attackCD_ <= 0)
 			{
 				if (!bullet.GetIsShot() && _bullet_now > 0)
 				{
