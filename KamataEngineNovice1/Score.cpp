@@ -40,7 +40,7 @@ void Score::AddScore(Enemy* enemy, bool longKill)
 		addScore -= 100;
 		break;
 	}
-	if (longKill && !Enemy::tPlayer)
+	if (longKill && type != Enemy::tPlayer)
 		addScore = 10;
 
 	if (type != Enemy::tPlayer)

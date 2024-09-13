@@ -208,9 +208,8 @@ void Enemy::Initialize(Camera* camera, Vector2 pos, Type type, Vector2 targetPos
 		break;
 	case Enemy::tBee:
 		_sprite = EnemyManager::_spBee;
-		_frameSum = 6;
-		_spriteSize = { 1152.f / _frameSum,128 };
-		hpMax_ = 2;
+		_frameSum = 4;
+		_spriteSize = { 512.f / _frameSum,128 };
 		break;
 	case Enemy::tPlayer:
 		_sprite = EnemyManager::_spPlayer_walk;
@@ -403,29 +402,36 @@ void EnemyManager::BornEnemy(Camera* camera, int score, int friendSum)
 	_enemyType_fly[0] = { Enemy::tEagles };
 	_enemyType_fly[1] = { Enemy::tEagles };
 	//按照分数调整难度
-	if (score < 600) {
+	if (score < 200) {
 		_linesSum = 2;								//当前多少条线路
 		_lineTime = 10;								//进行随机选择路线的时间
 		_eachBornMax = 2;							//每回至多生成敌人数量
 	}
-	else if (score < 2000) {
+	else if (score < 400) {
 		_linesSum = 4;
 		_lineTime = 20;
 		_eachBornMax = 2;
 	}
-	else if (score < 4000) {
+	else if (score < 700) {
 		_linesSum = 4;
 		_lineTime = 20;
 		_eachBornMax = 3;
+		_enemyType_walk[1] = { Enemy::tSpider };
 	}
-	else if (score < 7000) {
+	else if (score < 1000) {
 		_linesSum = 6;
-		_lineTime = 30;
+		_lineTime = 50;
 		_eachBornMax = 3;
+	}
+	else if (score < 1300) {
+		_linesSum = 6;
+		_lineTime = 50;
+		_eachBornMax = 4;
+		_enemyType_fly[1] = { Enemy::tBee };
 	}
 	else {
 		_linesSum = 6;
-		_lineTime = 50;
+		_lineTime = 30;
 		_eachBornMax = 4;
 	}
 
@@ -552,7 +558,7 @@ void EnemyManager::LoadRes()
 	_spEagles_hurt = Novice::LoadTexture("./RS/Enemy/hawk_hurt.png");
 	_spSpider = Novice::LoadTexture("./RS/Enemy/spider_walk.png");
 	_spSpider_hurt = Novice::LoadTexture("./RS/Enemy/spider_hurt.png");
-	_spBee = Novice::LoadTexture("./RS/Enemy/hawk_walk.png");
+	_spBee = Novice::LoadTexture("./RS/Enemy/bee_walk.png");
 	_spPlayer_walk = Novice::LoadTexture("./RS/Enemy/friend_walk.png");
 	_spPlayer_fly = Novice::LoadTexture("./RS/Enemy/friend_fly.png");
 	_spPlayer_sad = Novice::LoadTexture("./RS/Enemy/player_sad.png");

@@ -171,4 +171,5 @@ public:
 	static void Draw();
 	static void PreDraw();//前景绘图
 	static void ScreenDraw();//UI绘图
+	static void ClearAll();
 };

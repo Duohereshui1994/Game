@@ -32,6 +32,7 @@ void GameStage::Initialize()
 
 	EnemyManager::ClearAllEnemy();	//清除所有敌人
 	Score::Initialize();			//重置分数
+	ParticleManager::ClearAll();	//清除粒子
 
 	bg_ = new Background();
 	bg_->Initialize();
@@ -145,7 +146,7 @@ void GameStage::IsCollision()
 						else {
 							ParticleManager::ADD_Particle(camera_, enemyPos, Emitter::plusScore_long);
 							Score::AddScore(enemy, true);
-							Novice::PlayAudio(audioClip_->audioHitEnemy, false, 0.5f);
+							Novice::PlayAudio(audioClip_->audioHitEnemy, false, 2.0f);
 						}
 						Score::AddCombo(enemy);//增加连击
 					}

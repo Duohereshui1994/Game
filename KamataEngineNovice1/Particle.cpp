@@ -760,3 +760,15 @@ void ParticleManager::ScreenDraw()
 		it->ScreenDraw();
 	}
 }
+
+void ParticleManager::ClearAll()
+{
+	for (Particle* it : _particleUpdatePool) {
+		ReleaseParticle(it);
+	}
+	_particleUpdatePool.clear();
+	for (Emitter* it : _emitterUpadtePool) {
+		ReleaseEmitter(it);
+	}
+	_emitterUpadtePool.clear();
+}
