@@ -79,7 +79,7 @@ void Score::DrawScore(Vector2 pos)
 {
 	Vector2 listSize = { 462,42 };			//整张数字图集的大小(中间的图都是正方形的)
 	float scoreNextLength = -12;			//两个数字贴图之间的间隔距离
-	int digitMax = 7;						//最多显示多少位数
+	int digitMax = 8;						//最多显示多少位数
 	bool isMax = false;						//是否超过所有可以显示的位数了
 	int sprite = _sprite;
 	Vector2 mPos = { pos.x + 290,pos.y };	//倍率数字的开始
@@ -95,14 +95,14 @@ void Score::DrawScore(Vector2 pos)
 		temp /= 10;
 	}
 	std::reverse(scoreDigits.begin(), scoreDigits.end()); // 翻转要素，让它正确显示数字顺序
-	isMax = digitMax <= scoreDigits.size() ? true : false;
+	isMax = _score >= 99999999 ? true : false;
 
 	// 画图
 	if (scoreDigits.size() == 0) {
 		Novice::DrawSpriteRect((int)pos.x, (int)pos.y, (int)listSize.y * 0, 0, (int)listSize.y, (int)listSize.y, sprite, listSize.y / listSize.x, 1, 0, WHITE);
 	}
 	else if (isMax) {
-		for (int i = 0; i < digitMax + 1; i++) {
+		for (int i = 0; i < digitMax; i++) {
 			Vector2 numPos = { pos.x + i * (listSize.y + scoreNextLength), pos.y };
 			Novice::DrawSpriteRect((int)numPos.x, (int)numPos.y, (int)(listSize.y * 9), 0, (int)listSize.y, (int)listSize.y, sprite, listSize.y / listSize.x, 1, 0, RED);
 		}

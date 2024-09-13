@@ -24,8 +24,8 @@ private:
 	AudioClip* audioClip_ = nullptr;
 
 	int _spListNum = 0;
-	Vector2 _scorePos = { 530,240 };
-	Vector2 _scoreHighPos = { 530,350 };
+	Vector2 _scorePos = { 1280 / 2.f + 20,240 };			//中心坐标
+	Vector2 _scoreHighPos = { 1280 / 2.f + 20,350 };		//中心坐标
 
 public:
 	ClearStage();
@@ -38,7 +38,7 @@ public:
 
 	void Draw();
 
-	void DrawScore(Vector2 pos, int score);
+	void DrawScore(Vector2 pos, int score, int color);
 
 	bool IsFinished() const { return finished_; }
 
